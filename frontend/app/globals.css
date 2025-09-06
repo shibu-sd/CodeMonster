@@ -182,10 +182,40 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    /* Disable text selection globally by default */
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
   }
+  
   body {
     @apply bg-background text-foreground;
     letter-spacing: var(--tracking-normal);
+  }
+  
+  /* Only allow text selection on specific text elements when needed */
+  input, 
+  textarea, 
+  [contenteditable="true"],
+  .selectable-text {
+    user-select: text;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+  }
+  
+  /* Ensure proper cursor styles */
+  button, 
+  a, 
+  .cursor-pointer,
+  [role="button"] {
+    cursor: pointer;
+  }
+  
+  input, 
+  textarea {
+    cursor: text;
   }
 }
 
