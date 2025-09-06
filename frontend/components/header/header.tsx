@@ -7,6 +7,7 @@ import React from 'react'
 import { cn } from '@/lib/utils'
 import { useScroll } from 'motion/react'
 import { ThemeToggle } from '@/components/theme-toggle/theme-toggle'
+import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
 
 const menuItems = [
     { name: 'Problems', href: '#problems' },
@@ -69,25 +70,25 @@ export const HeroHeader = () => {
                             <X className="in-data-[state=active]:rotate-0 in-data-[state=active]:scale-100 in-data-[state=active]:opacity-100 absolute inset-0 m-auto size-6 -rotate-180 scale-0 opacity-0 duration-200" />
                         </button>
 
-                        {/* Auth Buttons - Right (hidden on mobile) */}
-                        <div className="hidden lg:flex lg:items-center lg:gap-3">
-                            <Button
-                                asChild
-                                variant="outline"
-                                size="sm">
-                                <Link href="#">
-                                    <span>Login</span>
-                                </Link>
-                            </Button>
-                            <Button
-                                asChild
-                                size="sm">
-                                <Link href="#">
-                                    <span>Sign Up</span>
-                                </Link>
-                            </Button>
-                            <ThemeToggle />
-                        </div>
+                         {/* Auth Buttons - Right (hidden on mobile) */}
+                         <div className="hidden lg:flex lg:items-center lg:gap-3">
+                             <SignedOut>
+                                 <Link href="/auth/sign-in">
+                                     <Button variant="outline" size="sm">
+                                         Login
+                                     </Button>
+                                 </Link>
+                                 <Link href="/auth/sign-up">
+                                     <Button size="sm">
+                                         Sign Up
+                                     </Button>
+                                 </Link>
+                             </SignedOut>
+                             <SignedIn>
+                                 <UserButton />
+                             </SignedIn>
+                             <ThemeToggle />
+                         </div>
 
                         {/* Mobile Menu */}
                         <div className="bg-background in-data-[state=active]:block mb-6 hidden w-full rounded-3xl border p-6 shadow-2xl shadow-zinc-300/20 lg:hidden dark:shadow-none">
@@ -103,26 +104,28 @@ export const HeroHeader = () => {
                                         </li>
                                     ))}
                                 </ul>
-                                <div className="flex flex-col space-y-3 pt-4 border-t">
-                                    <Button
-                                        asChild
-                                        variant="outline"
-                                        size="sm">
-                                        <Link href="#">
-                                            <span>Login</span>
-                                        </Link>
-                                    </Button>
-                                    <Button
-                                        asChild
-                                        size="sm">
-                                        <Link href="#">
-                                            <span>Sign Up</span>
-                                        </Link>
-                                    </Button>
-                                    <div className="flex justify-center pt-2">
-                                        <ThemeToggle />
-                                    </div>
-                                </div>
+                                 <div className="flex flex-col space-y-3 pt-4 border-t">
+                                     <SignedOut>
+                                         <Link href="/auth/sign-in">
+                                             <Button variant="outline" size="sm" className="w-full">
+                                                 Login
+                                             </Button>
+                                         </Link>
+                                         <Link href="/auth/sign-up">
+                                             <Button size="sm" className="w-full">
+                                                 Sign Up
+                                             </Button>
+                                         </Link>
+                                     </SignedOut>
+                                     <SignedIn>
+                                         <div className="flex justify-center">
+                                             <UserButton />
+                                         </div>
+                                     </SignedIn>
+                                     <div className="flex justify-center pt-2">
+                                         <ThemeToggle />
+                                     </div>
+                                 </div>
                             </div>
                         </div>
                     </div>
