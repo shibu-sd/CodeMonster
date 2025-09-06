@@ -7,8 +7,8 @@ export const Logo = ({ className }: { className?: string }) => {
             <Image
                 src="/logo.png"
                 alt="CodeMonster Logo"
-                width={40}
-                height={40}
+                width={640}
+                height={640}
                 className="h-9 w-9 sm:h-10 sm:w-10 object-contain"
             />
             <span className="text-base sm:text-lg font-semibold text-foreground font-sans">
