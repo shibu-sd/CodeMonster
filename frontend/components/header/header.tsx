@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import React from 'react'
 import { cn } from '@/lib/utils'
 import { useScroll } from 'motion/react'
-import { ThemeToggle } from '@/components/theme-toggle'
+import { ThemeToggle } from '@/components/theme-toggle/theme-toggle'
 
 const menuItems = [
     { name: 'Problems', href: '#problems' },

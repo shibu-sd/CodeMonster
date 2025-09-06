@@ -11,7 +11,7 @@ export const Logo = ({ className }: { className?: string }) => {
                 height={640}
                 className="h-9 w-9 sm:h-10 sm:w-10 object-contain"
             />
-            <span className="text-base sm:text-lg font-semibold text-foreground font-sans">
+            <span className="text-lg sm:text-2xl font-semibold text-foreground font-sans">
                 CodeMonster
             </span>
         </div>
