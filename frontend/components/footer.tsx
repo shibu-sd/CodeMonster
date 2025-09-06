@@ -3,64 +3,89 @@ import Link from 'next/link'
 
 const links = [
     {
-        group: 'Product',
+        group: 'Practice',
         items: [
             {
-                title: 'Features',
-                href: '#',
+                title: 'All Problems',
+                href: '#problems',
             },
             {
-                title: 'Solution',
-                href: '#',
+                title: 'Easy Problems',
+                href: '#easy',
             },
             {
-                title: 'Customers',
-                href: '#',
+                title: 'Medium Problems',
+                href: '#medium',
             },
             {
-                title: 'Pricing',
-                href: '#',
+                title: 'Hard Problems',
+                href: '#hard',
             },
             {
-                title: 'Help',
-                href: '#',
+                title: 'Algorithms',
+                href: '#algorithms',
             },
             {
-                title: 'About',
-                href: '#',
+                title: 'Data Structures',
+                href: '#data-structures',
             },
         ],
     },
     {
-        group: 'Solution',
+        group: 'Compete',
         items: [
             {
-                title: 'Startup',
-                href: '#',
+                title: 'Live Contests',
+                href: '#contests',
             },
             {
-                title: 'Freelancers',
-                href: '#',
+                title: 'Past Contests',
+                href: '#past-contests',
             },
             {
-                title: 'Organizations',
-                href: '#',
+                title: 'Leaderboard',
+                href: '#leaderboard',
             },
             {
-                title: 'Students',
-                href: '#',
+                title: 'Rankings',
+                href: '#rankings',
             },
             {
-                title: 'Collaboration',
-                href: '#',
+                title: 'Achievements',
+                href: '#achievements',
             },
             {
-                title: 'Design',
-                href: '#',
+                title: 'Statistics',
+                href: '#stats',
+            },
+        ],
+    },
+    {
+        group: 'Learn',
+        items: [
+            {
+                title: 'Tutorials',
+                href: '#tutorials',
             },
             {
-                title: 'Management',
-                href: '#',
+                title: 'Interview Prep',
+                href: '#interview',
+            },
+            {
+                title: 'Study Plans',
+                href: '#study-plans',
+            },
+            {
+                title: 'Discussion',
+                href: '#discussion',
+            },
+            {
+                title: 'Blog',
+                href: '#blog',
+            },
+            {
+                title: 'Help Center',
+                href: '#help',
             },
         ],
     },
@@ -68,49 +93,20 @@ const links = [
         group: 'Company',
         items: [
             {
-                title: 'About',
-                href: '#',
-            },
-            {
-                title: 'Careers',
-                href: '#',
-            },
-            {
-                title: 'Blog',
-                href: '#',
-            },
-            {
-                title: 'Press',
-                href: '#',
+                title: 'About Us',
+                href: '#about',
             },
             {
                 title: 'Contact',
-                href: '#',
+                href: '#contact',
             },
             {
-                title: 'Help',
-                href: '#',
-            },
-        ],
-    },
-    {
-        group: 'Legal',
-        items: [
-            {
-                title: 'Licence',
-                href: '#',
+                title: 'Privacy Policy',
+                href: '#privacy',
             },
             {
-                title: 'Privacy',
-                href: '#',
-            },
-            {
-                title: 'Cookies',
-                href: '#',
-            },
-            {
-                title: 'Security',
-                href: '#',
+                title: 'Terms of Service',
+                href: '#terms',
             },
         ],
     },

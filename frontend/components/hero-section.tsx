@@ -57,7 +57,7 @@ export default function HeroSection() {
                                     <Link
                                         href="#link"
                                         className="hover:bg-background dark:hover:border-t-border bg-muted group mx-auto flex w-fit items-center gap-4 rounded-full border p-1 pl-4 shadow-md shadow-zinc-950/5 transition-colors duration-300 dark:border-t-transparent dark:shadow-zinc-950">
-                                        <span className="text-foreground text-sm">Introducing Support for AI Models</span>
+                                        <span className="text-foreground text-sm">New Contest Platform & Judge System</span>
                                         <span className="dark:border-background block h-4 w-0.5 border-l bg-zinc-300 dark:bg-zinc-700"></span>
 
                                         <div className="bg-background group-hover:bg-muted size-6 overflow-hidden rounded-full duration-500">
@@ -78,7 +78,7 @@ export default function HeroSection() {
                                     speedSegment={0.3}
                                     as="h1"
                                     className="mt-8 text-balance text-6xl md:text-7xl lg:mt-16 xl:text-[5.25rem]">
-                                    Modern Solutions for Customer Engagement
+                                    Master Coding Through Practice
                                 </TextEffect>
                                 <TextEffect
                                     per="line"
@@ -87,7 +87,7 @@ export default function HeroSection() {
                                     delay={0.5}
                                     as="p"
                                     className="mx-auto mt-8 max-w-2xl text-balance text-lg">
-                                    Highly customizable components for building modern websites and applications that look and feel the way you mean it.
+                                    Solve algorithmic problems, compete with others, and improve your programming skills. Practice data structures, algorithms, and competitive programming with instant feedback from our online judge.
                                 </TextEffect>
 
                                 <AnimatedGroup
@@ -111,7 +111,7 @@ export default function HeroSection() {
                                             size="lg"
                                             className="rounded-xl px-5 text-base">
                                             <Link href="#link">
-                                                <span className="text-nowrap">Start Building</span>
+                                                <span className="text-nowrap">Start Solving</span>
                                             </Link>
                                         </Button>
                                     </div>
@@ -122,7 +122,7 @@ export default function HeroSection() {
                                         variant="ghost"
                                         className="h-10.5 rounded-xl px-5">
                                         <Link href="#link">
-                                            <span className="text-nowrap">Request a demo</span>
+                                            <span className="text-nowrap">Browse Problems</span>
                                         </Link>
                                     </Button>
                                 </AnimatedGroup>
@@ -149,14 +149,14 @@ export default function HeroSection() {
                                 <div className="inset-shadow-2xs ring-background dark:inset-shadow-zinc-800/20 bg-background relative mx-auto max-w-6xl overflow-hidden rounded-2xl border p-4 shadow-lg shadow-zinc-950/15 ring-1">
                                     <div className="bg-background aspect-15/8 relative hidden rounded-2xl dark:block flex items-center justify-center">
                                         <div className="text-muted-foreground text-center">
-                                            <div className="text-4xl mb-2">📧</div>
-                                            <div className="text-sm">App Preview</div>
+                                            <div className="text-4xl mb-2">⚡</div>
+                                            <div className="text-sm">Online Judge</div>
                                         </div>
                                     </div>
                                     <div className="z-2 border-border/25 aspect-15/8 relative rounded-2xl border dark:hidden flex items-center justify-center">
                                         <div className="text-muted-foreground text-center">
-                                            <div className="text-4xl mb-2">📧</div>
-                                            <div className="text-sm">App Preview</div>
+                                            <div className="text-4xl mb-2">⚡</div>
+                                            <div className="text-sm">Online Judge</div>
                                         </div>
                                     </div>
                                 </div>
@@ -170,7 +170,7 @@ export default function HeroSection() {
                             <Link
                                 href="/"
                                 className="block text-sm duration-150 hover:opacity-75">
-                                <span> Meet Our Customers</span>
+                                <span> Join Our Community</span>
 
                                 <ChevronRight className="ml-1 inline-block size-3" />
                             </Link>

@@ -9,10 +9,10 @@ import { useScroll } from 'motion/react'
 import { ThemeToggle } from '@/components/theme-toggle'
 
 const menuItems = [
-    { name: 'Features', href: '#link' },
-    { name: 'Solution', href: '#link' },
-    { name: 'Pricing', href: '#link' },
-    { name: 'About', href: '#link' },
+    { name: 'Problems', href: '#problems' },
+    { name: 'Contests', href: '#contests' },
+    { name: 'Leaderboard', href: '#leaderboard' },
+    { name: 'Learn', href: '#learn' },
 ]
 
 export const HeroHeader = () => {
