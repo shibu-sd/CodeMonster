@@ -1,0 +1,178 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model - integrates with Clerk authentication
+model User {
+  id              String   @id @default(cuid())
+  clerkId         String   @unique // Clerk user ID
+  email           String   @unique
+  username        String?  @unique
+  firstName       String?
+  lastName        String?
+  profileImageUrl String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // User statistics
+  problemsSolved  Int      @default(0)
+  contestsJoined  Int      @default(0)
+  totalSubmissions Int     @default(0)
+  acceptedSubmissions Int  @default(0)
+  
+  // Relations
+  submissions     Submission[]
+  userProblems    UserProblem[] // Track user progress on problems
+  
+  @@map("users")
+}
+
+// Problem difficulty enum
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+// Programming language enum
+enum Language {
+  JAVASCRIPT
+  PYTHON
+  JAVA
+  CPP
+  C
+  TYPESCRIPT
+}
+
+// Submission status enum
+enum SubmissionStatus {
+  PENDING
+  ACCEPTED
+  WRONG_ANSWER
+  TIME_LIMIT_EXCEEDED
+  MEMORY_LIMIT_EXCEEDED
+  RUNTIME_ERROR
+  COMPILATION_ERROR
+  INTERNAL_ERROR
+}
+
+// Problem model
+model Problem {
+  id            String     @id @default(cuid())
+  title         String
+  slug          String     @unique
+  description   String     @db.Text
+  difficulty    Difficulty
+  tags          String[]   // Array of tags like ["array", "two-pointers"]
+  
+  // Constraints and limits
+  timeLimit     Int        @default(2000) // in milliseconds
+  memoryLimit   Int        @default(128)  // in MB
+  
+  // Problem metadata
+  isPublic      Boolean    @default(true)
+  authorId      String?    // Admin who created the problem
+  acceptanceRate Float     @default(0.0)
+  totalSubmissions Int     @default(0)
+  acceptedSubmissions Int  @default(0)
+  
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  
+  // Relations
+  testCases     TestCase[]
+  submissions   Submission[]
+  userProblems  UserProblem[]
+  starterCode   StarterCode[]
+  
+  @@map("problems")
+}
+
+// Test cases for problems
+model TestCase {
+  id        String  @id @default(cuid())
+  problemId String
+  input     String  @db.Text
+  output    String  @db.Text
+  isHidden  Boolean @default(false) // Hidden test cases for final validation
+  
+  // Relations
+  problem   Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  
+  @@map("test_cases")
+}
+
+// Starter code templates for different languages
+model StarterCode {
+  id        String   @id @default(cuid())
+  problemId String
+  language  Language
+  code      String   @db.Text
+  
+  // Relations
+  problem   Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  
+  @@unique([problemId, language])
+  @@map("starter_codes")
+}
+
+// User submissions
+model Submission {
+  id            String           @id @default(cuid())
+  userId        String
+  problemId     String
+  language      Language
+  code          String           @db.Text
+  status        SubmissionStatus @default(PENDING)
+  
+  // Execution results
+  runtime       Int?             // in milliseconds
+  memoryUsage   Int?             // in MB
+  errorMessage  String?          @db.Text
+  testCasesPassed Int           @default(0)
+  totalTestCases  Int           @default(0)
+  
+  // Submission metadata
+  submittedAt   DateTime         @default(now())
+  completedAt   DateTime?
+  
+  // Relations
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problem       Problem         @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  
+  @@map("submissions")
+}
+
+// Track user progress on individual problems
+model UserProblem {
+  id         String   @id @default(cuid())
+  userId     String
+  problemId  String
+  
+  // Progress tracking
+  isSolved   Boolean  @default(false)
+  attempts   Int      @default(0)
+  bestSubmissionId String? // Reference to best submission
+  
+  firstAttemptAt DateTime?
+  solvedAt       DateTime?
+  lastAttemptAt  DateTime @default(now())
+  
+  // Relations
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problem    Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, problemId])
+  @@map("user_problems")
+}
