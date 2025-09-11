@@ -1,0 +1,398 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { Search, Filter, BarChart3, Trophy, Clock, Users } from "lucide-react";
+import { HeroHeader } from "@/components/header/header";
+import FooterSection from "@/components/footer/footer";
+import { Button } from "@/components/ui/button";
+import { ProtectedPage } from "@/components/auth/protected-page";
+import {
+    useApiWithAuth,
+    Problem,
+    ProblemStats,
+    getDifficultyColor,
+    getDifficultyBadgeColor,
+    formatAcceptanceRate,
+    formatSubmissionCount,
+} from "@/lib/api";
+
+function ProblemsPageContent() {
+    const api = useApiWithAuth();
+    const [problems, setProblems] = useState<Problem[]>([]);
+    const [stats, setStats] = useState<ProblemStats | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [selectedDifficulty, setSelectedDifficulty] = useState<string>("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+
+    // Fetch problems and stats
+    useEffect(() => {
+        fetchProblems();
+        fetchStats();
+    }, [currentPage, selectedDifficulty, searchTerm]);
+
+    const fetchProblems = async () => {
+        try {
+            setLoading(true);
+            const response = await api.getProblems({
+                page: currentPage,
+                limit: 10,
+                difficulty: selectedDifficulty || undefined,
+                search: searchTerm || undefined,
+            });
+
+            if (response.success) {
+                setProblems(response.data.problems);
+                setTotalPages(response.data.pagination.totalPages);
+            } else {
+                setError("Failed to fetch problems");
+            }
+        } catch (err) {
+            setError(
+                err instanceof Error ? err.message : "Failed to fetch problems"
+            );
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchStats = async () => {
+        try {
+            const response = await api.getProblemStats();
+            if (response.success) {
+                setStats(response.data);
+            }
+        } catch (err) {
+            console.error("Failed to fetch stats:", err);
+        }
+    };
+
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        setCurrentPage(1);
+        fetchProblems();
+    };
+
+    const handleDifficultyFilter = (difficulty: string) => {
+        setSelectedDifficulty(
+            difficulty === selectedDifficulty ? "" : difficulty
+        );
+        setCurrentPage(1);
+    };
+
+    if (loading && problems.length === 0) {
+        return (
+            <div className="min-h-screen bg-background">
+                <HeroHeader />
+                <div className="container mx-auto px-4 pt-24 pb-16">
+                    <div className="flex items-center justify-center min-h-[400px]">
+                        <div className="text-center">
+                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                            <p className="text-muted-foreground">
+                                Loading problems...
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <FooterSection />
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="min-h-screen bg-background">
+                <HeroHeader />
+                <div className="container mx-auto px-4 pt-24 pb-16">
+                    <div className="flex items-center justify-center min-h-[400px]">
+                        <div className="text-center">
+                            <div className="text-red-500 mb-4">❌</div>
+                            <h2 className="text-2xl font-bold mb-2">
+                                Error Loading Problems
+                            </h2>
+                            <p className="text-muted-foreground mb-4">
+                                {error}
+                            </p>
+                            <Button onClick={fetchProblems}>Try Again</Button>
+                        </div>
+                    </div>
+                </div>
+                <FooterSection />
+            </div>
+        );
+    }
+
+    return (
+        <div className="min-h-screen bg-background">
+            <HeroHeader />
+
+            <main className="container mx-auto px-4 pt-24 pb-16">
+                {/* Header Section */}
+                <div className="mb-8">
+                    <h1 className="text-4xl font-bold mb-4">Problem Set</h1>
+                    <p className="text-xl text-muted-foreground mb-6">
+                        Challenge yourself with coding problems from easy to
+                        hard
+                    </p>
+
+                    {/* Stats Cards */}
+                    {stats && (
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                            <div className="bg-card rounded-lg p-4 border">
+                                <div className="flex items-center space-x-2 mb-2">
+                                    <BarChart3 className="h-5 w-5 text-primary" />
+                                    <span className="text-sm font-medium">
+                                        Total
+                                    </span>
+                                </div>
+                                <p className="text-2xl font-bold">
+                                    {stats.total}
+                                </p>
+                            </div>
+                            <div className="bg-card rounded-lg p-4 border">
+                                <div className="flex items-center space-x-2 mb-2">
+                                    <Trophy className="h-5 w-5 text-green-500" />
+                                    <span className="text-sm font-medium">
+                                        Easy
+                                    </span>
+                                </div>
+                                <p className="text-2xl font-bold text-green-600">
+                                    {stats.easy}
+                                </p>
+                            </div>
+                            <div className="bg-card rounded-lg p-4 border">
+                                <div className="flex items-center space-x-2 mb-2">
+                                    <Clock className="h-5 w-5 text-yellow-500" />
+                                    <span className="text-sm font-medium">
+                                        Medium
+                                    </span>
+                                </div>
+                                <p className="text-2xl font-bold text-yellow-600">
+                                    {stats.medium}
+                                </p>
+                            </div>
+                            <div className="bg-card rounded-lg p-4 border">
+                                <div className="flex items-center space-x-2 mb-2">
+                                    <Users className="h-5 w-5 text-red-500" />
+                                    <span className="text-sm font-medium">
+                                        Hard
+                                    </span>
+                                </div>
+                                <p className="text-2xl font-bold text-red-600">
+                                    {stats.hard}
+                                </p>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Search and Filter */}
+                    <div className="flex flex-col md:flex-row gap-4 mb-6">
+                        <form onSubmit={handleSearch} className="flex-1">
+                            <div className="relative">
+                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                                <input
+                                    type="text"
+                                    placeholder="Search problems..."
+                                    value={searchTerm}
+                                    onChange={(e) =>
+                                        setSearchTerm(e.target.value)
+                                    }
+                                    className="w-full pl-10 pr-4 py-2 border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+                                />
+                            </div>
+                        </form>
+
+                        <div className="flex gap-2">
+                            <Button
+                                variant={
+                                    selectedDifficulty === "EASY"
+                                        ? "default"
+                                        : "outline"
+                                }
+                                size="sm"
+                                onClick={() => handleDifficultyFilter("EASY")}
+                                className="text-green-600"
+                            >
+                                Easy
+                            </Button>
+                            <Button
+                                variant={
+                                    selectedDifficulty === "MEDIUM"
+                                        ? "default"
+                                        : "outline"
+                                }
+                                size="sm"
+                                onClick={() => handleDifficultyFilter("MEDIUM")}
+                                className="text-yellow-600"
+                            >
+                                Medium
+                            </Button>
+                            <Button
+                                variant={
+                                    selectedDifficulty === "HARD"
+                                        ? "default"
+                                        : "outline"
+                                }
+                                size="sm"
+                                onClick={() => handleDifficultyFilter("HARD")}
+                                className="text-red-600"
+                            >
+                                Hard
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Problems Table */}
+                <div className="bg-card rounded-lg border overflow-hidden">
+                    <div className="overflow-x-auto">
+                        <table className="w-full">
+                            <thead className="bg-muted/50">
+                                <tr>
+                                    <th className="text-left py-3 px-4 font-medium">
+                                        Problem
+                                    </th>
+                                    <th className="text-left py-3 px-4 font-medium">
+                                        Difficulty
+                                    </th>
+                                    <th className="text-left py-3 px-4 font-medium">
+                                        Acceptance
+                                    </th>
+                                    <th className="text-left py-3 px-4 font-medium">
+                                        Submissions
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {problems?.map((problem, index) => (
+                                    <tr
+                                        key={problem?.id || index}
+                                        className="border-t hover:bg-muted/30 transition-colors"
+                                    >
+                                        <td className="py-4 px-4">
+                                            <Link
+                                                href={`/problems/${
+                                                    problem?.slug || "unknown"
+                                                }`}
+                                                className="hover:text-primary transition-colors"
+                                            >
+                                                <div className="flex items-center space-x-2">
+                                                    <span className="text-sm text-muted-foreground w-8">
+                                                        {(currentPage - 1) *
+                                                            10 +
+                                                            index +
+                                                            1}
+                                                        .
+                                                    </span>
+                                                    <span className="font-medium">
+                                                        {problem?.title ||
+                                                            "Unknown Problem"}
+                                                    </span>
+                                                </div>
+                                            </Link>
+                                        </td>
+                                        <td className="py-4 px-4">
+                                            <span
+                                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getDifficultyBadgeColor(
+                                                    problem?.difficulty ||
+                                                        "EASY"
+                                                )}`}
+                                            >
+                                                {problem?.difficulty || "EASY"}
+                                            </span>
+                                        </td>
+                                        <td className="py-4 px-4">
+                                            <span className="text-sm">
+                                                {formatAcceptanceRate(
+                                                    problem?.acceptance_rate
+                                                )}
+                                            </span>
+                                        </td>
+                                        <td className="py-4 px-4">
+                                            <span className="text-sm">
+                                                {formatSubmissionCount(
+                                                    problem?.total_submissions
+                                                )}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                    <div className="flex justify-center items-center space-x-2 mt-8">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                                setCurrentPage((prev) => Math.max(1, prev - 1))
+                            }
+                            disabled={currentPage === 1}
+                        >
+                            Previous
+                        </Button>
+
+                        <div className="flex space-x-1">
+                            {Array.from(
+                                { length: Math.min(5, totalPages) },
+                                (_, i) => {
+                                    const pageNum = i + 1;
+                                    return (
+                                        <Button
+                                            key={pageNum}
+                                            variant={
+                                                currentPage === pageNum
+                                                    ? "default"
+                                                    : "outline"
+                                            }
+                                            size="sm"
+                                            onClick={() =>
+                                                setCurrentPage(pageNum)
+                                            }
+                                            className="min-w-[40px]"
+                                        >
+                                            {pageNum}
+                                        </Button>
+                                    );
+                                }
+                            )}
+                        </div>
+
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                                setCurrentPage((prev) =>
+                                    Math.min(totalPages, prev + 1)
+                                )
+                            }
+                            disabled={currentPage === totalPages}
+                        >
+                            Next
+                        </Button>
+                    </div>
+                )}
+            </main>
+
+            <FooterSection />
+        </div>
+    );
+}
+
+export default function ProblemsPage() {
+    return (
+        <ProtectedPage
+            fallbackTitle="Authentication Required"
+            fallbackMessage="You need to sign in to access the problems."
+        >
+            <ProblemsPageContent />
+        </ProtectedPage>
+    );
+}
