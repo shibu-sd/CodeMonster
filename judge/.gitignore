@@ -1,0 +1,46 @@
+# Node.js dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Output of build process
+dist/
+build/
+out/
+.tmp/
+temp/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Logs
+logs
+*.log
+*.log.*
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# OS files
+.DS_Store
+Thumbs.dbbefore
+
+# Editor directories and files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Coverage directory
+coverage/
+
+# Optional: If using Next.js or similar
+.next/
