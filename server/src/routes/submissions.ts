@@ -16,6 +16,13 @@ router.post(
     SubmissionController.submitCode
 );
 
+router.post(
+    "/run",
+    authenticateUser,
+    validateSubmission,
+    SubmissionController.runCode
+);
+
 router.get(
     "/:id/status",
     authenticateUser,
