@@ -140,8 +140,31 @@ class ApiClient {
         problemId: string;
         language: string;
         code: string;
-    }): Promise<ApiResponse<{ submissionId: string }>> {
-        return this.request<{ submissionId: string }>("/api/submissions", {
+    }): Promise<
+        ApiResponse<{
+            submissionId: string;
+            jobId: string;
+            status: string;
+            message: string;
+        }>
+    > {
+        return this.request<{
+            submissionId: string;
+            jobId: string;
+            status: string;
+            message: string;
+        }>("/api/submissions", {
+            method: "POST",
+            body: JSON.stringify(data),
+        });
+    }
+
+    async runCode(data: {
+        problemId: string;
+        language: string;
+        code: string;
+    }): Promise<ApiResponse<any>> {
+        return this.request<any>("/api/submissions/run", {
             method: "POST",
             body: JSON.stringify(data),
         });
@@ -149,6 +172,16 @@ class ApiClient {
 
     async getSubmission(submissionId: string): Promise<ApiResponse<any>> {
         return this.request<any>(`/api/submissions/${submissionId}`);
+    }
+
+    async getSubmissionStatus(
+        submissionId: string,
+        jobId?: string
+    ): Promise<ApiResponse<any>> {
+        const query = jobId ? `?jobId=${jobId}` : "";
+        return this.request<any>(
+            `/api/submissions/${submissionId}/status${query}`
+        );
     }
 
     async getSubmissionsByProblem(
@@ -173,7 +206,11 @@ export const api = {
 
     submitCode: (data: Parameters<typeof apiClient.submitCode>[0]) =>
         apiClient.submitCode(data),
+    runCode: (data: Parameters<typeof apiClient.runCode>[0]) =>
+        apiClient.runCode(data),
     getSubmission: (id: string) => apiClient.getSubmission(id),
+    getSubmissionStatus: (id: string, jobId?: string) =>
+        apiClient.getSubmissionStatus(id, jobId),
     getSubmissionsByProblem: (problemId: string) =>
         apiClient.getSubmissionsByProblem(problemId),
 
