@@ -2,11 +2,20 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Search, Filter, BarChart3, Trophy, Clock, Users } from "lucide-react";
+import {
+    Search,
+    Filter,
+    BarChart3,
+    Trophy,
+    Clock,
+    Users,
+    CheckCircle,
+} from "lucide-react";
 import { HeroHeader } from "@/components/header/header";
 import FooterSection from "@/components/footer/footer";
 import { Button } from "@/components/ui/button";
 import { ProtectedPage } from "@/components/auth/protected-page";
+import { useAuth } from "@clerk/nextjs";
 import {
     useApiWithAuth,
     Problem,
@@ -19,6 +28,7 @@ import {
 
 function ProblemsPageContent() {
     const api = useApiWithAuth();
+    const { isLoaded, isSignedIn, getToken } = useAuth();
     const [problems, setProblems] = useState<Problem[]>([]);
     const [stats, setStats] = useState<ProblemStats | null>(null);
     const [loading, setLoading] = useState(true);
@@ -27,12 +37,61 @@ function ProblemsPageContent() {
     const [selectedDifficulty, setSelectedDifficulty] = useState<string>("");
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [authReady, setAuthReady] = useState(false);
+    const [solvedProblemIds, setSolvedProblemIds] = useState<Set<string>>(
+        new Set()
+    );
+
+    useEffect(() => {
+        const initAuth = async () => {
+            if (isLoaded && isSignedIn) {
+                try {
+                    const token = await getToken();
+                    if (token) {
+                        api.setAuthToken(token);
+                        setAuthReady(true);
+                    }
+                } catch (err) {
+                    console.error("Failed to get token:", err);
+                }
+            } else if (isLoaded && !isSignedIn) {
+                setAuthReady(true);
+            }
+        };
+
+        initAuth();
+    }, [isLoaded, isSignedIn]);
+
+    // Fetch solved problems when user is authenticated
+    useEffect(() => {
+        if (authReady && isSignedIn) {
+            fetchSolvedProblems();
+        }
+    }, [authReady, isSignedIn]);
 
     // Fetch problems and stats
     useEffect(() => {
-        fetchProblems();
-        fetchStats();
-    }, [currentPage, selectedDifficulty, searchTerm]);
+        if (authReady) {
+            fetchProblems();
+            fetchStats();
+        }
+    }, [currentPage, selectedDifficulty, searchTerm, authReady]);
+
+    const fetchSolvedProblems = async () => {
+        try {
+            const response = await api.getUserDashboard();
+            if (response.success && response.data.solvedProblems) {
+                const solvedIds = new Set<string>(
+                    response.data.solvedProblems.map(
+                        (p: any) => p.problemId as string
+                    )
+                );
+                setSolvedProblemIds(solvedIds);
+            }
+        } catch (err) {
+            console.log("Could not fetch solved problems:", err);
+        }
+    };
 
     const fetchProblems = async () => {
         try {
@@ -255,14 +314,17 @@ function ProblemsPageContent() {
                                     <th className="text-left py-3 px-4 font-medium">
                                         Problem
                                     </th>
-                                    <th className="text-left py-3 px-4 font-medium">
+                                    <th className="text-center py-3 px-4 font-medium">
                                         Difficulty
                                     </th>
-                                    <th className="text-left py-3 px-4 font-medium">
+                                    <th className="text-center py-3 px-4 font-medium">
                                         Acceptance
                                     </th>
-                                    <th className="text-left py-3 px-4 font-medium">
+                                    <th className="text-center py-3 px-4 font-medium">
                                         Submissions
+                                    </th>
+                                    <th className="text-center py-3 px-4 font-medium">
+                                        Status
                                     </th>
                                 </tr>
                             </thead>
@@ -280,7 +342,7 @@ function ProblemsPageContent() {
                                                 className="hover:text-primary transition-colors"
                                             >
                                                 <div className="flex items-center space-x-2">
-                                                    <span className="text-sm text-muted-foreground w-8">
+                                                    <span className="text-sm text-muted-foreground">
                                                         {(currentPage - 1) *
                                                             10 +
                                                             index +
@@ -294,7 +356,7 @@ function ProblemsPageContent() {
                                                 </div>
                                             </Link>
                                         </td>
-                                        <td className="py-4 px-4">
+                                        <td className="py-4 px-4 text-center">
                                             <span
                                                 className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getDifficultyBadgeColor(
                                                     problem?.difficulty ||
@@ -304,19 +366,26 @@ function ProblemsPageContent() {
                                                 {problem?.difficulty || "EASY"}
                                             </span>
                                         </td>
-                                        <td className="py-4 px-4">
+                                        <td className="py-4 px-4 text-center">
                                             <span className="text-sm">
                                                 {formatAcceptanceRate(
-                                                    problem?.acceptance_rate
+                                                    problem?.acceptanceRate
                                                 )}
                                             </span>
                                         </td>
-                                        <td className="py-4 px-4">
+                                        <td className="py-4 px-4 text-center">
                                             <span className="text-sm">
                                                 {formatSubmissionCount(
-                                                    problem?.total_submissions
+                                                    problem?.totalSubmissions
                                                 )}
                                             </span>
+                                        </td>
+                                        <td className="py-4 px-4 text-center">
+                                            {solvedProblemIds.has(
+                                                problem?.id || ""
+                                            ) && (
+                                                <CheckCircle className="h-5 w-5 text-green-500 inline-block" />
+                                            )}
                                         </td>
                                     </tr>
                                 ))}
