@@ -1,13 +1,28 @@
 "use client";
 import Link from "next/link";
 import { Logo } from "@/components/logo";
-import { Menu, X } from "lucide-react";
+import { Menu, X, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import React from "react";
 import { cn } from "@/lib/utils";
 import { useScroll } from "motion/react";
 import { ThemeToggle } from "@/components/theme-toggle/theme-toggle";
-import { SignedIn, SignedOut, UserButton, useAuth } from "@clerk/nextjs";
+import {
+    SignedIn,
+    SignedOut,
+    useAuth,
+    useUser,
+    SignOutButton,
+} from "@clerk/nextjs";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useRouter } from "next/navigation";
 
 const menuItems = [
     { name: "Problems", href: "/problems", requireAuth: true },
@@ -18,6 +33,8 @@ const menuItems = [
 
 export const HeroHeader = () => {
     const { isSignedIn } = useAuth();
+    const { user } = useUser();
+    const router = useRouter();
     const [menuState, setMenuState] = React.useState(false);
     const [scrolled, setScrolled] = React.useState(false);
 
@@ -103,7 +120,54 @@ export const HeroHeader = () => {
                                 </Link>
                             </SignedOut>
                             <SignedIn>
-                                <UserButton />
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <button
+                                            className="relative h-8 w-8 rounded-full overflow-hidden border-2 border-primary/20 hover:border-primary transition-colors cursor-pointer"
+                                            onClick={() =>
+                                                router.push("/dashboard")
+                                            }
+                                        >
+                                            {user?.imageUrl ? (
+                                                <img
+                                                    src={user.imageUrl}
+                                                    alt={
+                                                        user.firstName || "User"
+                                                    }
+                                                    className="h-full w-full object-cover"
+                                                />
+                                            ) : (
+                                                <div className="h-full w-full bg-primary/10 flex items-center justify-center">
+                                                    <User className="h-4 w-4" />
+                                                </div>
+                                            )}
+                                        </button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent
+                                        align="end"
+                                        className="w-48"
+                                    >
+                                        <DropdownMenuItem
+                                            onClick={() =>
+                                                router.push("/dashboard")
+                                            }
+                                        >
+                                            <User className="mr-2 h-4 w-4" />
+                                            Profile
+                                        </DropdownMenuItem>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuItem asChild>
+                                            <SignOutButton>
+                                                <button className="w-full text-left flex items-center">
+                                                    <span className="mr-2">
+                                                        🚪
+                                                    </span>
+                                                    Sign Out
+                                                </button>
+                                            </SignOutButton>
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
                             </SignedIn>
                             <ThemeToggle />
                         </div>
@@ -158,8 +222,39 @@ export const HeroHeader = () => {
                                         </Link>
                                     </SignedOut>
                                     <SignedIn>
-                                        <div className="flex justify-center">
-                                            <UserButton />
+                                        <div className="flex flex-col gap-2">
+                                            <button
+                                                onClick={() => {
+                                                    router.push("/dashboard");
+                                                    setMenuState(false);
+                                                }}
+                                                className="w-full flex items-center gap-2 p-3 rounded-lg border hover:bg-accent transition-colors"
+                                            >
+                                                {user?.imageUrl && (
+                                                    <img
+                                                        src={user.imageUrl}
+                                                        alt={
+                                                            user.firstName ||
+                                                            "User"
+                                                        }
+                                                        className="h-8 w-8 rounded-full object-cover"
+                                                    />
+                                                )}
+                                                <User className="h-4 w-4" />
+                                                <span className="text-sm font-medium">
+                                                    Profile
+                                                </span>
+                                            </button>
+                                            <SignOutButton>
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="w-full flex items-center justify-center gap-2"
+                                                >
+                                                    <span>🚪</span>
+                                                    Sign Out
+                                                </Button>
+                                            </SignOutButton>
                                         </div>
                                     </SignedIn>
                                     <div className="flex justify-center pt-2">
