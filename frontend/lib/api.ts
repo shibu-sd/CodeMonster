@@ -9,8 +9,9 @@ export interface Problem {
     title: string;
     description: string;
     difficulty: "EASY" | "MEDIUM" | "HARD";
-    acceptance_rate: number;
-    total_submissions: number;
+    acceptanceRate: number;
+    totalSubmissions: number;
+    acceptedSubmissions?: number;
     tags?: string[];
     createdAt: string;
     updatedAt: string;
@@ -85,22 +86,43 @@ class ApiClient {
         }
 
         try {
+            console.log(`🌐 API Request: ${options.method || "GET"} ${url}`);
+
             const response = await fetch(url, {
                 ...options,
                 headers,
             });
 
+            console.log(
+                `📡 API Response: ${response.status} ${response.statusText}`
+            );
+
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
-                throw new Error(
+                const errorMessage =
                     errorData.error ||
-                        `HTTP ${response.status}: ${response.statusText}`
-                );
+                    `HTTP ${response.status}: ${response.statusText}`;
+                console.error(`❌ API Error: ${errorMessage}`);
+                throw new Error(errorMessage);
             }
 
             return await response.json();
         } catch (error) {
-            console.error(`API request failed: ${endpoint}`, error);
+            if (
+                error instanceof TypeError &&
+                error.message === "Failed to fetch"
+            ) {
+                console.error(
+                    `❌ Network Error: Cannot connect to ${this.baseUrl}`
+                );
+                console.error(
+                    `   Is the server running? Check: ${this.baseUrl}/health`
+                );
+                throw new Error(
+                    `Cannot connect to server at ${this.baseUrl}. Make sure the server is running.`
+                );
+            }
+            console.error(`❌ API request failed: ${endpoint}`, error);
             throw error;
         }
     }
@@ -194,6 +216,15 @@ class ApiClient {
     async healthCheck(): Promise<ApiResponse<any>> {
         return this.request<any>("/health");
     }
+
+    // User Dashboard
+    async getUserDashboard(): Promise<ApiResponse<any>> {
+        return this.request("/api/users/dashboard");
+    }
+
+    async getUserSolution(problemId: string): Promise<ApiResponse<any>> {
+        return this.request(`/api/users/solutions/${problemId}`);
+    }
 }
 
 export const apiClient = new ApiClient(API_BASE_URL);
@@ -214,15 +245,15 @@ export const api = {
     getSubmissionsByProblem: (problemId: string) =>
         apiClient.getSubmissionsByProblem(problemId),
 
+    getUserDashboard: () => apiClient.getUserDashboard(),
+    getUserSolution: (problemId: string) =>
+        apiClient.getUserSolution(problemId),
+
     healthCheck: () => apiClient.healthCheck(),
     setAuthToken: (token: string) => apiClient.setAuthToken(token),
 };
 
 export const useApiWithAuth = () => {
-    React.useEffect(() => {
-        apiClient.setAuthToken("test-token");
-    }, []);
-
     return api;
 };
 
