@@ -1,4 +1,5 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { clerkClient } from "@clerk/nextjs/server";
 
 const isProtectedRoute = createRouteMatcher([
     "/problems(.*)",
@@ -16,6 +17,41 @@ const isPublicRoute = createRouteMatcher([
     "/auth/sign-up(.*)",
 ]);
 
+async function syncUserToBackend(userId: string) {
+    try {
+        const clerk = await clerkClient();
+        const user = await clerk.users.getUser(userId);
+
+        const response = await fetch(
+            `${
+                process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
+            }/api/users/sync`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    id: user.id,
+                    emailAddresses: user.emailAddresses,
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    username: user.username,
+                    profileImageUrl: user.imageUrl,
+                }),
+            }
+        );
+
+        if (response.ok) {
+            console.log("✅ User synced to backend:", userId);
+        } else {
+            console.error("❌ Failed to sync user:", await response.text());
+        }
+    } catch (error) {
+        console.error("❌ Error syncing user:", error);
+    }
+}
+
 export default clerkMiddleware(async (auth, req) => {
     if (isPublicRoute(req)) {
         return;
@@ -28,6 +64,8 @@ export default clerkMiddleware(async (auth, req) => {
             signInUrl.searchParams.set("redirect_url", req.url);
             return Response.redirect(signInUrl);
         }
+
+        syncUserToBackend(userId).catch(console.error);
     }
 });
 
