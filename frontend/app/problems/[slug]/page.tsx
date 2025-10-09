@@ -20,6 +20,7 @@ import {
 import { HeroHeader } from "@/components/header/header";
 import { Button } from "@/components/ui/button";
 import { ProtectedPage } from "@/components/auth/protected-page";
+import { useAuth } from "@clerk/nextjs";
 import { MonacoEditor } from "@/components/code-editor/monaco-editor";
 import {
     ResizablePanelGroup,
@@ -76,10 +77,12 @@ function ProblemDetailPageContent() {
     const router = useRouter();
     const slug = params.slug as string;
     const api = useApiWithAuth();
+    const { isLoaded, isSignedIn, getToken } = useAuth();
 
     const [problem, setProblem] = useState<Problem | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [authReady, setAuthReady] = useState(false);
     const [activeTab, setActiveTab] = useState<
         "description" | "submissions" | "editorial"
     >("description");
@@ -95,6 +98,13 @@ function ProblemDetailPageContent() {
     >(null);
     const [currentJobId, setCurrentJobId] = useState<string | null>(null);
     const [pollingAttempts, setPollingAttempts] = useState<number>(0);
+    const [acceptedSolution, setAcceptedSolution] = useState<{
+        code: string;
+        language: string;
+        runtime: number;
+        memory: number;
+        solvedAt: string;
+    } | null>(null);
 
     // Pop-up window states
     const [showRunPanel, setShowRunPanel] = useState(false);
@@ -108,10 +118,30 @@ function ProblemDetailPageContent() {
     ];
 
     useEffect(() => {
-        if (slug) {
+        const initAuth = async () => {
+            if (isLoaded && isSignedIn) {
+                try {
+                    const token = await getToken();
+                    if (token) {
+                        api.setAuthToken(token);
+                        setAuthReady(true);
+                    }
+                } catch (err) {
+                    console.error("Failed to get token:", err);
+                }
+            } else if (isLoaded && !isSignedIn) {
+                setAuthReady(true);
+            }
+        };
+
+        initAuth();
+    }, [isLoaded, isSignedIn]);
+
+    useEffect(() => {
+        if (slug && authReady) {
             fetchProblem();
         }
-    }, [slug]);
+    }, [slug, authReady]);
 
     // Load starter code when problem is loaded
     useEffect(() => {
@@ -120,6 +150,32 @@ function ProblemDetailPageContent() {
             setCode(starterCode);
         }
     }, [problem, selectedLanguage]);
+
+    useEffect(() => {
+        if (problem && authReady && isSignedIn) {
+            loadAcceptedSolution();
+        }
+    }, [problem, authReady, isSignedIn]);
+
+    const loadAcceptedSolution = async () => {
+        if (!problem) return;
+
+        try {
+            const response = await api.getUserSolution(problem.id);
+            if (response.success && response.data) {
+                setAcceptedSolution({
+                    code: response.data.acceptedSolution || "",
+                    language: response.data.acceptedLanguage || "PYTHON",
+                    runtime: response.data.acceptedRuntime || 0,
+                    memory: response.data.acceptedMemory || 0,
+                    solvedAt: response.data.solvedAt || "",
+                });
+            }
+        } catch (error) {
+            // User hasn't solved this problem yet - that's ok
+            console.log("No accepted solution found");
+        }
+    };
 
     const fetchProblem = async () => {
         try {
@@ -493,13 +549,13 @@ function ProblemDetailPageContent() {
                                 <span className="text-sm text-muted-foreground">
                                     Acceptance Rate:{" "}
                                     {formatAcceptanceRate(
-                                        problem?.acceptance_rate
+                                        problem?.acceptanceRate
                                     )}
                                 </span>
                                 <span className="text-sm text-muted-foreground">
                                     Submissions:{" "}
                                     {formatSubmissionCount(
-                                        problem?.total_submissions
+                                        problem?.totalSubmissions
                                     )}
                                 </span>
                             </div>
@@ -614,18 +670,97 @@ function ProblemDetailPageContent() {
                                     )}
 
                                     {activeTab === "submissions" && (
-                                        <div className="bg-card rounded-lg p-6 border">
-                                            <h3 className="text-lg font-semibold mb-4">
-                                                Your Submissions
-                                            </h3>
-                                            <div className="text-center py-8 text-muted-foreground">
-                                                <Code className="h-12 w-12 mx-auto mb-4" />
-                                                <p>No submissions yet</p>
-                                                <p className="text-sm">
-                                                    Submit your solution to see
-                                                    submission history
-                                                </p>
-                                            </div>
+                                        <div className="space-y-4">
+                                            {acceptedSolution ? (
+                                                <div className="bg-card rounded-lg p-6 border">
+                                                    <div className="flex items-center justify-between mb-4">
+                                                        <h3 className="text-lg font-semibold flex items-center gap-2">
+                                                            <CheckCircle className="h-5 w-5 text-green-500" />
+                                                            Your Accepted
+                                                            Solution
+                                                        </h3>
+                                                        <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                                                            <span className="flex items-center gap-1">
+                                                                <Code className="h-4 w-4" />
+                                                                {
+                                                                    acceptedSolution.language
+                                                                }
+                                                            </span>
+                                                            <span className="flex items-center gap-1">
+                                                                ⚡{" "}
+                                                                {
+                                                                    acceptedSolution.runtime
+                                                                }
+                                                                ms
+                                                            </span>
+                                                            <span className="flex items-center gap-1">
+                                                                💾{" "}
+                                                                {
+                                                                    acceptedSolution.memory
+                                                                }
+                                                                MB
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="mb-3 text-sm text-muted-foreground">
+                                                        Solved on{" "}
+                                                        {new Date(
+                                                            acceptedSolution.solvedAt
+                                                        ).toLocaleDateString(
+                                                            "en-US",
+                                                            {
+                                                                year: "numeric",
+                                                                month: "long",
+                                                                day: "numeric",
+                                                            }
+                                                        )}
+                                                    </div>
+                                                    <div className="bg-muted/50 rounded-lg p-4 overflow-x-auto">
+                                                        <pre className="text-sm">
+                                                            <code>
+                                                                {
+                                                                    acceptedSolution.code
+                                                                }
+                                                            </code>
+                                                        </pre>
+                                                    </div>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="mt-4"
+                                                        onClick={() => {
+                                                            setCode(
+                                                                acceptedSolution.code
+                                                            );
+                                                            setSelectedLanguage(
+                                                                acceptedSolution.language
+                                                            );
+                                                            setActiveTab(
+                                                                "description"
+                                                            );
+                                                        }}
+                                                    >
+                                                        Load in Editor
+                                                    </Button>
+                                                </div>
+                                            ) : (
+                                                <div className="bg-card rounded-lg p-6 border">
+                                                    <h3 className="text-lg font-semibold mb-4">
+                                                        Your Submissions
+                                                    </h3>
+                                                    <div className="text-center py-8 text-muted-foreground">
+                                                        <Code className="h-12 w-12 mx-auto mb-4" />
+                                                        <p>
+                                                            No accepted solution
+                                                            yet
+                                                        </p>
+                                                        <p className="text-sm">
+                                                            Submit your solution
+                                                            to see it here
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
                                     )}
 
@@ -811,7 +946,7 @@ function ProblemDetailPageContent() {
                                             </div>
 
                                             {/* Panel Content */}
-                                            <div className="flex-1 overflow-y-auto p-4 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded [&::-webkit-scrollbar-thumb:hover]:bg-gray-400 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 dark:[&::-webkit-scrollbar-thumb:hover]:bg-gray-500">
+                                            <div className="flex-1 overflow-y-auto p-4 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#424242] [&::-webkit-scrollbar-thumb]:rounded dark:[&::-webkit-scrollbar-thumb:hover]:bg-[#4f4f4f] [&::-webkit-scrollbar-thumb:hover]:bg-[#525252]">
                                                 {/* Run Results */}
                                                 {showRunPanel && runResult && (
                                                     <div className="space-y-4">
