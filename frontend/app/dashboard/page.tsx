@@ -1,0 +1,477 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useApiWithAuth } from "@/lib/api";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@clerk/nextjs";
+import { ProtectedPage } from "@/components/auth/protected-page";
+import { HeroHeader } from "@/components/header/header";
+import {
+    Trophy,
+    Target,
+    Code,
+    CheckCircle,
+    XCircle,
+    Clock,
+    TrendingUp,
+    Calendar,
+    Tag,
+    BarChart3,
+    ChevronRight,
+    Loader2,
+} from "lucide-react";
+import Link from "next/link";
+import { getDifficultyBadgeColor } from "@/lib/api";
+
+interface DashboardData {
+    user: {
+        id: string;
+        username: string;
+        firstName: string;
+        lastName: string;
+        email: string;
+        profileImageUrl: string;
+        problemsSolved: number;
+        contestsJoined: number;
+        totalSubmissions: number;
+        acceptedSubmissions: number;
+        acceptanceRate: number;
+        createdAt: string;
+    };
+    solvedProblems: Array<{
+        id: string;
+        problemId: string;
+        title: string;
+        slug: string;
+        difficulty: "EASY" | "MEDIUM" | "HARD";
+        tags: string[];
+        solvedAt: string;
+        acceptedLanguage: string;
+        acceptedRuntime: number;
+        acceptedMemory: number;
+    }>;
+    recentSubmissions: Array<{
+        id: string;
+        problemId: string;
+        problemTitle: string;
+        problemSlug: string;
+        difficulty: "EASY" | "MEDIUM" | "HARD";
+        language: string;
+        status: string;
+        runtime: number;
+        memoryUsage: number;
+        submittedAt: string;
+        completedAt: string;
+    }>;
+    stats: {
+        difficultyBreakdown: {
+            easy: number;
+            medium: number;
+            hard: number;
+        };
+        topTags: Array<{
+            tag: string;
+            count: number;
+        }>;
+        submissionHistory: any[];
+    };
+}
+
+function DashboardPageContent() {
+    const router = useRouter();
+    const api = useApiWithAuth();
+    const { isLoaded, isSignedIn, getToken } = useAuth();
+    const [loading, setLoading] = useState(true);
+    const [dashboardData, setDashboardData] = useState<DashboardData | null>(
+        null
+    );
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const initDashboard = async () => {
+            if (isLoaded && isSignedIn) {
+                try {
+                    const token = await getToken();
+                    if (token) {
+                        api.setAuthToken(token);
+                        await loadDashboard();
+                    }
+                } catch (err) {
+                    console.error("Failed to get token:", err);
+                    setError("Authentication failed");
+                    setLoading(false);
+                }
+            } else if (isLoaded && !isSignedIn) {
+                router.push("/auth/sign-in");
+            }
+        };
+
+        initDashboard();
+    }, [isLoaded, isSignedIn]);
+
+    const loadDashboard = async () => {
+        try {
+            setLoading(true);
+            const response = await api.getUserDashboard();
+
+            if (response.success && response.data) {
+                setDashboardData(response.data);
+            } else {
+                setError("Failed to load dashboard data");
+            }
+        } catch (err) {
+            console.error("Error loading dashboard:", err);
+            setError("Failed to load dashboard");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex flex-col">
+                <HeroHeader />
+                <div className="flex-1 flex items-center justify-center pt-20">
+                    <div className="text-center">
+                        <Loader2 className="h-12 w-12 animate-spin mx-auto mb-4 text-primary" />
+                        <p className="text-muted-foreground">
+                            Loading your dashboard...
+                        </p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    if (error || !dashboardData) {
+        return (
+            <div className="min-h-screen flex flex-col">
+                <HeroHeader />
+                <div className="flex-1 flex items-center justify-center pt-20">
+                    <div className="text-center max-w-md mx-auto px-4">
+                        <XCircle className="h-12 w-12 mx-auto mb-4 text-destructive" />
+                        <p className="text-lg font-medium mb-2">
+                            Failed to load dashboard
+                        </p>
+                        <p className="text-muted-foreground mb-4">{error}</p>
+                        {error?.includes("Cannot connect") && (
+                            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-4 text-left">
+                                <p className="text-sm font-medium text-yellow-800 dark:text-yellow-200 mb-2">
+                                    🔧 Server Connection Issue
+                                </p>
+                                <p className="text-xs text-yellow-700 dark:text-yellow-300 mb-2">
+                                    The backend server is not responding. Please
+                                    make sure:
+                                </p>
+                                <ul className="text-xs text-yellow-700 dark:text-yellow-300 list-disc list-inside space-y-1">
+                                    <li>
+                                        Server is running:{" "}
+                                        <code className="bg-yellow-100 dark:bg-yellow-900 px-1 rounded">
+                                            cd server && npm run dev
+                                        </code>
+                                    </li>
+                                    <li>
+                                        Redis is running:{" "}
+                                        <code className="bg-yellow-100 dark:bg-yellow-900 px-1 rounded">
+                                            docker-compose -f
+                                            docker-compose.redis-only.yml up -d
+                                        </code>
+                                    </li>
+                                    <li>
+                                        Or run all services:{" "}
+                                        <code className="bg-yellow-100 dark:bg-yellow-900 px-1 rounded">
+                                            start-all-local.bat
+                                        </code>
+                                    </li>
+                                </ul>
+                            </div>
+                        )}
+                        <Button onClick={loadDashboard}>Try Again</Button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    const { user, solvedProblems, recentSubmissions, stats } = dashboardData;
+    const { difficultyBreakdown, topTags } = stats;
+
+    return (
+        <div className="min-h-screen flex flex-col">
+            <HeroHeader />
+            <div className="flex-1 container mx-auto px-4 pt-32 pb-8 max-w-7xl">
+                <div className="mb-8">
+                    <div className="flex items-center gap-4 mb-4">
+                        {user.profileImageUrl && (
+                            <img
+                                src={user.profileImageUrl}
+                                alt={user.username || "User"}
+                                className="w-20 h-20 rounded-full border-4 border-primary"
+                            />
+                        )}
+                        <div>
+                            <h1 className="text-3xl font-bold">
+                                {user.firstName || user.username || "User"}
+                                's Dashboard
+                            </h1>
+                            <p className="text-muted-foreground">
+                                @{user.username || "user"} • Member since{" "}
+                                {new Date(user.createdAt).toLocaleDateString()}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                    <Card className="p-6 border-l-4 border-l-green-500">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm text-muted-foreground">
+                                    Problems Solved
+                                </p>
+                                <p className="text-3xl font-bold">
+                                    {user.problemsSolved}
+                                </p>
+                            </div>
+                            <Trophy className="h-10 w-10 text-green-500" />
+                        </div>
+                    </Card>
+
+                    <Card className="p-6 border-l-4 border-l-blue-500">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm text-muted-foreground">
+                                    Total Submissions
+                                </p>
+                                <p className="text-3xl font-bold">
+                                    {user.totalSubmissions}
+                                </p>
+                            </div>
+                            <Code className="h-10 w-10 text-blue-500" />
+                        </div>
+                    </Card>
+
+                    <Card className="p-6 border-l-4 border-l-purple-500">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm text-muted-foreground">
+                                    Acceptance Rate
+                                </p>
+                                <p className="text-3xl font-bold">
+                                    {user.acceptanceRate}%
+                                </p>
+                            </div>
+                            <TrendingUp className="h-10 w-10 text-purple-500" />
+                        </div>
+                    </Card>
+
+                    <Card className="p-6 border-l-4 border-l-orange-500">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm text-muted-foreground">
+                                    Contests Joined
+                                </p>
+                                <p className="text-3xl font-bold">
+                                    {user.contestsJoined}
+                                </p>
+                            </div>
+                            <Target className="h-10 w-10 text-orange-500" />
+                        </div>
+                    </Card>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="space-y-6">
+                        <Card className="p-6">
+                            <h2 className="text-xl font-bold mb-4 flex items-center">
+                                <BarChart3 className="h-5 w-5 mr-2" />
+                                Difficulty Breakdown
+                            </h2>
+                            <div className="space-y-4">
+                                <div>
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="text-green-600 dark:text-green-400 font-medium">
+                                            Easy
+                                        </span>
+                                        <span className="font-bold">
+                                            {difficultyBreakdown.easy}
+                                        </span>
+                                    </div>
+                                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                        <div
+                                            className="bg-green-500 h-2 rounded-full"
+                                            style={{
+                                                width: `${
+                                                    (difficultyBreakdown.easy /
+                                                        user.problemsSolved) *
+                                                        100 || 0
+                                                }%`,
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="text-yellow-600 dark:text-yellow-400 font-medium">
+                                            Medium
+                                        </span>
+                                        <span className="font-bold">
+                                            {difficultyBreakdown.medium}
+                                        </span>
+                                    </div>
+                                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                        <div
+                                            className="bg-yellow-500 h-2 rounded-full"
+                                            style={{
+                                                width: `${
+                                                    (difficultyBreakdown.medium /
+                                                        user.problemsSolved) *
+                                                        100 || 0
+                                                }%`,
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="text-red-600 dark:text-red-400 font-medium">
+                                            Hard
+                                        </span>
+                                        <span className="font-bold">
+                                            {difficultyBreakdown.hard}
+                                        </span>
+                                    </div>
+                                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                        <div
+                                            className="bg-red-500 h-2 rounded-full"
+                                            style={{
+                                                width: `${
+                                                    (difficultyBreakdown.hard /
+                                                        user.problemsSolved) *
+                                                        100 || 0
+                                                }%`,
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </Card>
+
+                        <Card className="p-6">
+                            <h2 className="text-xl font-bold mb-4 flex items-center">
+                                <Tag className="h-5 w-5 mr-2" />
+                                Top Tags
+                            </h2>
+                            <div className="space-y-2">
+                                {topTags.slice(0, 8).map((tagItem) => (
+                                    <div
+                                        key={tagItem.tag}
+                                        className="flex items-center justify-between p-2 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors"
+                                    >
+                                        <span className="text-sm font-medium">
+                                            {tagItem.tag}
+                                        </span>
+                                        <span className="text-xs bg-primary text-primary-foreground px-2 py-1 rounded-full">
+                                            {tagItem.count}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        </Card>
+                    </div>
+
+                    <div className="lg:col-span-2">
+                        <Card className="p-6">
+                            <div className="flex items-center justify-between mb-4">
+                                <h2 className="text-xl font-bold flex items-center">
+                                    <Code className="h-5 w-5 mr-2" />
+                                    Recent Submissions
+                                </h2>
+                            </div>
+                            <div className="space-y-2 max-h-96 overflow-y-auto pr-2 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#424242] [&::-webkit-scrollbar-thumb]:rounded dark:[&::-webkit-scrollbar-thumb:hover]:bg-[#4f4f4f] [&::-webkit-scrollbar-thumb:hover]:bg-[#525252]">
+                                {recentSubmissions.length === 0 ? (
+                                    <p className="text-muted-foreground text-center py-8">
+                                        No submissions yet
+                                    </p>
+                                ) : (
+                                    recentSubmissions.map((submission) => (
+                                        <Link
+                                            key={submission.id}
+                                            href={`/problems/${submission.problemSlug}`}
+                                            className="block p-3 rounded-lg border hover:border-primary transition-all group"
+                                        >
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex-1">
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <h3 className="font-medium group-hover:text-primary transition-colors">
+                                                            {
+                                                                submission.problemTitle
+                                                            }
+                                                        </h3>
+                                                        <span
+                                                            className={`text-xs px-2 py-0.5 rounded-full ${getDifficultyBadgeColor(
+                                                                submission.difficulty
+                                                            )}`}
+                                                        >
+                                                            {
+                                                                submission.difficulty
+                                                            }
+                                                        </span>
+                                                        <span
+                                                            className={`text-xs px-2 py-0.5 rounded-full ${
+                                                                submission.status ===
+                                                                "ACCEPTED"
+                                                                    ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                                                                    : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+                                                            }`}
+                                                        >
+                                                            {submission.status}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                                                        <span className="flex items-center gap-1">
+                                                            <Code className="h-3 w-3" />
+                                                            {
+                                                                submission.language
+                                                            }
+                                                        </span>
+                                                        {submission.runtime && (
+                                                            <span className="flex items-center gap-1">
+                                                                <Clock className="h-3 w-3" />
+                                                                {
+                                                                    submission.runtime
+                                                                }
+                                                                ms
+                                                            </span>
+                                                        )}
+                                                        <span className="flex items-center gap-1">
+                                                            <Calendar className="h-3 w-3" />
+                                                            {new Date(
+                                                                submission.submittedAt
+                                                            ).toLocaleDateString()}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                                            </div>
+                                        </Link>
+                                    ))
+                                )}
+                            </div>
+                        </Card>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+export default function DashboardPage() {
+    return (
+        <ProtectedPage>
+            <DashboardPageContent />
+        </ProtectedPage>
+    );
+}
