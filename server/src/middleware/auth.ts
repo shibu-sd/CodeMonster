@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { createClerkClient } from "@clerk/nextjs/server";
 import { prisma } from "../utils/database";
+import { clerkClient } from "@clerk/clerk-sdk-node";
 
 declare global {
     namespace Express {
@@ -54,10 +54,93 @@ export const authenticateUser = async (
             }
         }
 
-        res.status(401).json({
-            success: false,
-            error: "Invalid authentication token",
-        });
+        try {
+            console.log("🔐 Attempting to verify Clerk token...");
+
+            const session = await clerkClient.verifyToken(token);
+            console.log("✅ Token verified successfully");
+
+            const userId = session.sub;
+
+            if (!userId) {
+                res.status(401).json({
+                    success: false,
+                    error: "Invalid token - no user ID",
+                });
+                return;
+            }
+
+            let user = await prisma.user.findUnique({
+                where: { clerkId: userId },
+                select: {
+                    id: true,
+                    clerkId: true,
+                    email: true,
+                    username: true,
+                    firstName: true,
+                    lastName: true,
+                },
+            });
+
+            if (!user) {
+                try {
+                    const clerkUser = await clerkClient.users.getUser(userId);
+                    const email =
+                        clerkUser.emailAddresses[0]?.emailAddress ||
+                        "unknown@codemonster.dev";
+
+                    user = await prisma.user.create({
+                        data: {
+                            clerkId: userId,
+                            email: email,
+                            username: clerkUser.username || null,
+                            firstName: clerkUser.firstName || null,
+                            lastName: clerkUser.lastName || null,
+                            profileImageUrl: clerkUser.imageUrl,
+                        },
+                        select: {
+                            id: true,
+                            clerkId: true,
+                            email: true,
+                            username: true,
+                            firstName: true,
+                            lastName: true,
+                        },
+                    });
+                    console.log("✅ Auto-created user from Clerk:", userId);
+                } catch (createError) {
+                    console.error("Error creating user:", createError);
+                    res.status(401).json({
+                        success: false,
+                        error: "Failed to create user",
+                    });
+                    return;
+                }
+            }
+
+            req.user = user;
+            next();
+        } catch (clerkError: any) {
+            console.error(
+                "❌ Clerk token verification error:",
+                clerkError.message || clerkError
+            );
+            console.error("❌ Error details:", {
+                name: clerkError.name,
+                message: clerkError.message,
+                code: clerkError.code,
+                status: clerkError.status,
+            });
+
+            res.status(401).json({
+                success: false,
+                error: "Invalid authentication token",
+                details:
+                    process.env.NODE_ENV === "development"
+                        ? clerkError.message
+                        : undefined,
+            });
+        }
     } catch (error) {
         console.error("Authentication middleware error:", error);
         res.status(500).json({
