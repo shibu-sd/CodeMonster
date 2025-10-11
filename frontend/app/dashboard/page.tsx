@@ -114,6 +114,12 @@ function DashboardPageContent() {
     const loadDashboard = async () => {
         try {
             setLoading(true);
+
+            const token = await getToken();
+            if (token) {
+                api.setAuthToken(token);
+            }
+
             const response = await api.getUserDashboard();
 
             if (response.success && response.data) {
