@@ -78,7 +78,14 @@ function ProblemsPageContent() {
     }, [currentPage, selectedDifficulty, searchTerm, authReady]);
 
     const fetchSolvedProblems = async () => {
+        if (!isSignedIn) return;
+
         try {
+            const token = await getToken();
+            if (token) {
+                api.setAuthToken(token);
+            }
+
             const response = await api.getUserDashboard();
             if (response.success && response.data.solvedProblems) {
                 const solvedIds = new Set<string>(
