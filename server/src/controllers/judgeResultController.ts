@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { prisma } from "../utils/database";
 import { SubmissionStatus } from "@prisma/client";
 import { JudgeJobResult } from "../types";
+import { SubmissionCleanupService } from "../services/submissionCleanupService";
 
 export class JudgeResultController {
     static async handleJudgeResult(req: Request, res: Response): Promise<void> {
@@ -106,10 +107,26 @@ async function updateSubmissionResult(result: JudgeJobResult): Promise<void> {
             `🎉 Submission accepted! Updating user and problem stats...`
         );
 
+        const existingUserProblem = await prisma.userProblem.findUnique({
+            where: {
+                userId_problemId: {
+                    userId: userId,
+                    problemId: problemId,
+                },
+            },
+        });
+
+        const isFirstAccepted = !existingUserProblem?.isSolved;
+
         await prisma.user.update({
             where: { id: userId },
             data: {
-                problemsSolved: {
+                problemsSolved: isFirstAccepted
+                    ? {
+                          increment: 1,
+                      }
+                    : undefined,
+                acceptedSubmissions: {
                     increment: 1,
                 },
             },
@@ -125,16 +142,24 @@ async function updateSubmissionResult(result: JudgeJobResult): Promise<void> {
             update: {
                 isSolved: true,
                 solvedAt: new Date(),
+                acceptedSolution: existingSubmission.code,
+                acceptedLanguage: existingSubmission.language,
+                acceptedRuntime: judgeResult.totalRuntime,
+                acceptedMemory: judgeResult.maxMemoryUsage,
             },
             create: {
                 userId: userId,
                 problemId: problemId,
                 isSolved: true,
                 solvedAt: new Date(),
+                acceptedSolution: existingSubmission.code,
+                acceptedLanguage: existingSubmission.language,
+                acceptedRuntime: judgeResult.totalRuntime,
+                acceptedMemory: judgeResult.maxMemoryUsage,
             },
         });
 
-        await prisma.problem.update({
+        const updatedProblem = await prisma.problem.update({
             where: { id: problemId },
             data: {
                 totalSubmissions: {
@@ -146,11 +171,26 @@ async function updateSubmissionResult(result: JudgeJobResult): Promise<void> {
             },
         });
 
-        console.log(`📊 Updated stats for ACCEPTED submission`);
+        const newAcceptanceRate =
+            updatedProblem.totalSubmissions > 0
+                ? updatedProblem.acceptedSubmissions /
+                  updatedProblem.totalSubmissions
+                : 0;
+
+        await prisma.problem.update({
+            where: { id: problemId },
+            data: {
+                acceptanceRate: newAcceptanceRate,
+            },
+        });
+
+        console.log(
+            `📊 Updated stats for ACCEPTED submission and saved solution`
+        );
     } else {
         console.log(`📊 Updating problem stats for non-accepted submission...`);
 
-        await prisma.problem.update({
+        const updatedProblem = await prisma.problem.update({
             where: { id: problemId },
             data: {
                 totalSubmissions: {
@@ -158,9 +198,26 @@ async function updateSubmissionResult(result: JudgeJobResult): Promise<void> {
                 },
             },
         });
+
+        const newAcceptanceRate =
+            updatedProblem.totalSubmissions > 0
+                ? updatedProblem.acceptedSubmissions /
+                  updatedProblem.totalSubmissions
+                : 0;
+
+        await prisma.problem.update({
+            where: { id: problemId },
+            data: {
+                acceptanceRate: newAcceptanceRate,
+            },
+        });
     }
 
     console.log(
         `📊 Updated submission ${submissionId} with status: ${judgeResult.status}`
+    );
+
+    SubmissionCleanupService.cleanupUserSubmissions(userId).catch((error) =>
+        console.error("Error during submission cleanup:", error)
     );
 }
