@@ -159,6 +159,12 @@ model UserProblem {
   attempts   Int      @default(0)
   bestSubmissionId String? // Reference to best submission
   
+  // Accepted solution storage
+  acceptedSolution String?  @db.Text // Store the accepted code
+  acceptedLanguage Language? // Language of accepted solution
+  acceptedRuntime  Int?      // Runtime of accepted solution (ms)
+  acceptedMemory   Int?      // Memory of accepted solution (MB)
+  
   firstAttemptAt DateTime?
   solvedAt       DateTime?
   lastAttemptAt  DateTime @default(now())
