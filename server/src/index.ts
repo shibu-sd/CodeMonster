@@ -3,7 +3,6 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import compression from "compression";
-import rateLimit from "express-rate-limit";
 import dotenv from "dotenv";
 import { connectDatabase } from "./utils/database";
 import { apiRoutes } from "./routes";
@@ -13,16 +12,9 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Rate limiting
-const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100,
-});
-
 // Middlewares
 app.use(helmet());
 app.use(compression());
-app.use(limiter);
 app.use(morgan("combined"));
 app.use(
     cors({
