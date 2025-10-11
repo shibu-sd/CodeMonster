@@ -126,6 +126,69 @@ export class UserController {
         }
     }
 
+    static async updateUserProfile(req: Request, res: Response): Promise<void> {
+        try {
+            const userId = req.user?.id;
+            const { username, firstName, lastName } = req.body;
+
+            if (!userId) {
+                res.status(401).json({
+                    success: false,
+                    error: "User not authenticated",
+                });
+                return;
+            }
+
+            if (username) {
+                const existingUser = await prisma.user.findFirst({
+                    where: {
+                        username,
+                        NOT: { id: userId },
+                    },
+                });
+
+                if (existingUser) {
+                    res.status(409).json({
+                        success: false,
+                        error: "Username is already taken",
+                    });
+                    return;
+                }
+            }
+
+            const user = await prisma.user.update({
+                where: { id: userId },
+                data: {
+                    username,
+                    firstName,
+                    lastName,
+                },
+                select: {
+                    id: true,
+                    email: true,
+                    username: true,
+                    firstName: true,
+                    lastName: true,
+                    profileImageUrl: true,
+                },
+            });
+
+            const response: ApiResponse = {
+                success: true,
+                data: user,
+                message: "Profile updated successfully",
+            };
+
+            res.status(200).json(response);
+        } catch (error) {
+            console.error("Error updating user profile:", error);
+            res.status(500).json({
+                success: false,
+                error: "Failed to update profile",
+            });
+        }
+    }
+
     static async getUserStats(req: Request, res: Response): Promise<void> {
         try {
             const { id } = req.params;
@@ -201,6 +264,177 @@ export class UserController {
             res.status(500).json({
                 success: false,
                 error: "Failed to fetch user statistics",
+            });
+        }
+    }
+
+    static async getUserDashboard(req: Request, res: Response): Promise<void> {
+        try {
+            const userId = req.user?.id;
+
+            if (!userId) {
+                res.status(401).json({
+                    success: false,
+                    error: "Unauthorized",
+                });
+                return;
+            }
+
+            const user = await prisma.user.findUnique({
+                where: { id: userId },
+                select: {
+                    id: true,
+                    username: true,
+                    firstName: true,
+                    lastName: true,
+                    email: true,
+                    profileImageUrl: true,
+                    problemsSolved: true,
+                    contestsJoined: true,
+                    totalSubmissions: true,
+                    acceptedSubmissions: true,
+                    createdAt: true,
+                },
+            });
+
+            if (!user) {
+                res.status(404).json({
+                    success: false,
+                    error: "User not found",
+                });
+                return;
+            }
+
+            const solvedProblems = await prisma.userProblem.findMany({
+                where: {
+                    userId: userId,
+                    isSolved: true,
+                },
+                include: {
+                    problem: {
+                        select: {
+                            id: true,
+                            title: true,
+                            slug: true,
+                            difficulty: true,
+                            tags: true,
+                            acceptanceRate: true,
+                        },
+                    },
+                },
+                orderBy: {
+                    solvedAt: "desc",
+                },
+            });
+
+            const recentSubmissions = await prisma.submission.findMany({
+                where: { userId: userId },
+                include: {
+                    problem: {
+                        select: {
+                            id: true,
+                            title: true,
+                            slug: true,
+                            difficulty: true,
+                        },
+                    },
+                },
+                orderBy: {
+                    submittedAt: "desc",
+                },
+                take: 15,
+            });
+
+            const difficultyStats = {
+                easy: 0,
+                medium: 0,
+                hard: 0,
+            };
+
+            solvedProblems.forEach((sp) => {
+                const difficulty = sp.problem.difficulty.toLowerCase();
+                if (difficulty === "easy") difficultyStats.easy++;
+                else if (difficulty === "medium") difficultyStats.medium++;
+                else if (difficulty === "hard") difficultyStats.hard++;
+            });
+
+            const tagStats: Record<string, number> = {};
+            solvedProblems.forEach((sp) => {
+                sp.problem.tags.forEach((tag) => {
+                    tagStats[tag] = (tagStats[tag] || 0) + 1;
+                });
+            });
+
+            const topTags = Object.entries(tagStats)
+                .sort(([, a], [, b]) => b - a)
+                .slice(0, 10)
+                .map(([tag, count]) => ({ tag, count }));
+
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+            const submissionHistory = await prisma.submission.groupBy({
+                by: ["submittedAt"],
+                where: {
+                    userId: userId,
+                    submittedAt: {
+                        gte: thirtyDaysAgo,
+                    },
+                },
+                _count: {
+                    id: true,
+                },
+            });
+
+            const acceptanceRate =
+                user.totalSubmissions > 0
+                    ? (user.acceptedSubmissions / user.totalSubmissions) * 100
+                    : 0;
+
+            res.json({
+                success: true,
+                data: {
+                    user: {
+                        ...user,
+                        acceptanceRate: Math.round(acceptanceRate * 100) / 100,
+                    },
+                    solvedProblems: solvedProblems.map((sp) => ({
+                        id: sp.id,
+                        problemId: sp.problem.id,
+                        title: sp.problem.title,
+                        slug: sp.problem.slug,
+                        difficulty: sp.problem.difficulty,
+                        tags: sp.problem.tags,
+                        solvedAt: sp.solvedAt,
+                        acceptedLanguage: sp.acceptedLanguage,
+                        acceptedRuntime: sp.acceptedRuntime,
+                        acceptedMemory: sp.acceptedMemory,
+                    })),
+                    recentSubmissions: recentSubmissions.map((sub) => ({
+                        id: sub.id,
+                        problemId: sub.problem.id,
+                        problemTitle: sub.problem.title,
+                        problemSlug: sub.problem.slug,
+                        difficulty: sub.problem.difficulty,
+                        language: sub.language,
+                        status: sub.status,
+                        runtime: sub.runtime,
+                        memoryUsage: sub.memoryUsage,
+                        submittedAt: sub.submittedAt,
+                        completedAt: sub.completedAt,
+                    })),
+                    stats: {
+                        difficultyBreakdown: difficultyStats,
+                        topTags,
+                        submissionHistory,
+                    },
+                },
+            });
+        } catch (error) {
+            console.error("Error fetching user dashboard:", error);
+            res.status(500).json({
+                success: false,
+                error: "Failed to fetch dashboard data",
             });
         }
     }
@@ -316,65 +550,65 @@ export class UserController {
         }
     }
 
-    static async updateUserProfile(req: Request, res: Response): Promise<void> {
+    static async getUserSolution(req: Request, res: Response): Promise<void> {
         try {
             const userId = req.user?.id;
-            const { username, firstName, lastName } = req.body;
+            const { problemId } = req.params;
 
             if (!userId) {
                 res.status(401).json({
                     success: false,
-                    error: "User not authenticated",
+                    error: "Unauthorized",
                 });
                 return;
             }
 
-            if (username) {
-                const existingUser = await prisma.user.findFirst({
-                    where: {
-                        username,
-                        NOT: { id: userId },
+            const userProblem = await prisma.userProblem.findUnique({
+                where: {
+                    userId_problemId: {
+                        userId: userId,
+                        problemId: problemId,
                     },
-                });
-
-                if (existingUser) {
-                    res.status(409).json({
-                        success: false,
-                        error: "Username is already taken",
-                    });
-                    return;
-                }
-            }
-
-            const user = await prisma.user.update({
-                where: { id: userId },
-                data: {
-                    username,
-                    firstName,
-                    lastName,
                 },
-                select: {
-                    id: true,
-                    email: true,
-                    username: true,
-                    firstName: true,
-                    lastName: true,
-                    profileImageUrl: true,
+                include: {
+                    problem: {
+                        select: {
+                            id: true,
+                            title: true,
+                            slug: true,
+                            difficulty: true,
+                        },
+                    },
                 },
             });
 
-            const response: ApiResponse = {
-                success: true,
-                data: user,
-                message: "Profile updated successfully",
-            };
+            if (!userProblem || !userProblem.isSolved) {
+                res.status(404).json({
+                    success: false,
+                    error: "No accepted solution found",
+                });
+                return;
+            }
 
-            res.status(200).json(response);
+            res.json({
+                success: true,
+                data: {
+                    problemId: userProblem.problem.id,
+                    problemTitle: userProblem.problem.title,
+                    problemSlug: userProblem.problem.slug,
+                    difficulty: userProblem.problem.difficulty,
+                    acceptedSolution: userProblem.acceptedSolution,
+                    acceptedLanguage: userProblem.acceptedLanguage,
+                    acceptedRuntime: userProblem.acceptedRuntime,
+                    acceptedMemory: userProblem.acceptedMemory,
+                    solvedAt: userProblem.solvedAt,
+                },
+            });
         } catch (error) {
-            console.error("Error updating user profile:", error);
+            console.error("Error fetching user solution:", error);
             res.status(500).json({
                 success: false,
-                error: "Failed to update profile",
+                error: "Failed to fetch solution",
             });
         }
     }
