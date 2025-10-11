@@ -4,6 +4,7 @@ import {
     authenticateUser,
     validateSubmission,
     submissionRateLimit,
+    runCodeRateLimit,
 } from "../middleware/auth";
 
 const router = Router();
@@ -20,6 +21,7 @@ router.post(
     "/run",
     authenticateUser,
     validateSubmission,
+    runCodeRateLimit,
     SubmissionController.runCode
 );
 
