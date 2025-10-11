@@ -158,9 +158,14 @@ function ProblemDetailPageContent() {
     }, [problem, authReady, isSignedIn]);
 
     const loadAcceptedSolution = async () => {
-        if (!problem) return;
+        if (!problem || !isSignedIn) return;
 
         try {
+            const token = await getToken();
+            if (token) {
+                api.setAuthToken(token);
+            }
+
             const response = await api.getUserSolution(problem.id);
             if (response.success && response.data) {
                 setAcceptedSolution({
@@ -209,6 +214,15 @@ function ProblemDetailPageContent() {
             return;
         }
 
+        if (!isSignedIn) {
+            console.error("❌ User not signed in!");
+            setRunResult({
+                status: "ERROR",
+                error: "Please sign in to run code",
+            });
+            return;
+        }
+
         console.log(`🔧 Running code for problem: ${problem.id}`);
         console.log(`📝 Language: ${selectedLanguage}`);
         console.log(`💻 Code length: ${code.length} characters`);
@@ -219,6 +233,11 @@ function ProblemDetailPageContent() {
             setShowRunPanel(true);
             setShowSubmitPanel(false);
             setActiveTestCase(0);
+
+            const token = await getToken();
+            if (token) {
+                api.setAuthToken(token);
+            }
 
             const response = await api.runCode({
                 problemId: problem.id,
@@ -260,6 +279,15 @@ function ProblemDetailPageContent() {
             return;
         }
 
+        if (!isSignedIn) {
+            console.error("❌ User not signed in!");
+            setSubmissionResult({
+                status: "ERROR",
+                error: "Please sign in to submit code",
+            });
+            return;
+        }
+
         console.log(`🔧 Submitting code for problem: ${problem.id}`);
         console.log(`📝 Language: ${selectedLanguage}`);
         console.log(`💻 Code length: ${code.length} characters`);
@@ -271,6 +299,11 @@ function ProblemDetailPageContent() {
             setShowRunPanel(false);
             setActiveTestCase(0);
             setPollingAttempts(0);
+
+            const token = await getToken();
+            if (token) {
+                api.setAuthToken(token);
+            }
 
             const response = await api.submitCode({
                 problemId: problem.id,
