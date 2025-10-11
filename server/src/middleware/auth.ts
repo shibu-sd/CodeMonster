@@ -239,17 +239,91 @@ export const validateSubmission = (
     next();
 };
 
+const submissionCounts = new Map<
+    string,
+    { count: number; resetTime: number }
+>();
+
 export const submissionRateLimit = (
     req: Request,
     res: Response,
     next: NextFunction
 ): void => {
-    // In a real implementation, you'd use Redis or memory store
-    // For now, we'll just add a simple check
-    const userAgent = req.headers["user-agent"];
-    const ip = req.ip;
+    const userId = req.user?.id;
+    if (!userId) {
+        next();
+        return;
+    }
 
-    // TODO: Implement proper rate limiting with Redis
-    // For now, just continue
+    const now = Date.now();
+    const windowMs = 60 * 1000;
+    const maxSubmissions = 5; // 5 submissions per minute
+
+    const userKey = `submission:${userId}`;
+    const userLimit = submissionCounts.get(userKey);
+
+    if (userLimit && now > userLimit.resetTime) {
+        submissionCounts.delete(userKey);
+    }
+
+    const currentCount =
+        userLimit && now <= userLimit.resetTime ? userLimit.count : 0;
+
+    if (currentCount >= maxSubmissions) {
+        res.status(429).json({
+            success: false,
+            error: "Too many submissions. Please wait a minute before trying again.",
+        });
+        return;
+    }
+
+    submissionCounts.set(userKey, {
+        count: currentCount + 1,
+        resetTime: userLimit?.resetTime || now + windowMs,
+    });
+
+    next();
+};
+
+const runCounts = new Map<string, { count: number; resetTime: number }>();
+
+export const runCodeRateLimit = (
+    req: Request,
+    res: Response,
+    next: NextFunction
+): void => {
+    const userId = req.user?.id;
+    if (!userId) {
+        next();
+        return;
+    }
+
+    const now = Date.now();
+    const windowMs = 60 * 1000;
+    const maxRuns = 10; // 10 runs per minute
+
+    const userKey = `run:${userId}`;
+    const userLimit = runCounts.get(userKey);
+
+    if (userLimit && now > userLimit.resetTime) {
+        runCounts.delete(userKey);
+    }
+
+    const currentCount =
+        userLimit && now <= userLimit.resetTime ? userLimit.count : 0;
+
+    if (currentCount >= maxRuns) {
+        res.status(429).json({
+            success: false,
+            error: "Too many run requests. Please wait a minute before trying again.",
+        });
+        return;
+    }
+
+    runCounts.set(userKey, {
+        count: currentCount + 1,
+        resetTime: userLimit?.resetTime || now + windowMs,
+    });
+
     next();
 };
