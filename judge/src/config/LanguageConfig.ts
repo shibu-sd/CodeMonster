@@ -19,7 +19,7 @@ export const LANGUAGE_CONFIGS: Record<string, LanguageConfig> = {
         compileCommand: "javac -cp /workspace /workspace/Solution.java",
         runCommand: "java -cp /workspace Solution",
         timeLimit: 10,
-        memoryLimit: 512,
+        memoryLimit: 768,
     },
 
     CPP: {
