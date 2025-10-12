@@ -93,8 +93,18 @@ export class CodeExecutor {
 
         console.log(`📝 Creating workspace for ${langConfig.name}`);
 
+        // For Java, ensure the public class name matches the filename
+        let processedCode = code;
+        if (langConfig.id === "JAVA") {
+            processedCode = this.normalizeJavaClassName(code);
+        }
+
         const codeFileName = this.getCodeFileName(langConfig);
-        await fs.writeFile(path.join(workspaceDir, codeFileName), code, "utf8");
+        await fs.writeFile(
+            path.join(workspaceDir, codeFileName),
+            processedCode,
+            "utf8"
+        );
 
         if (input) {
             await fs.writeFile(
@@ -103,6 +113,13 @@ export class CodeExecutor {
                 "utf8"
             );
         }
+    }
+
+    private normalizeJavaClassName(code: string): string {
+        // Replace public class <AnyName> with public class Solution
+        // This ensures the class name matches the filename (Solution.java)
+        const publicClassRegex = /public\s+class\s+\w+/g;
+        return code.replace(publicClassRegex, "public class Solution");
     }
 
     private getCodeFileName(langConfig: LanguageConfig): string {
