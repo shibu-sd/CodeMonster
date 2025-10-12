@@ -12,6 +12,6 @@ RUN javac /Runner.java
 
 USER coderunner
 
-ENV JAVA_TOOL_OPTIONS="-Xmx32m -Xms8m -XX:+UseSerialGC -XX:CompressedClassSpaceSize=32m -XX:MaxMetaspaceSize=32m"
+ENV JAVA_TOOL_OPTIONS="-Xmx256m -Xms64m -XX:+UseSerialGC -XX:MaxMetaspaceSize=128m"
 
 CMD ["/runner.sh"]
