@@ -195,17 +195,11 @@ export class UserController {
 
             const user = await prisma.user.findUnique({
                 where: { id },
-                include: {
-                    submissions: {
-                        select: {
-                            status: true,
-                            problem: {
-                                select: {
-                                    difficulty: true,
-                                },
-                            },
-                        },
-                    },
+                select: {
+                    id: true,
+                    problemsSolved: true,
+                    totalSubmissions: true,
+                    acceptedSubmissions: true,
                     userProblems: {
                         where: { isSolved: true },
                         select: {
@@ -227,9 +221,6 @@ export class UserController {
                 return;
             }
 
-            const acceptedSubmissions = user.submissions.filter(
-                (s) => s.status === "ACCEPTED"
-            );
             const acceptanceRate =
                 user.totalSubmissions > 0
                     ? (user.acceptedSubmissions / user.totalSubmissions) * 100
@@ -583,9 +574,10 @@ export class UserController {
             });
 
             if (!userProblem || !userProblem.isSolved) {
-                res.status(404).json({
-                    success: false,
-                    error: "No accepted solution found",
+                res.json({
+                    success: true,
+                    data: null,
+                    message: "No accepted solution found",
                 });
                 return;
             }
