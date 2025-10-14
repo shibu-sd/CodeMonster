@@ -1,72 +1,118 @@
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
-import morgan from "morgan";
 import compression from "compression";
-import dotenv from "dotenv";
+import { config, validateConfig } from "./config";
 import { connectDatabase } from "./utils/database";
 import { apiRoutes } from "./routes";
+import { errorHandler, notFoundHandler } from "./middleware/errorHandler";
+import { sanitizeInput } from "./middleware/validation";
+import { rateLimitMiddleware } from "./middleware/rateLimiter";
+import { requestLogger, logger } from "./utils/logger";
+import { redisConnection } from "./queues/submissionQueue";
 
-dotenv.config();
+// Validate configuration
+validateConfig();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = config.server.port;
 
 // Middlewares
 app.use(helmet());
 app.use(compression());
-app.use(morgan("combined"));
-app.use(
-    cors({
-        origin:
-            process.env.NODE_ENV === "production"
-                ? ["https://your-domain.com"]
-                : ["http://localhost:3000"],
-        credentials: true,
-    })
-);
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
-app.get("/health", (req, res) => {
+app.use(cors(config.cors));
+
+app.use(requestLogger());
+
+app.use(sanitizeInput);
+
+// Global rate limiting
+app.use("/api", rateLimitMiddleware.global(redisConnection));
+
+app.get("/health", (_req, res) => {
     res.status(200).json({
         status: "OK",
         timestamp: new Date().toISOString(),
-        environment: process.env.NODE_ENV || "development",
+        environment: config.server.nodeEnv,
+        version: "1.0.0",
+        uptime: process.uptime(),
     });
 });
 
-app.use("/api", apiRoutes);
+app.use(config.server.apiPrefix, apiRoutes);
 
-app.use((req, res) => {
-    res.status(404).json({
-        error: "Route not found",
-        path: req.originalUrl,
+app.use(notFoundHandler);
+
+app.use(errorHandler);
+
+// Graceful shutdown handling
+const gracefulShutdown = (signal: string) => {
+    logger.info(`Received ${signal}, shutting down gracefully...`);
+
+    server.close(() => {
+        logger.info("HTTP server closed");
+
+        const prisma = require("./utils/database").prisma;
+        if (prisma) {
+            prisma
+                .$disconnect()
+                .then(() => {
+                    logger.info("Database connection closed");
+
+                    redisConnection.disconnect();
+                    logger.info("Redis connection closed");
+
+                    process.exit(0);
+                })
+                .catch((error: Error) => {
+                    logger.error("Error during shutdown:", error);
+                    process.exit(1);
+                });
+        } else {
+            process.exit(0);
+        }
     });
-});
 
-// Global error handler
-app.use(
-    (
-        err: any,
-        req: express.Request,
-        res: express.Response,
-        next: express.NextFunction
-    ) => {
-        console.error(err.stack);
-        res.status(500).json({
-            error:
-                process.env.NODE_ENV === "production"
-                    ? "Internal server error"
-                    : err.message,
-        });
+    setTimeout(() => {
+        logger.error(
+            "Could not close connections in time, forcefully shutting down"
+        );
+        process.exit(1);
+    }, 30000);
+};
+
+// Start server
+const server = app.listen(PORT, async () => {
+    logger.info(`🚀 Server running on port ${PORT}`, {
+        port: PORT,
+        environment: config.server.nodeEnv,
+        healthCheck: `http://localhost:${PORT}/health`,
+        apiPrefix: config.server.apiPrefix,
+    });
+
+    try {
+        await connectDatabase();
+        logger.info("✅ Database connected successfully");
+    } catch (error) {
+        logger.error("❌ Database connection failed:", error);
+        process.exit(1);
     }
-);
-
-app.listen(PORT, async () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-    console.log(`📊 Environment: ${process.env.NODE_ENV || "development"}`);
-    console.log(`🔗 Health check: http://localhost:${PORT}/health`);
-
-    await connectDatabase();
 });
+
+process.on("uncaughtException", (error) => {
+    logger.error("Uncaught Exception:", error);
+    process.exit(1);
+});
+
+process.on("unhandledRejection", (reason, promise) => {
+    logger.error("Unhandled Rejection at:", { promise, reason });
+    process.exit(1);
+});
+
+process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
+process.on("SIGINT", () => gracefulShutdown("SIGINT"));
+
+export default app;
