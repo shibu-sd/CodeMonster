@@ -400,6 +400,11 @@ function ProblemDetailPageContent() {
                     } else {
                         console.log(`🎉 Final result: ${status}`);
                         setIsSubmitting(false);
+
+                        if (status === "ACCEPTED") {
+                            await loadAcceptedSolution();
+                            setActiveTab("submissions");
+                        }
                     }
                 } else {
                     if (attempts < maxAttempts) {
