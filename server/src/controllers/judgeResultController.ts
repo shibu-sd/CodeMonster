@@ -3,6 +3,7 @@ import { prisma } from "../utils/database";
 import { SubmissionStatus } from "@prisma/client";
 import { JudgeJobResult } from "../types";
 import { SubmissionCleanupService } from "../services/submissionCleanupService";
+import { problemRepository } from "../repositories";
 
 export class JudgeResultController {
     static async handleJudgeResult(req: Request, res: Response): Promise<void> {
@@ -83,7 +84,7 @@ async function updateSubmissionResult(result: JudgeJobResult): Promise<void> {
         `🔄 Updating submission ${submissionId} to status: ${mappedStatus}`
     );
 
-    const updatedSubmission = await prisma.submission.update({
+    await prisma.submission.update({
         where: { id: submissionId },
         data: {
             status: mappedStatus,
@@ -187,6 +188,8 @@ async function updateSubmissionResult(result: JudgeJobResult): Promise<void> {
         console.log(
             `📊 Updated stats for ACCEPTED submission and saved solution`
         );
+
+        problemRepository.invalidateCacheForId(problemId);
     } else {
         console.log(`📊 Updating problem stats for non-accepted submission...`);
 
@@ -211,6 +214,8 @@ async function updateSubmissionResult(result: JudgeJobResult): Promise<void> {
                 acceptanceRate: newAcceptanceRate,
             },
         });
+
+        problemRepository.invalidateCacheForId(problemId);
     }
 
     console.log(
