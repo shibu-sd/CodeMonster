@@ -1,11 +1,6 @@
 import { Request, Response } from "express";
 import { prisma } from "../utils/database";
-import {
-    ApiResponse,
-    SubmissionRequest,
-    JudgeResult,
-    TestCaseResult,
-} from "../types";
+import { ApiResponse, SubmissionRequest } from "../types";
 import { Language, SubmissionStatus } from "@prisma/client";
 import { addSubmissionJob, getJobStatus } from "../queues/submissionQueue";
 import { JudgeJobData } from "../types";
@@ -117,7 +112,20 @@ export class SubmissionController {
                 })),
             };
 
+            console.log(
+                `🔗 Adding job to queue for submission: ${submission.id}`
+            );
+            console.log(
+                `📝 Test cases count: ${judgeJobData.testCases.length}`
+            );
+            console.log(
+                `📝 Test cases data:`,
+                JSON.stringify(judgeJobData.testCases, null, 2)
+            );
+
             const job = await addSubmissionJob(judgeJobData);
+
+            console.log(`✅ Job added to queue: ${job.id}`);
 
             const response: ApiResponse = {
                 success: true,
@@ -190,7 +198,7 @@ export class SubmissionController {
             const judgeUrl = process.env.JUDGE_URL || "http://localhost:3001";
 
             console.log(
-                `🔗 Sending run request to judge service: ${judgeUrl}/api/execute`
+                `🔗 Sending run request to real judge service: ${judgeUrl}/api/execute`
             );
             console.log(`📝 Test cases found: ${problem.testCases.length}`);
             console.log(
@@ -214,7 +222,7 @@ export class SubmissionController {
                 };
 
                 console.log(
-                    `📝 Sending payload:`,
+                    `📝 Sending payload to real judge:`,
                     JSON.stringify(payload, null, 2)
                 );
 
