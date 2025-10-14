@@ -1,6 +1,13 @@
 import { Request, Response, NextFunction } from "express";
-import { prisma } from "../utils/database";
 import { clerkClient } from "@clerk/clerk-sdk-node";
+import {
+    AuthenticationError,
+    AuthorizationError,
+    asyncHandler,
+} from "./errorHandler";
+import { config } from "../config";
+import { logger } from "../utils/logger";
+import { userRepository } from "../repositories";
 
 declare global {
     namespace Express {
@@ -12,318 +19,180 @@ declare global {
                 username?: string | null;
                 firstName?: string | null;
                 lastName?: string | null;
+                profileImageUrl?: string | null;
             };
         }
     }
 }
 
-export const authenticateUser = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-): Promise<void> => {
-    try {
+export const authenticateUser = asyncHandler(
+    async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
         const authHeader = req.headers.authorization;
         if (!authHeader || !authHeader.startsWith("Bearer ")) {
-            res.status(401).json({
-                success: false,
-                error: "No authentication token provided",
-            });
-            return;
+            throw new AuthenticationError("No authentication token provided");
         }
 
         const token = authHeader.substring(7);
 
-        if (token === "test-token") {
-            const user = await prisma.user.findUnique({
-                where: { email: "test@codemonster.dev" },
-                select: {
-                    id: true,
-                    clerkId: true,
-                    email: true,
-                    username: true,
-                    firstName: true,
-                    lastName: true,
-                },
-            });
-
+        if (token === config.auth.testToken) {
+            const user = await userRepository.findByEmail(
+                config.auth.testEmail
+            );
             if (user) {
                 req.user = user;
-                next();
-                return;
+                logger.debug("Test user authenticated", { userId: user.id });
+                return next();
             }
         }
 
         try {
-            console.log("🔐 Attempting to verify Clerk token...");
+            logger.debug("Attempting to verify Clerk token", {
+                tokenLength: token.length,
+            });
 
             const session = await clerkClient.verifyToken(token);
-            console.log("✅ Token verified successfully");
+            logger.debug("Token verified successfully");
 
             const userId = session.sub;
 
             if (!userId) {
-                res.status(401).json({
-                    success: false,
-                    error: "Invalid token - no user ID",
-                });
-                return;
+                throw new AuthenticationError("Invalid token - no user ID");
             }
 
-            let user = await prisma.user.findUnique({
-                where: { clerkId: userId },
-                select: {
-                    id: true,
-                    clerkId: true,
-                    email: true,
-                    username: true,
-                    firstName: true,
-                    lastName: true,
-                },
-            });
+            let user = await userRepository.findByClerkId(userId);
 
             if (!user) {
+                logger.info("Auto-creating user from Clerk", {
+                    clerkId: userId,
+                });
+
                 try {
                     const clerkUser = await clerkClient.users.getUser(userId);
                     const email =
                         clerkUser.emailAddresses[0]?.emailAddress ||
                         "unknown@codemonster.dev";
 
-                    user = await prisma.user.create({
-                        data: {
-                            clerkId: userId,
-                            email: email,
-                            username: clerkUser.username || null,
-                            firstName: clerkUser.firstName || null,
-                            lastName: clerkUser.lastName || null,
-                            profileImageUrl: clerkUser.imageUrl,
-                        },
-                        select: {
-                            id: true,
-                            clerkId: true,
-                            email: true,
-                            username: true,
-                            firstName: true,
-                            lastName: true,
-                        },
+                    user = await userRepository.createUserFromClerk({
+                        id: userId,
+                        email,
+                        username: clerkUser.username,
+                        firstName: clerkUser.firstName,
+                        lastName: clerkUser.lastName,
+                        profileImageUrl: clerkUser.imageUrl,
                     });
-                    console.log("✅ Auto-created user from Clerk:", userId);
+
+                    logger.info("User created successfully", {
+                        clerkId: userId,
+                        email,
+                        userId: user.id,
+                    });
                 } catch (createError) {
-                    console.error("Error creating user:", createError);
-                    res.status(401).json({
-                        success: false,
-                        error: "Failed to create user",
+                    logger.error("Error creating user from Clerk", {
+                        clerkId: userId,
+                        error: createError,
                     });
-                    return;
+                    throw new AuthenticationError("Failed to create user");
                 }
             }
 
             req.user = user;
+            logger.debug("User authenticated", {
+                userId: user.id,
+                clerkId: user.clerkId,
+            });
             next();
         } catch (clerkError: any) {
-            console.error(
-                "❌ Clerk token verification error:",
-                clerkError.message || clerkError
-            );
-            console.error("❌ Error details:", {
-                name: clerkError.name,
-                message: clerkError.message,
-                code: clerkError.code,
-                status: clerkError.status,
+            logger.error("Clerk token verification error", {
+                error: clerkError.message || clerkError,
+                details: {
+                    name: clerkError.name,
+                    message: clerkError.message,
+                    code: clerkError.code,
+                    status: clerkError.status,
+                },
+                ip: req.ip,
+                userAgent: req.get("User-Agent"),
             });
 
-            res.status(401).json({
-                success: false,
-                error: "Invalid authentication token",
-                details:
-                    process.env.NODE_ENV === "development"
-                        ? clerkError.message
-                        : undefined,
-            });
+            throw new AuthenticationError("Invalid authentication token");
         }
-    } catch (error) {
-        console.error("Authentication middleware error:", error);
-        res.status(500).json({
-            success: false,
-            error: "Authentication service error",
-        });
     }
-};
+);
 
-export const optionalAuth = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-): Promise<void> => {
-    const authHeader = req.headers.authorization;
+export const optionalAuth = asyncHandler(
+    async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
+        const authHeader = req.headers.authorization;
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            return next();
+        }
+
+        try {
+            await authenticateUser(req, _res, next);
+        } catch (error: any) {
+            logger.debug("Optional authentication failed", {
+                error: error.message,
+            });
+            next();
+        }
+    }
+);
+
+export const requireAdmin = asyncHandler(
+    async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
+        if (!req.user) {
+            throw new AuthenticationError("Authentication required");
+        }
+
+        const isAdmin = req.user.email === config.auth.testEmail;
+
+        if (!isAdmin) {
+            logger.logSecurity("Unauthorized admin access attempt", {
+                userId: req.user.id,
+                email: req.user.email,
+                ip: req.ip,
+                userAgent: req.get("User-Agent"),
+            });
+            throw new AuthorizationError("Admin access required");
+        }
+
+        logger.debug("Admin access granted", { userId: req.user.id });
         next();
-        return;
     }
-
-    await authenticateUser(req, res, next);
-};
-
-export const requireAdmin = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-): Promise<void> => {
-    if (!req.user) {
-        res.status(401).json({
-            success: false,
-            error: "Authentication required",
-        });
-        return;
-    }
-
-    const isAdmin = req.user.email === "test@codemonster.dev";
-
-    if (!isAdmin) {
-        res.status(403).json({
-            success: false,
-            error: "Admin access required",
-        });
-        return;
-    }
-
-    next();
-};
+);
 
 export const validateSubmission = (
     req: Request,
-    res: Response,
+    _res: Response,
     next: NextFunction
 ): void => {
     const { problemId, language, code } = req.body;
 
     if (!problemId || typeof problemId !== "string") {
-        res.status(400).json({
-            success: false,
-            error: "Valid problem ID is required",
-        });
-        return;
+        throw new AuthenticationError("Valid problem ID is required");
     }
 
-    if (
-        !language ||
-        !["JAVASCRIPT", "PYTHON", "JAVA", "CPP", "C", "TYPESCRIPT"].includes(
-            language
-        )
-    ) {
-        res.status(400).json({
-            success: false,
-            error: "Valid programming language is required",
-        });
-        return;
+    const validLanguages = [
+        "JAVASCRIPT",
+        "PYTHON",
+        "JAVA",
+        "CPP",
+        "C",
+        "TYPESCRIPT",
+    ];
+    if (!language || !validLanguages.includes(language)) {
+        throw new AuthenticationError("Valid programming language is required");
     }
 
     if (!code || typeof code !== "string" || code.trim().length === 0) {
-        res.status(400).json({
-            success: false,
-            error: "Code is required",
-        });
-        return;
+        throw new AuthenticationError("Code is required");
     }
 
-    if (code.length > 50000) {
-        // 50KB limit
-        res.status(400).json({
-            success: false,
-            error: "Code is too long (maximum 50KB)",
-        });
-        return;
+    if (code.length > config.upload.maxCodeLength) {
+        throw new AuthenticationError(
+            `Code is too long (maximum ${config.upload.maxCodeLength / 1000}KB)`
+        );
     }
-
-    next();
-};
-
-const submissionCounts = new Map<
-    string,
-    { count: number; resetTime: number }
->();
-
-export const submissionRateLimit = (
-    req: Request,
-    res: Response,
-    next: NextFunction
-): void => {
-    const userId = req.user?.id;
-    if (!userId) {
-        next();
-        return;
-    }
-
-    const now = Date.now();
-    const windowMs = 60 * 1000;
-    const maxSubmissions = 5; // 5 submissions per minute
-
-    const userKey = `submission:${userId}`;
-    const userLimit = submissionCounts.get(userKey);
-
-    if (userLimit && now > userLimit.resetTime) {
-        submissionCounts.delete(userKey);
-    }
-
-    const currentCount =
-        userLimit && now <= userLimit.resetTime ? userLimit.count : 0;
-
-    if (currentCount >= maxSubmissions) {
-        res.status(429).json({
-            success: false,
-            error: "Too many submissions. Please wait a minute before trying again.",
-        });
-        return;
-    }
-
-    submissionCounts.set(userKey, {
-        count: currentCount + 1,
-        resetTime: userLimit?.resetTime || now + windowMs,
-    });
-
-    next();
-};
-
-const runCounts = new Map<string, { count: number; resetTime: number }>();
-
-export const runCodeRateLimit = (
-    req: Request,
-    res: Response,
-    next: NextFunction
-): void => {
-    const userId = req.user?.id;
-    if (!userId) {
-        next();
-        return;
-    }
-
-    const now = Date.now();
-    const windowMs = 60 * 1000;
-    const maxRuns = 10; // 10 runs per minute
-
-    const userKey = `run:${userId}`;
-    const userLimit = runCounts.get(userKey);
-
-    if (userLimit && now > userLimit.resetTime) {
-        runCounts.delete(userKey);
-    }
-
-    const currentCount =
-        userLimit && now <= userLimit.resetTime ? userLimit.count : 0;
-
-    if (currentCount >= maxRuns) {
-        res.status(429).json({
-            success: false,
-            error: "Too many run requests. Please wait a minute before trying again.",
-        });
-        return;
-    }
-
-    runCounts.set(userKey, {
-        count: currentCount + 1,
-        resetTime: userLimit?.resetTime || now + windowMs,
-    });
 
     next();
 };
