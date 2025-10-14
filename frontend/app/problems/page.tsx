@@ -111,8 +111,9 @@ function ProblemsPageContent() {
             });
 
             if (response.success) {
-                setProblems(response.data.problems);
-                setTotalPages(response.data.pagination.totalPages);
+                // Handle actual API response format: data.data contains problems
+                setProblems(response.data.data || []);
+                setTotalPages(response.data.pagination?.totalPages || 1);
             } else {
                 setError("Failed to fetch problems");
             }
