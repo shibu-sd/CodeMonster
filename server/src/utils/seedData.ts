@@ -3,23 +3,21 @@ import { Difficulty, Language } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-/**
- * Seed sample problems with Codeforces-style format
- */
 export async function seedSampleProblems(): Promise<void> {
     console.log("🌱 Seeding Codeforces-style problems...");
 
-    // Clear existing problems
-    console.log("🗑️ Clearing existing problems...");
-    await prisma.submission.deleteMany();
-    await prisma.starterCode.deleteMany();
-    await prisma.testCase.deleteMany();
-    await prisma.problem.deleteMany();
-    console.log("✅ Existing data cleared");
+    const existingProblems = await prisma.problem.count();
+    if (existingProblems > 0) {
+        console.log(
+            `ℹ️ Found ${existingProblems} existing problems. Skipping seeding.`
+        );
+        return;
+    }
+    console.log("ℹ️ No existing problems found. Creating sample problems...");
 
     // Problem 1: Two Sum (Array problem)
     console.log("📝 Creating Two Sum problem...");
-    const twoSumProblem = await prisma.problem.create({
+    await prisma.problem.create({
         data: {
             title: "Two Sum",
             slug: "two-sum",
@@ -93,12 +91,17 @@ n = int(input())
 nums = list(map(int, input().split()))
 target = int(input())
 
-# Your solution here
-# Print the two indices separated by space
+# TODO: Write your solution here
+# Find two numbers in the array that add up to target
+# Return their indices (0-based)
 
 # Example:
-# i, j = find_two_sum(nums, target)
-# print(i, j)`,
+# def two_sum(nums, target):
+#     # Your code here
+#     return [i, j]
+
+# result = two_sum(nums, target)
+# print(result[0], result[1])`,
                     },
                     {
                         language: Language.JAVA,
@@ -107,20 +110,64 @@ target = int(input())
 public class Solution {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        
+
         int n = sc.nextInt();
         int[] nums = new int[n];
         for (int i = 0; i < n; i++) {
             nums[i] = sc.nextInt();
         }
         int target = sc.nextInt();
-        
-        // Your solution here
-        // System.out.println(i + " " + j);
-        
+
+        // TODO: Write your solution here
+        // Find two numbers that add up to target
+        // Return their indices as space-separated values
+
         sc.close();
     }
 }`,
+                    },
+                    {
+                        language: Language.JAVASCRIPT,
+                        code: `// Read input (Node.js)
+const fs = require('fs');
+const input = fs.readFileSync(0, 'utf-8').trim().split('\\n');
+
+const n = parseInt(input[0]);
+const nums = input[1].split(' ').map(Number);
+const target = parseInt(input[2]);
+
+// TODO: Write your solution here
+// Find two numbers that add up to target
+// Return their indices as space-separated values
+
+// Example:
+// function twoSum(nums, target) {
+//     // Your code here
+// }
+
+// const result = twoSum(nums, target);
+// console.log(result[0], result[1]);`,
+                    },
+                    {
+                        language: Language.TYPESCRIPT,
+                        code: `// Read input (Node.js)
+import * as fs from 'fs';
+const input = fs.readFileSync(0, 'utf-8').trim().split('\\n');
+
+const n = parseInt(input[0]);
+const nums: number[] = input[1].split(' ').map(Number);
+const target: number = parseInt(input[2]);
+
+// TODO: Write your solution here
+// Find two numbers that add up to target
+// Return their indices as space-separated values
+
+// function twoSum(nums: number[], target: number): number[] {
+//     // Your code here
+// }
+
+// const result = twoSum(nums, target);
+// console.log(result[0], result[1]);`,
                     },
                     {
                         language: Language.CPP,
@@ -131,18 +178,42 @@ using namespace std;
 int main() {
     int n;
     cin >> n;
-    
+
     vector<int> nums(n);
     for (int i = 0; i < n; i++) {
         cin >> nums[i];
     }
-    
+
     int target;
     cin >> target;
-    
-    // Your solution here
-    // cout << i << " " << j << endl;
-    
+
+    // TODO: Write your solution here
+    // Find two numbers that add up to target
+    // Print their indices as space-separated values
+
+    return 0;
+}`,
+                    },
+                    {
+                        language: Language.C,
+                        code: `#include <stdio.h>
+
+int main() {
+    int n;
+    scanf("%d", &n);
+
+    int nums[n];
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &nums[i]);
+    }
+
+    int target;
+    scanf("%d", &target);
+
+    // TODO: Write your solution here
+    // Find two numbers that add up to target
+    // Print their indices as space-separated values
+
     return 0;
 }`,
                     },
@@ -158,7 +229,7 @@ int main() {
 
     // Problem 2: Simple Addition (Basic I/O)
     console.log("📝 Creating Simple Addition problem...");
-    const additionProblem = await prisma.problem.create({
+    await prisma.problem.create({
         data: {
             title: "A + B Problem",
             slug: "a-plus-b",
@@ -211,11 +282,13 @@ Output:
                 create: [
                     {
                         language: Language.PYTHON,
-                        code: `# Read two integers
+                        code: `# Read two integers from input
 a, b = map(int, input().split())
 
-# Output their sum
-print(a + b)`,
+# TODO: Calculate and output their sum
+# Example:
+# result = a + b
+# print(result)`,
                     },
                     {
                         language: Language.JAVA,
@@ -224,15 +297,43 @@ print(a + b)`,
 public class Solution {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        
+
         int a = sc.nextInt();
         int b = sc.nextInt();
-        
-        System.out.println(a + b);
-        
+
+        // TODO: Calculate and output the sum
+        // int result = a + b;
+        // System.out.println(result);
+
         sc.close();
     }
 }`,
+                    },
+                    {
+                        language: Language.JAVASCRIPT,
+                        code: `// Read input (Node.js)
+const fs = require('fs');
+const input = fs.readFileSync(0, 'utf-8').trim().split(' ');
+
+const a = parseInt(input[0]);
+const b = parseInt(input[1]);
+
+// TODO: Calculate and output the sum
+// const result = a + b;
+// console.log(result);`,
+                    },
+                    {
+                        language: Language.TYPESCRIPT,
+                        code: `// Read input (Node.js)
+import * as fs from 'fs';
+const input = fs.readFileSync(0, 'utf-8').trim().split(' ');
+
+const a: number = parseInt(input[0]);
+const b: number = parseInt(input[1]);
+
+// TODO: Calculate and output the sum
+// const result = a + b;
+// console.log(result);`,
                     },
                     {
                         language: Language.CPP,
@@ -242,9 +343,26 @@ using namespace std;
 int main() {
     int a, b;
     cin >> a >> b;
-    
-    cout << a + b << endl;
-    
+
+    // TODO: Calculate and output the sum
+    // int result = a + b;
+    // cout << result << endl;
+
+    return 0;
+}`,
+                    },
+                    {
+                        language: Language.C,
+                        code: `#include <stdio.h>
+
+int main() {
+    int a, b;
+    scanf("%d %d", &a, &b);
+
+    // TODO: Calculate and output the sum
+    // int result = a + b;
+    // printf("%d\\n", result);
+
     return 0;
 }`,
                     },
@@ -260,7 +378,7 @@ int main() {
 
     // Problem 3: Valid Parentheses (String problem)
     console.log("📝 Creating Valid Parentheses problem...");
-    const parenthesesProblem = await prisma.problem.create({
+    await prisma.problem.create({
         data: {
             title: "Valid Parentheses",
             slug: "valid-parentheses",
@@ -339,10 +457,15 @@ false
                         code: `# Read input string
 s = input().strip()
 
-# Your solution here
-# Print "true" or "false"
+# TODO: Write your solution here
+# Check if the string contains valid parentheses
+# Return "true" if valid, "false" otherwise
 
 # Example:
+# def is_valid(s):
+#     # Your code here
+#     return True/False
+#
 # if is_valid(s):
 #     print("true")
 # else:
@@ -355,15 +478,48 @@ s = input().strip()
 public class Solution {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        
+
         String s = sc.nextLine().trim();
-        
-        // Your solution here
-        // System.out.println(isValid(s) ? "true" : "false");
-        
+
+        // TODO: Write your solution here
+        // Check if the string contains valid parentheses
+        // Return "true" if valid, "false" otherwise
+
         sc.close();
     }
 }`,
+                    },
+                    {
+                        language: Language.JAVASCRIPT,
+                        code: `// Read input (Node.js)
+const fs = require('fs');
+const s = fs.readFileSync(0, 'utf-8').trim();
+
+// TODO: Write your solution here
+// Check if the string contains valid parentheses
+// Return "true" if valid, "false" otherwise
+
+// function isValid(s) {
+//     // Your code here
+// }
+
+// console.log(isValid(s) ? "true" : "false");`,
+                    },
+                    {
+                        language: Language.TYPESCRIPT,
+                        code: `// Read input (Node.js)
+import * as fs from 'fs';
+const s: string = fs.readFileSync(0, 'utf-8').trim();
+
+// TODO: Write your solution here
+// Check if the string contains valid parentheses
+// Return "true" if valid, "false" otherwise
+
+// function isValid(s: string): boolean {
+//     // Your code here
+// }
+
+// console.log(isValid(s) ? "true" : "false");`,
                     },
                     {
                         language: Language.CPP,
@@ -375,10 +531,40 @@ using namespace std;
 int main() {
     string s;
     getline(cin, s);
-    
-    // Your solution here
-    // cout << (isValid(s) ? "true" : "false") << endl;
-    
+
+    // TODO: Write your solution here
+    // Check if the string contains valid parentheses
+    // Return "true" if valid, "false" otherwise
+
+    return 0;
+}`,
+                    },
+                    {
+                        language: Language.C,
+                        code: `#include <stdio.h>
+#include <string.h>
+#include <stdbool.h>
+
+bool isValid(const char* s) {
+    // TODO: Write your solution here
+    // Check if the string contains valid parentheses
+    // Return true if valid, false otherwise
+}
+
+int main() {
+    char s[10000];
+    fgets(s, sizeof(s), stdin);
+
+    // Remove trailing newline
+    s[strcspn(s, "\\n")] = '\\0';
+
+    // TODO: Print result
+    // if (isValid(s)) {
+    //     printf("true\\n");
+    // } else {
+    //     printf("false\\n");
+    // }
+
     return 0;
 }`,
                     },
@@ -398,9 +584,6 @@ int main() {
     console.log("   - Valid Parentheses (EASY)");
 }
 
-/**
- * Seed a test user for development
- */
 export async function seedTestUser(): Promise<void> {
     console.log("👤 Seeding test user...");
 
@@ -420,14 +603,10 @@ export async function seedTestUser(): Promise<void> {
     console.log("✅ Test user created");
 }
 
-/**
- * Main seeding function
- */
 export async function seedDatabase(): Promise<void> {
     try {
         console.log("🌱 Starting Codeforces-style database seeding...");
 
-        // Connect to database
         await prisma.$connect();
         console.log("✅ Database connected successfully");
 
@@ -448,7 +627,6 @@ export async function seedDatabase(): Promise<void> {
     }
 }
 
-// Run seeding if called directly
 if (require.main === module) {
     seedDatabase()
         .then(() => process.exit(0))
