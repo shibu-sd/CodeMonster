@@ -1,18 +1,17 @@
 "use client";
+
 import Link from "next/link";
-import { Logo } from "@/components/logo";
 import { Menu, X, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import React from "react";
+import React, { useCallback, useState } from "react";
 import { cn } from "@/lib/utils";
-import { useScroll } from "motion/react";
 import { ThemeToggle } from "@/components/theme-toggle/theme-toggle";
 import {
     SignedIn,
     SignedOut,
+    SignOutButton,
     useAuth,
     useUser,
-    SignOutButton,
 } from "@clerk/nextjs";
 import {
     DropdownMenu,
@@ -23,29 +22,29 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
+import { useScrollDetection } from "@/hooks/useScrollDetection";
+import { HEADER_MENU_ITEMS } from "@/constants";
+import { Logo } from "@/components/logo";
 
-const menuItems = [
-    { name: "Problems", href: "/problems", requireAuth: true },
-    { name: "Contests", href: "#contests", requireAuth: true },
-    { name: "Leaderboard", href: "#leaderboard", requireAuth: true },
-    { name: "Learn", href: "#learn", requireAuth: true },
-];
-
-export const HeroHeader = () => {
+export const HeroHeader: React.FC = () => {
     const { isSignedIn } = useAuth();
     const { user } = useUser();
     const router = useRouter();
-    const [menuState, setMenuState] = React.useState(false);
-    const [scrolled, setScrolled] = React.useState(false);
+    const [menuState, setMenuState] = useState(false);
+    const scrolled = useScrollDetection(0.05);
 
-    const { scrollYProgress } = useScroll();
+    const toggleMenu = useCallback(() => {
+        setMenuState(prev => !prev);
+    }, []);
 
-    React.useEffect(() => {
-        const unsubscribe = scrollYProgress.on("change", (latest) => {
-            setScrolled(latest > 0.05);
-        });
-        return () => unsubscribe();
-    }, [scrollYProgress]);
+    const closeMenu = useCallback(() => {
+        setMenuState(false);
+    }, []);
+
+    const navigateToProfile = useCallback(() => {
+        router.push("/dashboard");
+        closeMenu();
+    }, [router, closeMenu]);
 
     return (
         <header>
@@ -70,7 +69,7 @@ export const HeroHeader = () => {
 
                         <div className="hidden lg:flex lg:flex-1 lg:justify-center">
                             <ul className="flex gap-8 text-base">
-                                {menuItems
+                                {HEADER_MENU_ITEMS
                                     .filter(
                                         (item) =>
                                             !item.requireAuth || isSignedIn
@@ -98,10 +97,8 @@ export const HeroHeader = () => {
                         </div>
 
                         <button
-                            onClick={() => setMenuState(!menuState)}
-                            aria-label={
-                                menuState == true ? "Close Menu" : "Open Menu"
-                            }
+                            onClick={toggleMenu}
+                            aria-label={menuState ? "Close Menu" : "Open Menu"}
                             className="relative z-20 -m-2.5 -mr-4 block cursor-pointer p-2.5 lg:hidden"
                         >
                             <Menu className="in-data-[state=active]:rotate-180 in-data-[state=active]:scale-0 in-data-[state=active]:opacity-0 m-auto size-6 duration-200" />
@@ -124,9 +121,7 @@ export const HeroHeader = () => {
                                     <DropdownMenuTrigger asChild>
                                         <button
                                             className="relative h-8 w-8 rounded-full overflow-hidden border-2 border-primary/20 hover:border-primary transition-colors cursor-pointer"
-                                            onClick={() =>
-                                                router.push("/dashboard")
-                                            }
+                                            onClick={() => router.push("/dashboard")}
                                         >
                                             {user?.imageUrl ? (
                                                 <img
@@ -148,9 +143,7 @@ export const HeroHeader = () => {
                                         className="w-48"
                                     >
                                         <DropdownMenuItem
-                                            onClick={() =>
-                                                router.push("/dashboard")
-                                            }
+                                            onClick={() => router.push("/dashboard")}
                                         >
                                             <User className="mr-2 h-4 w-4" />
                                             Profile
@@ -175,7 +168,7 @@ export const HeroHeader = () => {
                         <div className="bg-background in-data-[state=active]:block mb-6 hidden w-full rounded-3xl border p-6 shadow-2xl shadow-zinc-300/20 lg:hidden dark:shadow-none">
                             <div className="space-y-6">
                                 <ul className="space-y-6 text-lg">
-                                    {menuItems
+                                    {HEADER_MENU_ITEMS
                                         .filter(
                                             (item) =>
                                                 !item.requireAuth || isSignedIn
@@ -224,10 +217,7 @@ export const HeroHeader = () => {
                                     <SignedIn>
                                         <div className="flex flex-col gap-2">
                                             <button
-                                                onClick={() => {
-                                                    router.push("/dashboard");
-                                                    setMenuState(false);
-                                                }}
+                                                onClick={navigateToProfile}
                                                 className="w-full flex items-center gap-2 p-3 rounded-lg border hover:bg-accent transition-colors"
                                             >
                                                 {user?.imageUrl && (

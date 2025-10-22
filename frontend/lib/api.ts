@@ -46,14 +46,13 @@ export interface ApiResponse<T> {
 }
 
 export interface ProblemsResponse {
-    problems: Problem[];
+    data: Problem[];
     pagination: {
         currentPage: number;
         totalPages: number;
-        totalProblems: number;
-        limit: number;
-        hasNextPage: boolean;
-        hasPreviousPage: boolean;
+        totalItems: number;
+        hasNext: boolean;
+        hasPrev: boolean;
     };
 }
 

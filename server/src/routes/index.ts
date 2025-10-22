@@ -11,7 +11,7 @@ router.use("/users", userRoutes);
 router.use("/submissions", submissionRoutes);
 router.use("/judge", judgeRoutes);
 
-router.get("/", (req, res) => {
+router.get("/", (_req, res) => {
     res.json({
         message: "CodeMonster API Server",
         version: "1.0.0",

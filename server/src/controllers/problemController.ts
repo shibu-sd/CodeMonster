@@ -1,152 +1,91 @@
 import { Request, Response } from "express";
-import { prisma } from "../utils/database";
-import { ApiResponse, ProblemFilters, PaginationQuery } from "../types";
+import {
+    NotFoundError,
+    ConflictError,
+    ValidationError,
+    asyncHandler,
+} from "../middleware/errorHandler";
+import { ProblemFilters, PaginationQuery } from "../types";
 import { Difficulty } from "@prisma/client";
+import { problemRepository } from "../repositories";
+import {
+    createSuccessResponse,
+    getPaginationParams,
+    createPaginationResponse,
+    generateSlug,
+} from "../utils/helpers";
+import { logger } from "../utils/logger";
 
 export class ProblemController {
-    static async getAllProblems(req: Request, res: Response): Promise<void> {
-        try {
-            const {
-                page = 1,
-                limit = 20,
+    static getAllProblems = asyncHandler(
+        async (req: Request, res: Response): Promise<void> => {
+            const { difficulty, tags, search } = req.query as ProblemFilters;
+
+            const pagination = getPaginationParams(
+                req.query as PaginationQuery
+            );
+
+            logger.info("Fetching problems with filters", {
                 difficulty,
                 tags,
                 search,
-                sortBy = "createdAt",
-                sortOrder = "desc",
-            } = req.query as PaginationQuery & ProblemFilters;
-
-            const skip = (Number(page) - 1) * Number(limit);
-            const take = Number(limit);
-
-            const where: any = {
-                isPublic: true,
-            };
-
-            if (difficulty && ["EASY", "MEDIUM", "HARD"].includes(difficulty)) {
-                where.difficulty = difficulty;
-            }
-
-            if (tags && Array.isArray(tags)) {
-                where.tags = {
-                    hasEvery: tags,
-                };
-            }
-
-            if (search) {
-                where.OR = [
-                    { title: { contains: search, mode: "insensitive" } },
-                    { description: { contains: search, mode: "insensitive" } },
-                ];
-            }
-
-            const [problems, totalCount] = await Promise.all([
-                prisma.problem.findMany({
-                    where,
-                    skip,
-                    take,
-                    orderBy: {
-                        [sortBy]: sortOrder,
-                    },
-                    select: {
-                        id: true,
-                        title: true,
-                        slug: true,
-                        difficulty: true,
-                        tags: true,
-                        acceptanceRate: true,
-                        totalSubmissions: true,
-                        acceptedSubmissions: true,
-                        createdAt: true,
-                    },
-                }),
-                prisma.problem.count({ where }),
-            ]);
-
-            const response: ApiResponse = {
-                success: true,
-                data: {
-                    problems,
-                    pagination: {
-                        currentPage: Number(page),
-                        totalPages: Math.ceil(totalCount / take),
-                        totalItems: totalCount,
-                        hasNext: skip + take < totalCount,
-                        hasPrev: Number(page) > 1,
-                    },
-                },
-            };
-
-            res.status(200).json(response);
-        } catch (error) {
-            console.error("Error fetching problems:", error);
-            res.status(500).json({
-                success: false,
-                error: "Failed to fetch problems",
+                pagination,
+                userId: (req as any).user?.id,
             });
-        }
-    }
 
-    static async getProblemByIdentifier(
-        req: Request,
-        res: Response
-    ): Promise<void> {
-        try {
+            const { problems, totalCount } =
+                await problemRepository.findProblemsWithFilters(
+                    { difficulty, tags, search } as ProblemFilters,
+                    pagination
+                );
+
+            const paginatedResponse = createPaginationResponse(
+                problems,
+                totalCount,
+                pagination.page,
+                pagination.limit
+            );
+
+            logger.debug("Problems fetched successfully", {
+                count: problems.length,
+                totalCount,
+            });
+
+            const response = createSuccessResponse(paginatedResponse);
+            res.status(200).json(response);
+        }
+    );
+
+    static getProblemByIdentifier = asyncHandler(
+        async (req: Request, res: Response): Promise<void> => {
             const { identifier } = req.params;
 
-            const problem = await prisma.problem.findFirst({
-                where: {
-                    OR: [{ id: identifier }, { slug: identifier }],
-                    isPublic: true,
-                },
-                include: {
-                    testCases: {
-                        where: { isHidden: false },
-                        select: {
-                            id: true,
-                            input: true,
-                            output: true,
-                        },
-                    },
-                    starterCode: {
-                        select: {
-                            language: true,
-                            code: true,
-                        },
-                    },
-                    _count: {
-                        select: {
-                            submissions: true,
-                        },
-                    },
-                },
+            logger.info("Fetching problem by identifier", {
+                identifier,
+                userId: (req as any).user?.id,
             });
+
+            const problem = await problemRepository.findProblemByIdentifier(
+                identifier
+            );
 
             if (!problem) {
-                res.status(404).json({
-                    success: false,
-                    error: "Problem not found",
-                });
-                return;
+                logger.warn("Problem not found", { identifier });
+                throw new NotFoundError("Problem not found");
             }
 
-            const response: ApiResponse = {
-                success: true,
-                data: problem,
-            };
-
-            res.status(200).json(response);
-        } catch (error) {
-            console.error("Error fetching problem:", error);
-            res.status(500).json({
-                success: false,
-                error: "Failed to fetch problem",
+            logger.debug("Problem fetched successfully", {
+                problemId: problem.id,
+                title: problem.title,
             });
-        }
-    }
 
-    static async createProblem(req: Request, res: Response): Promise<void> {
-        try {
+            const response = createSuccessResponse(problem);
+            res.status(200).json(response);
+        }
+    );
+
+    static createProblem = asyncHandler(
+        async (req: Request, res: Response): Promise<void> => {
             const {
                 title,
                 description,
@@ -158,189 +97,164 @@ export class ProblemController {
                 starterCode = [],
             } = req.body;
 
+            const parsedTimeLimit = parseInt(timeLimit.toString());
+            const parsedMemoryLimit = parseInt(memoryLimit.toString());
+
+            logger.info("Creating new problem", {
+                title,
+                difficulty,
+                tagsCount: tags.length,
+                testCasesCount: testCases.length,
+                starterCodeCount: starterCode.length,
+                userId: (req as any).user?.id,
+            });
+
             if (!title || !description || !difficulty) {
-                res.status(400).json({
-                    success: false,
-                    error: "Title, description, and difficulty are required",
-                });
-                return;
+                throw new ValidationError(
+                    "Title, description, and difficulty are required"
+                );
             }
 
-            const slug = title
-                .toLowerCase()
-                .replace(/[^a-z0-9\s-]/g, "")
-                .replace(/\s+/g, "-")
-                .trim();
+            const slug = generateSlug(title);
 
-            const existingProblem = await prisma.problem.findUnique({
-                where: { slug },
-            });
-
-            if (existingProblem) {
-                res.status(409).json({
-                    success: false,
-                    error: "A problem with this title already exists",
-                });
-                return;
-            }
-
-            const problem = await prisma.problem.create({
-                data: {
-                    title,
+            const slugExists = await problemRepository.slugExists(slug);
+            if (slugExists) {
+                logger.warn("Problem with this slug already exists", {
                     slug,
-                    description,
-                    difficulty: difficulty as Difficulty,
-                    tags,
-                    timeLimit,
-                    memoryLimit,
-                    testCases: {
-                        create: testCases.map((tc: any) => ({
-                            input: tc.input,
-                            output: tc.output,
-                            isHidden: tc.isHidden || false,
-                        })),
-                    },
-                    starterCode: {
-                        create: starterCode.map((sc: any) => ({
-                            language: sc.language,
-                            code: sc.code,
-                        })),
-                    },
-                },
-                include: {
-                    testCases: true,
-                    starterCode: true,
-                },
-            });
+                    title,
+                });
+                throw new ConflictError(
+                    "A problem with this title already exists"
+                );
+            }
 
-            const response: ApiResponse = {
-                success: true,
-                data: problem,
-                message: "Problem created successfully",
-            };
+            try {
+                const problem =
+                    await problemRepository.createProblemWithRelations({
+                        title,
+                        slug,
+                        description,
+                        difficulty: difficulty as Difficulty,
+                        tags,
+                        timeLimit: parsedTimeLimit,
+                        memoryLimit: parsedMemoryLimit,
+                        testCases,
+                        starterCode,
+                    });
 
-            res.status(201).json(response);
-        } catch (error) {
-            console.error("Error creating problem:", error);
-            res.status(500).json({
-                success: false,
-                error: "Failed to create problem",
-            });
+                logger.info("Problem created successfully", {
+                    problemId: problem.id,
+                    title: problem.title,
+                    slug: problem.slug,
+                });
+
+                const response = createSuccessResponse(
+                    problem,
+                    "Problem created successfully"
+                );
+                res.status(201).json(response);
+            } catch (error: any) {
+                if (error.message.includes("already exists")) {
+                    throw new ConflictError(error.message);
+                }
+                throw error;
+            }
         }
-    }
+    );
 
-    static async updateProblem(req: Request, res: Response): Promise<void> {
-        try {
+    static updateProblem = asyncHandler(
+        async (req: Request, res: Response): Promise<void> => {
             const { id } = req.params;
             const updateData = req.body;
+
+            logger.info("Updating problem", {
+                problemId: id,
+                updateFields: Object.keys(updateData),
+                userId: (req as any).user?.id,
+            });
+
+            if (updateData.timeLimit !== undefined) {
+                updateData.timeLimit = parseInt(
+                    updateData.timeLimit.toString()
+                );
+            }
+            if (updateData.memoryLimit !== undefined) {
+                updateData.memoryLimit = parseInt(
+                    updateData.memoryLimit.toString()
+                );
+            }
 
             delete updateData.id;
             delete updateData.slug;
             delete updateData.createdAt;
             delete updateData.updatedAt;
 
-            const problem = await prisma.problem.update({
-                where: { id },
-                data: updateData,
-                include: {
-                    testCases: true,
-                    starterCode: true,
-                },
-            });
+            try {
+                const problem =
+                    await problemRepository.updateProblemWithRelations(
+                        id,
+                        updateData
+                    );
 
-            const response: ApiResponse = {
-                success: true,
-                data: problem,
-                message: "Problem updated successfully",
-            };
-
-            res.status(200).json(response);
-        } catch (error) {
-            if ((error as any).code === "P2025") {
-                res.status(404).json({
-                    success: false,
-                    error: "Problem not found",
+                logger.info("Problem updated successfully", {
+                    problemId: id,
+                    title: problem.title,
                 });
-                return;
+
+                const response = createSuccessResponse(
+                    problem,
+                    "Problem updated successfully"
+                );
+                res.status(200).json(response);
+            } catch (error: any) {
+                if (error.message.includes("not found")) {
+                    throw new NotFoundError("Problem not found");
+                }
+                throw error;
             }
-
-            console.error("Error updating problem:", error);
-            res.status(500).json({
-                success: false,
-                error: "Failed to update problem",
-            });
         }
-    }
+    );
 
-    static async deleteProblem(req: Request, res: Response): Promise<void> {
-        try {
+    static deleteProblem = asyncHandler(
+        async (req: Request, res: Response): Promise<void> => {
             const { id } = req.params;
 
-            await prisma.problem.delete({
-                where: { id },
+            logger.info("Deleting problem", {
+                problemId: id,
+                userId: (req as any).user?.id,
             });
 
-            const response: ApiResponse = {
-                success: true,
-                message: "Problem deleted successfully",
-            };
+            try {
+                await problemRepository.deleteProblemWithRelations(id);
 
-            res.status(200).json(response);
-        } catch (error) {
-            if ((error as any).code === "P2025") {
-                res.status(404).json({
-                    success: false,
-                    error: "Problem not found",
-                });
-                return;
+                logger.info("Problem deleted successfully", { problemId: id });
+
+                const response = createSuccessResponse(
+                    null,
+                    "Problem deleted successfully"
+                );
+                res.status(200).json(response);
+            } catch (error: any) {
+                if (error.message.includes("not found")) {
+                    throw new NotFoundError("Problem not found");
+                }
+                throw error;
             }
-
-            console.error("Error deleting problem:", error);
-            res.status(500).json({
-                success: false,
-                error: "Failed to delete problem",
-            });
         }
-    }
+    );
 
-    static async getProblemsStats(req: Request, res: Response): Promise<void> {
-        try {
-            const [totalProblems, difficultyStats] = await Promise.all([
-                prisma.problem.count({ where: { isPublic: true } }),
-                prisma.problem.groupBy({
-                    by: ["difficulty"],
-                    where: { isPublic: true },
-                    _count: {
-                        difficulty: true,
-                    },
-                }),
-            ]);
+    static getProblemsStats = asyncHandler(
+        async (req: Request, res: Response): Promise<void> => {
+            logger.info("Fetching problem statistics", {
+                userId: (req as any).user?.id,
+            });
 
-            const stats = {
-                total: totalProblems,
-                easy:
-                    difficultyStats.find((s) => s.difficulty === "EASY")?._count
-                        .difficulty || 0,
-                medium:
-                    difficultyStats.find((s) => s.difficulty === "MEDIUM")
-                        ?._count.difficulty || 0,
-                hard:
-                    difficultyStats.find((s) => s.difficulty === "HARD")?._count
-                        .difficulty || 0,
-            };
+            const stats = await problemRepository.getProblemStatistics();
 
-            const response: ApiResponse = {
-                success: true,
-                data: stats,
-            };
+            logger.debug("Problem statistics fetched", stats);
 
+            const response = createSuccessResponse(stats);
             res.status(200).json(response);
-        } catch (error) {
-            console.error("Error fetching problem stats:", error);
-            res.status(500).json({
-                success: false,
-                error: "Failed to fetch problem statistics",
-            });
         }
-    }
+    );
 }

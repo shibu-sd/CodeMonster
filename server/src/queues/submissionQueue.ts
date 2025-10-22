@@ -1,8 +1,6 @@
 import { Queue, Job } from "bullmq";
 import { Redis } from "ioredis";
 import { JudgeJobData, JudgeJobResult } from "../types";
-import { prisma } from "../utils/database";
-import { SubmissionStatus } from "@prisma/client";
 
 const redisConfig = {
     host: process.env.REDIS_HOST || "localhost",

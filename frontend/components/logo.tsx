@@ -1,7 +1,8 @@
+import React from "react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 
-export const Logo = ({ className }: { className?: string }) => {
+export const Logo = React.memo(({ className }: { className?: string }) => {
     return (
         <div
             className={cn(
@@ -15,15 +16,18 @@ export const Logo = ({ className }: { className?: string }) => {
                 width={640}
                 height={640}
                 className="h-9 w-9 sm:h-10 sm:w-10 object-contain"
+                priority
             />
             <span className="text-lg sm:text-2xl font-semibold text-foreground font-sans">
                 CodeMonster
             </span>
         </div>
     );
-};
+});
 
-export const LogoIcon = ({
+Logo.displayName = "Logo";
+
+export const LogoIcon = React.memo(({
     className,
     uniColor,
 }: {
@@ -58,9 +62,11 @@ export const LogoIcon = ({
             </defs>
         </svg>
     );
-};
+});
 
-export const LogoStroke = ({ className }: { className?: string }) => {
+LogoIcon.displayName = "LogoIcon";
+
+export const LogoStroke = React.memo(({ className }: { className?: string }) => {
     return (
         <svg
             className={cn("size-7 w-7", className)}
@@ -76,4 +82,6 @@ export const LogoStroke = ({ className }: { className?: string }) => {
             />
         </svg>
     );
-};
+});
+
+LogoStroke.displayName = "LogoStroke";
