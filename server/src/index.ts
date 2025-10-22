@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import compression from "compression";
+import { Clerk } from "@clerk/clerk-sdk-node";
 import { config, validateConfig } from "./config";
 import { connectDatabase } from "./utils/database";
 import { apiRoutes } from "./routes";
@@ -13,6 +14,9 @@ import { redisConnection } from "./queues/submissionQueue";
 
 // Validate configuration
 validateConfig();
+
+// Initialize Clerk environment
+process.env.CLERK_SECRET_KEY = config.auth.clerkSecretKey;
 
 const app = express();
 const PORT = config.server.port;
