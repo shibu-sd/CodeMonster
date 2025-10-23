@@ -200,9 +200,15 @@
         -ms-user-select: none;
     }
 
+    html {
+        scrollbar-gutter: stable;
+        overflow-x: hidden;
+    }
+
     body {
         @apply bg-background text-foreground;
         letter-spacing: var(--tracking-normal);
+        overflow-x: hidden;
     }
 
     /* Only allow text selection on specific text elements when needed */
