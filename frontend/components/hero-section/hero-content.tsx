@@ -66,11 +66,10 @@ export const HeroContent: React.FC = () => {
                 as="p"
                 className="mx-auto mt-8 max-w-2xl text-balance text-lg"
             >
-                Solve algorithmic problems, compete with
-                others, and improve your programming skills.
-                Practice data structures, algorithms, and
-                competitive programming with instant
-                feedback from our online judge.
+                Solve algorithmic problems, compete with others, and improve
+                your programming skills. Practice data structures, algorithms,
+                and competitive programming with instant feedback from our
+                online judge.
             </TextEffect>
 
             <AnimatedGroup
@@ -85,7 +84,7 @@ export const HeroContent: React.FC = () => {
                     },
                     ...transitionVariants,
                 }}
-                className="mt-12 flex flex-col items-center justify-center gap-2 md:flex-row"
+                className="mt-12 flex flex-col items-center justify-center gap-2 md:flex-row pointer-events-auto"
             >
                 <div
                     key={1}
