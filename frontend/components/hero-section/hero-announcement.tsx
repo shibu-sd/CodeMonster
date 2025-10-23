@@ -25,7 +25,10 @@ const transitionVariants = {
 
 export const HeroAnnouncement: React.FC = () => {
     return (
-        <AnimatedGroup variants={transitionVariants}>
+        <AnimatedGroup
+            variants={transitionVariants}
+            className="pointer-events-auto"
+        >
             <Link
                 href="#link"
                 className="hover:bg-background dark:hover:border-t-border bg-muted group mx-auto flex w-fit items-center gap-4 rounded-full border p-1 pl-4 shadow-md shadow-zinc-950/5 transition-colors duration-300 dark:border-t-transparent dark:shadow-zinc-950"
