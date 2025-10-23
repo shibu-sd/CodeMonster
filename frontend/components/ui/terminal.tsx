@@ -8,6 +8,8 @@ import {
   useMemo,
   useRef,
   useState,
+  useCallback,
+  memo,
 } from "react"
 import { motion, MotionProps, useInView } from "motion/react"
 
@@ -34,7 +36,7 @@ interface AnimatedSpanProps extends MotionProps {
   startOnView?: boolean
 }
 
-export const AnimatedSpan = ({
+export const AnimatedSpan = memo(({
   children,
   delay = 0,
   className,
@@ -88,7 +90,7 @@ export const AnimatedSpan = ({
       {children}
     </motion.div>
   )
-}
+})
 
 interface TypingAnimationProps extends MotionProps {
   children: string
@@ -99,7 +101,7 @@ interface TypingAnimationProps extends MotionProps {
   startOnView?: boolean
 }
 
-export const TypingAnimation = ({
+export const TypingAnimation = memo(({
   children,
   className,
   duration = 60,
@@ -205,7 +207,7 @@ export const TypingAnimation = ({
       {displayedText}
     </MotionComponent>
   )
-}
+})
 
 interface TerminalProps {
   children: React.ReactNode
@@ -216,7 +218,7 @@ interface TerminalProps {
   loopDelay?: number
 }
 
-export const Terminal = ({
+export const Terminal = memo(({
   children,
   className,
   sequence = true,
@@ -236,35 +238,37 @@ export const Terminal = ({
   const childrenArray = useMemo(() => Children.toArray(children), [children])
   const totalChildren = childrenArray.length
 
+  const completeItem = useCallback((index: number) => {
+    setActiveIndex((current) => {
+      if (index === current) {
+        const nextIndex = current + 1
+        // Update completed index
+        setCompletedIndex(index)
+
+        // Check if we've completed all children and looping is enabled
+        if (isLoop && nextIndex >= totalChildren) {
+          // Reset to 0 after loopDelay
+          setTimeout(() => {
+            setActiveIndex(0)
+            setCompletedIndex(-1) // Reset completed index when looping
+          }, loopDelay)
+          return nextIndex
+        }
+        return nextIndex
+      }
+      return current
+    })
+  }, [isLoop, totalChildren, loopDelay])
+
   const contextValue = useMemo<SequenceContextValue | null>(() => {
     if (!sequence) return null
     return {
-      completeItem: (index: number) => {
-        setActiveIndex((current) => {
-          if (index === current) {
-            const nextIndex = current + 1
-            // Update completed index
-            setCompletedIndex(index)
-
-            // Check if we've completed all children and looping is enabled
-            if (isLoop && nextIndex >= totalChildren) {
-              // Reset to 0 after loopDelay
-              setTimeout(() => {
-                setActiveIndex(0)
-                setCompletedIndex(-1) // Reset completed index when looping
-              }, loopDelay)
-              return nextIndex
-            }
-            return nextIndex
-          }
-          return current
-        })
-      },
+      completeItem,
       activeIndex,
       sequenceStarted: sequenceHasStarted,
       completedIndex,
     }
-  }, [sequence, activeIndex, sequenceHasStarted, isLoop, totalChildren, loopDelay])
+  }, [sequence, activeIndex, sequenceHasStarted, completedIndex, completeItem])
 
   const wrappedChildren = useMemo(() => {
     if (!sequence) return children
@@ -303,4 +307,4 @@ export const Terminal = ({
       {content}
     </SequenceContext.Provider>
   )
-}
+})
