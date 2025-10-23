@@ -17,6 +17,7 @@ interface SequenceContextValue {
   completeItem: (index: number) => void
   activeIndex: number
   sequenceStarted: boolean
+  completedIndex: number
 }
 
 const SequenceContext = createContext<SequenceContextValue | null>(null)
@@ -59,18 +60,28 @@ export const AnimatedSpan = ({
   }, [sequence?.activeIndex, sequence?.sequenceStarted, hasStarted, itemIndex])
 
   const shouldAnimate = sequence ? hasStarted : startOnView ? isInView : true
+  const isVisible = sequence ? hasStarted || (itemIndex !== null && itemIndex <= sequence.completedIndex) : startOnView ? isInView : true
+
+  // Reset state when loop resets
+  useEffect(() => {
+    if (sequence && itemIndex !== null && sequence.completedIndex === -1 && sequence.activeIndex === 0) {
+      setHasStarted(false)
+    }
+  }, [sequence?.completedIndex, sequence?.activeIndex, itemIndex])
 
   return (
     <motion.div
       ref={elementRef}
       initial={{ opacity: 0, y: -5 }}
-      animate={shouldAnimate ? { opacity: 1, y: 0 } : { opacity: 0, y: -5 }}
+      animate={isVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: -5 }}
       transition={{ duration: 0.3, delay: sequence ? 0 : delay / 1000 }}
       className={cn("grid text-sm font-normal tracking-tight", className)}
       onAnimationComplete={() => {
         if (!sequence) return
         if (itemIndex === null) return
-        sequence.completeItem(itemIndex)
+        if (hasStarted && itemIndex === sequence.activeIndex) {
+          sequence.completeItem(itemIndex)
+        }
       }}
       {...props}
     >
@@ -170,6 +181,21 @@ export const TypingAnimation = ({
     }
   }, [children, duration, started])
 
+  // Handle showing completed text when not active
+  useEffect(() => {
+    if (sequence && itemIndex !== null && itemIndex <= sequence.completedIndex && !started) {
+      setDisplayedText(children)
+    }
+  }, [sequence?.completedIndex, itemIndex, started, children])
+
+  // Reset text when loop resets
+  useEffect(() => {
+    if (sequence && itemIndex !== null && sequence.completedIndex === -1 && sequence.activeIndex === 0) {
+      setDisplayedText("")
+      setStarted(false)
+    }
+  }, [sequence?.completedIndex, sequence?.activeIndex, itemIndex])
+
   return (
     <MotionComponent
       ref={elementRef}
@@ -186,6 +212,8 @@ interface TerminalProps {
   className?: string
   sequence?: boolean
   startOnView?: boolean
+  isLoop?: boolean
+  loopDelay?: number
 }
 
 export const Terminal = ({
@@ -193,6 +221,8 @@ export const Terminal = ({
   className,
   sequence = true,
   startOnView = true,
+  isLoop = false,
+  loopDelay = 3000,
 }: TerminalProps) => {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const isInView = useInView(containerRef as React.RefObject<Element>, {
@@ -201,28 +231,49 @@ export const Terminal = ({
   })
 
   const [activeIndex, setActiveIndex] = useState(0)
+  const [completedIndex, setCompletedIndex] = useState(-1)
   const sequenceHasStarted = sequence ? !startOnView || isInView : false
+  const childrenArray = useMemo(() => Children.toArray(children), [children])
+  const totalChildren = childrenArray.length
 
   const contextValue = useMemo<SequenceContextValue | null>(() => {
     if (!sequence) return null
     return {
       completeItem: (index: number) => {
-        setActiveIndex((current) => (index === current ? current + 1 : current))
+        setActiveIndex((current) => {
+          if (index === current) {
+            const nextIndex = current + 1
+            // Update completed index
+            setCompletedIndex(index)
+
+            // Check if we've completed all children and looping is enabled
+            if (isLoop && nextIndex >= totalChildren) {
+              // Reset to 0 after loopDelay
+              setTimeout(() => {
+                setActiveIndex(0)
+                setCompletedIndex(-1) // Reset completed index when looping
+              }, loopDelay)
+              return nextIndex
+            }
+            return nextIndex
+          }
+          return current
+        })
       },
       activeIndex,
       sequenceStarted: sequenceHasStarted,
+      completedIndex,
     }
-  }, [sequence, activeIndex, sequenceHasStarted])
+  }, [sequence, activeIndex, sequenceHasStarted, isLoop, totalChildren, loopDelay])
 
   const wrappedChildren = useMemo(() => {
     if (!sequence) return children
-    const array = Children.toArray(children)
-    return array.map((child, index) => (
-      <ItemIndexContext.Provider key={index} value={index}>
+    return childrenArray.map((child, index) => (
+      <ItemIndexContext.Provider key={`${index}`} value={index}>
         {child as React.ReactNode}
       </ItemIndexContext.Provider>
     ))
-  }, [children, sequence])
+  }, [childrenArray, sequence])
 
   const content = (
     <div
