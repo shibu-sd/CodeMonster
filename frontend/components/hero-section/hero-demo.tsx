@@ -45,6 +45,8 @@ export const HeroDemo: React.FC = () => {
                 <Terminal
                     className="w-full max-w-6xl mx-auto h-[70vh]"
                     startOnView={true}
+                    isLoop={true}
+                    loopDelay={2000}
                 >
                     <TypingAnimation className="text-green-400">
                         $ codemonster init
@@ -87,9 +89,6 @@ export const HeroDemo: React.FC = () => {
                     </AnimatedSpan>
                     <TypingAnimation className="text-yellow-400">
                         🎉 All tests passed! Problem solved in 0.234s
-                    </TypingAnimation>
-                    <TypingAnimation className="text-green-400">
-                        $ _
                     </TypingAnimation>
                 </Terminal>
             </div>
