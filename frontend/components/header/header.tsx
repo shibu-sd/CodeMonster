@@ -34,7 +34,7 @@ export const HeroHeader: React.FC = () => {
     const scrolled = useScrollDetection(0.05);
 
     const toggleMenu = useCallback(() => {
-        setMenuState(prev => !prev);
+        setMenuState((prev) => !prev);
     }, []);
 
     const closeMenu = useCallback(() => {
@@ -51,8 +51,8 @@ export const HeroHeader: React.FC = () => {
             <nav
                 data-state={menuState && "active"}
                 className={cn(
-                    "fixed z-20 w-full border-b transition-colors duration-150",
-                    scrolled && "bg-background/50 backdrop-blur-3xl"
+                    "fixed z-20 w-full transition-colors duration-150",
+                    scrolled && "bg-background/50 backdrop-blur-3xl border-b"
                 )}
             >
                 <div className="mx-auto max-w-7xl px-6 transition-all duration-300">
@@ -69,30 +69,27 @@ export const HeroHeader: React.FC = () => {
 
                         <div className="hidden lg:flex lg:flex-1 lg:justify-center">
                             <ul className="flex gap-8 text-base">
-                                {HEADER_MENU_ITEMS
-                                    .filter(
-                                        (item) =>
-                                            !item.requireAuth || isSignedIn
-                                    )
-                                    .map((item, index) => (
-                                        <li key={index}>
-                                            {item.requireAuth && !isSignedIn ? (
-                                                <Link
-                                                    href="/auth/sign-in"
-                                                    className="text-muted-foreground hover:text-accent-foreground block duration-150"
-                                                >
-                                                    <span>{item.name}</span>
-                                                </Link>
-                                            ) : (
-                                                <Link
-                                                    href={item.href}
-                                                    className="text-muted-foreground hover:text-accent-foreground block duration-150"
-                                                >
-                                                    <span>{item.name}</span>
-                                                </Link>
-                                            )}
-                                        </li>
-                                    ))}
+                                {HEADER_MENU_ITEMS.filter(
+                                    (item) => !item.requireAuth || isSignedIn
+                                ).map((item, index) => (
+                                    <li key={index}>
+                                        {item.requireAuth && !isSignedIn ? (
+                                            <Link
+                                                href="/auth/sign-in"
+                                                className="text-muted-foreground hover:text-accent-foreground block duration-150"
+                                            >
+                                                <span>{item.name}</span>
+                                            </Link>
+                                        ) : (
+                                            <Link
+                                                href={item.href}
+                                                className="text-muted-foreground hover:text-accent-foreground block duration-150"
+                                            >
+                                                <span>{item.name}</span>
+                                            </Link>
+                                        )}
+                                    </li>
+                                ))}
                             </ul>
                         </div>
 
@@ -121,7 +118,9 @@ export const HeroHeader: React.FC = () => {
                                     <DropdownMenuTrigger asChild>
                                         <button
                                             className="relative h-8 w-8 rounded-full overflow-hidden border-2 border-primary/20 hover:border-primary transition-colors cursor-pointer"
-                                            onClick={() => router.push("/dashboard")}
+                                            onClick={() =>
+                                                router.push("/dashboard")
+                                            }
                                         >
                                             {user?.imageUrl ? (
                                                 <img
@@ -143,7 +142,9 @@ export const HeroHeader: React.FC = () => {
                                         className="w-48"
                                     >
                                         <DropdownMenuItem
-                                            onClick={() => router.push("/dashboard")}
+                                            onClick={() =>
+                                                router.push("/dashboard")
+                                            }
                                         >
                                             <User className="mr-2 h-4 w-4" />
                                             Profile
@@ -168,31 +169,28 @@ export const HeroHeader: React.FC = () => {
                         <div className="bg-background in-data-[state=active]:block mb-6 hidden w-full rounded-3xl border p-6 shadow-2xl shadow-zinc-300/20 lg:hidden dark:shadow-none">
                             <div className="space-y-6">
                                 <ul className="space-y-6 text-lg">
-                                    {HEADER_MENU_ITEMS
-                                        .filter(
-                                            (item) =>
-                                                !item.requireAuth || isSignedIn
-                                        )
-                                        .map((item, index) => (
-                                            <li key={index}>
-                                                {item.requireAuth &&
-                                                !isSignedIn ? (
-                                                    <Link
-                                                        href="/auth/sign-in"
-                                                        className="text-muted-foreground hover:text-accent-foreground block duration-150"
-                                                    >
-                                                        <span>{item.name}</span>
-                                                    </Link>
-                                                ) : (
-                                                    <Link
-                                                        href={item.href}
-                                                        className="text-muted-foreground hover:text-accent-foreground block duration-150"
-                                                    >
-                                                        <span>{item.name}</span>
-                                                    </Link>
-                                                )}
-                                            </li>
-                                        ))}
+                                    {HEADER_MENU_ITEMS.filter(
+                                        (item) =>
+                                            !item.requireAuth || isSignedIn
+                                    ).map((item, index) => (
+                                        <li key={index}>
+                                            {item.requireAuth && !isSignedIn ? (
+                                                <Link
+                                                    href="/auth/sign-in"
+                                                    className="text-muted-foreground hover:text-accent-foreground block duration-150"
+                                                >
+                                                    <span>{item.name}</span>
+                                                </Link>
+                                            ) : (
+                                                <Link
+                                                    href={item.href}
+                                                    className="text-muted-foreground hover:text-accent-foreground block duration-150"
+                                                >
+                                                    <span>{item.name}</span>
+                                                </Link>
+                                            )}
+                                        </li>
+                                    ))}
                                 </ul>
                                 <div className="flex flex-col space-y-3 pt-4 border-t">
                                     <SignedOut>
