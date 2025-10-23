@@ -42,7 +42,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en" suppressHydrationWarning>
+        <html lang="en" className="dark" suppressHydrationWarning>
             <head>
                 <link rel="icon" type="image/png" href="/favicon.png" />
                 <link rel="shortcut icon" href="/favicon.png" />
@@ -54,8 +54,9 @@ export default function RootLayout({
             >
                 <ThemeProvider
                     attribute="class"
-                    defaultTheme="system"
-                    enableSystem
+                    defaultTheme="dark"
+                    forcedTheme="dark"
+                    enableSystem={false}
                     disableTransitionOnChange
                 >
                     <ClerkThemeProvider>{children}</ClerkThemeProvider>
