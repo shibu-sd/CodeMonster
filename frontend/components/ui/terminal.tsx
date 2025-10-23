@@ -77,7 +77,7 @@ export const AnimatedSpan = memo(({
       initial={{ opacity: 0, y: -5 }}
       animate={isVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: -5 }}
       transition={{ duration: 0.3, delay: sequence ? 0 : delay / 1000 }}
-      className={cn("grid text-sm font-normal tracking-tight", className)}
+      className={cn("grid text-base font-normal tracking-tight", className)}
       onAnimationComplete={() => {
         if (!sequence) return
         if (itemIndex === null) return
@@ -201,7 +201,7 @@ export const TypingAnimation = memo(({
   return (
     <MotionComponent
       ref={elementRef}
-      className={cn("text-sm font-normal tracking-tight", className)}
+      className={cn("text-base font-normal tracking-tight", className)}
       {...props}
     >
       {displayedText}
@@ -283,7 +283,7 @@ export const Terminal = memo(({
     <div
       ref={containerRef}
       className={cn(
-        "border-border bg-background z-0 h-full max-h-[400px] w-full max-w-lg rounded-xl border",
+        "border-border bg-background z-0 h-full max-h-[500px] w-full max-w-lg rounded-xl border",
         className
       )}
     >
