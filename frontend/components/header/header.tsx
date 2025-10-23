@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Menu, X, User } from "lucide-react";
+import { LogOut, Menu, X, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import React, { useCallback, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -147,16 +147,12 @@ export const HeroHeader: React.FC = () => {
                                             Profile
                                         </DropdownMenuItem>
                                         <DropdownMenuSeparator />
-                                        <DropdownMenuItem asChild>
-                                            <SignOutButton>
-                                                <button className="w-full text-left flex items-center">
-                                                    <span className="mr-2">
-                                                        🚪
-                                                    </span>
-                                                    Sign Out
-                                                </button>
-                                            </SignOutButton>
-                                        </DropdownMenuItem>
+                                        <SignOutButton>
+                                            <DropdownMenuItem>
+                                                <LogOut className="mr-2 h-4 w-4" />
+                                                Sign Out
+                                            </DropdownMenuItem>
+                                        </SignOutButton>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </SignedIn>
@@ -235,7 +231,7 @@ export const HeroHeader: React.FC = () => {
                                                     size="sm"
                                                     className="w-full flex items-center justify-center gap-2"
                                                 >
-                                                    <span>🚪</span>
+                                                    <LogOut className="h-4 w-4" />
                                                     Sign Out
                                                 </Button>
                                             </SignOutButton>
