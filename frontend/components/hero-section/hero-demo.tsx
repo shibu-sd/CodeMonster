@@ -41,7 +41,7 @@ export const HeroDemo: React.FC = () => {
                 ...transitionVariants,
             }}
         >
-            <div className="relative -mr-56 mt-8 px-2 sm:mr-0 sm:mt-12 md:mt-20">
+            <div className="relative -mr-56 mt-8 px-2 sm:mr-0 sm:mt-12 md:mt-18">
                 <Terminal
                     className="w-full max-w-6xl mx-auto h-[70vh]"
                     startOnView={true}
