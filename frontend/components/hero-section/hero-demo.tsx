@@ -87,6 +87,9 @@ export const HeroDemo: React.FC = () => {
                     <AnimatedSpan className="text-green-400">
                         ✓ Passed (returned [0,1])
                     </AnimatedSpan>
+                    <TypingAnimation className="text-cyan-400">
+                        ⚡ Compiling your solution...
+                    </TypingAnimation>
                     <TypingAnimation className="text-yellow-400">
                         🎉 All tests passed! Problem solved in 0.234s
                     </TypingAnimation>
