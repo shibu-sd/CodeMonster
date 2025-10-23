@@ -5,7 +5,6 @@ import { Menu, X, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import React, { useCallback, useState } from "react";
 import { cn } from "@/lib/utils";
-import { ThemeToggle } from "@/components/theme-toggle/theme-toggle";
 import {
     SignedIn,
     SignedOut,
@@ -116,12 +115,7 @@ export const HeroHeader: React.FC = () => {
                             <SignedIn>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <button
-                                            className="relative h-8 w-8 rounded-full overflow-hidden border-2 border-primary/20 hover:border-primary transition-colors cursor-pointer"
-                                            onClick={() =>
-                                                router.push("/dashboard")
-                                            }
-                                        >
+                                        <button className="relative h-8 w-8 rounded-full overflow-hidden border-2 border-primary/20 hover:border-primary transition-colors cursor-pointer">
                                             {user?.imageUrl ? (
                                                 <img
                                                     src={user.imageUrl}
@@ -139,7 +133,10 @@ export const HeroHeader: React.FC = () => {
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent
                                         align="end"
+                                        alignOffset={-5}
+                                        sideOffset={5}
                                         className="w-48"
+                                        collisionPadding={10}
                                     >
                                         <DropdownMenuItem
                                             onClick={() =>
@@ -163,7 +160,6 @@ export const HeroHeader: React.FC = () => {
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </SignedIn>
-                            <ThemeToggle />
                         </div>
 
                         <div className="bg-background in-data-[state=active]:block mb-6 hidden w-full rounded-3xl border p-6 shadow-2xl shadow-zinc-300/20 lg:hidden dark:shadow-none">
@@ -245,9 +241,6 @@ export const HeroHeader: React.FC = () => {
                                             </SignOutButton>
                                         </div>
                                     </SignedIn>
-                                    <div className="flex justify-center pt-2">
-                                        <ThemeToggle />
-                                    </div>
                                 </div>
                             </div>
                         </div>
