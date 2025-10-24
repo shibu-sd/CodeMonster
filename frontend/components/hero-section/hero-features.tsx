@@ -27,7 +27,7 @@ export default function HeroFeatures() {
                 </div>
                 <div className="relative">
                     <div className="relative z-10 grid grid-cols-6 gap-3">
-                        <Card className="relative col-span-full flex overflow-hidden lg:col-span-2">
+                        <Card className="relative col-span-full flex overflow-hidden transition-all duration-300 ease-out hover:scale-105 hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1 lg:col-span-2">
                             <CardContent className="relative m-auto size-fit pt-6">
                                 <div className="relative flex h-24 w-56 items-center">
                                     <svg
@@ -50,16 +50,16 @@ export default function HeroFeatures() {
                                 </h2>
                             </CardContent>
                         </Card>
-                        <Card className="relative col-span-full overflow-hidden sm:col-span-3 lg:col-span-2">
+                        <Card className="relative col-span-full overflow-hidden transition-all duration-300 ease-out hover:scale-105 hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1 sm:col-span-3 lg:col-span-2">
                             <CardContent className="pt-6">
-                                <div className="relative mx-auto flex aspect-square size-32 rounded-full border before:absolute before:-inset-2 before:rounded-full before:border dark:border-white/10 dark:before:border-white/5">
+                                <div className="relative mx-auto flex aspect-square size-32 rounded-full border before:absolute before:-inset-2 before:rounded-full before:border dark:border-white/10 dark:before:border-white/5 transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-primary/20">
                                     <Code
-                                        className="m-auto h-12 w-12 text-primary-600 dark:text-primary-500"
+                                        className="m-auto h-12 w-12 text-primary-600 dark:text-primary-500 transition-all duration-300 hover:scale-110 hover:text-primary-700"
                                         strokeWidth={2}
                                     />
                                 </div>
                                 <div className="relative z-10 mt-6 space-y-2 text-center">
-                                    <h2 className="group-hover:text-secondary-950 text-lg font-medium transition dark:text-white">
+                                    <h2 className="group-hover:text-secondary-950 text-lg font-medium transition-all duration-300 hover:text-primary-600 dark:text-white">
                                         Multi-language Support
                                     </h2>
                                     <p className="text-foreground">
@@ -71,16 +71,16 @@ export default function HeroFeatures() {
                                 </div>
                             </CardContent>
                         </Card>
-                        <Card className="relative col-span-full overflow-hidden sm:col-span-3 lg:col-span-2">
+                        <Card className="relative col-span-full overflow-hidden transition-all duration-300 ease-out hover:scale-105 hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1 sm:col-span-3 lg:col-span-2">
                             <CardContent className="pt-6">
-                                <div className="relative mx-auto flex aspect-square size-32 rounded-full border before:absolute before:-inset-2 before:rounded-full before:border dark:border-white/10 dark:before:border-white/5">
+                                <div className="relative mx-auto flex aspect-square size-32 rounded-full border before:absolute before:-inset-2 before:rounded-full before:border dark:border-white/10 dark:before:border-white/5 transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-primary/20">
                                     <Swords
-                                        className="m-auto h-12 w-12 text-primary-600 dark:text-primary-500"
+                                        className="m-auto h-12 w-12 text-primary-600 dark:text-primary-500 transition-all duration-300 hover:scale-110 hover:text-primary-700"
                                         strokeWidth={2}
                                     />
                                 </div>
                                 <div className="relative z-10 mt-6 space-y-2 text-center">
-                                    <h2 className="group-hover:text-secondary-950 text-lg font-medium transition dark:text-white">
+                                    <h2 className="group-hover:text-secondary-950 text-lg font-medium transition-all duration-300 hover:text-primary-600 dark:text-white">
                                         DSA Battle 1v1
                                     </h2>
                                     <p className="text-foreground">
@@ -91,12 +91,12 @@ export default function HeroFeatures() {
                                 </div>
                             </CardContent>
                         </Card>
-                        <Card className="card variant-outlined relative col-span-full overflow-hidden lg:col-span-3">
+                        <Card className="card variant-outlined relative col-span-full overflow-hidden transition-all duration-300 ease-out hover:scale-105 hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1 lg:col-span-3">
                             <CardContent className="grid pt-6 sm:grid-cols-2">
                                 <div className="relative z-10 flex flex-col justify-between space-y-12 lg:space-y-6">
-                                    <div className="relative flex aspect-square size-12 rounded-full border before:absolute before:-inset-2 before:rounded-full before:border dark:border-white/10 dark:before:border-white/5">
+                                    <div className="relative flex aspect-square size-12 rounded-full border before:absolute before:-inset-2 before:rounded-full before:border dark:border-white/10 dark:before:border-white/5 transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-primary/20">
                                         <Trophy
-                                            className="m-auto size-5"
+                                            className="m-auto size-5 transition-all duration-300 hover:scale-110 hover:text-primary-700"
                                             strokeWidth={1}
                                         />
                                     </div>
@@ -161,17 +161,17 @@ export default function HeroFeatures() {
                                 </div>
                             </CardContent>
                         </Card>
-                        <Card className="card variant-outlined relative col-span-full overflow-hidden lg:col-span-3">
+                        <Card className="card variant-outlined relative col-span-full overflow-hidden transition-all duration-300 ease-out hover:scale-105 hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1 lg:col-span-3">
                             <CardContent className="grid h-full pt-6 sm:grid-cols-2">
                                 <div className="relative z-10 flex flex-col justify-between space-y-12 lg:space-y-6">
-                                    <div className="relative flex aspect-square size-12 rounded-full border before:absolute before:-inset-2 before:rounded-full before:border dark:border-white/10 dark:before:border-white/5">
+                                    <div className="relative flex aspect-square size-12 rounded-full border before:absolute before:-inset-2 before:rounded-full before:border dark:border-white/10 dark:before:border-white/5 transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-primary/20">
                                         <Target
-                                            className="m-auto size-6"
+                                            className="m-auto size-6 transition-all duration-300 hover:scale-110 hover:text-primary-700"
                                             strokeWidth={1}
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <h2 className="text-lg font-medium transition">
+                                        <h2 className="text-lg font-medium transition-all duration-300 hover:text-primary-600">
                                             Practice & Learn
                                         </h2>
                                         <p className="text-foreground">
@@ -185,27 +185,27 @@ export default function HeroFeatures() {
                                 <div className="before:bg-(--color-border) relative mt-6 before:absolute before:inset-0 before:mx-auto before:w-px sm:-my-6 sm:-mr-6">
                                     <div className="relative flex h-full flex-col justify-center space-y-6 py-6">
                                         <div className="relative flex w-[calc(50%+0.875rem)] items-center justify-end gap-2">
-                                            <span className="block h-fit rounded border px-2 py-1 text-xs shadow-sm">
+                                            <span className="block h-fit rounded border px-2 py-1 text-xs shadow-sm transition-all duration-300 hover:bg-blue-100 hover:border-blue-300 hover:scale-105 dark:hover:bg-blue-900/30">
                                                 Arrays
                                             </span>
-                                            <div className="ring-background size-7 ring-4">
-                                                <div className="size-full rounded-full bg-blue-500"></div>
+                                            <div className="ring-background size-7 ring-4 transition-all duration-300 hover:ring-4 hover:ring-blue-200 hover:scale-110">
+                                                <div className="size-full rounded-full bg-blue-500 transition-all duration-300 hover:bg-blue-600"></div>
                                             </div>
                                         </div>
                                         <div className="relative ml-[calc(50%-1rem)] flex items-center gap-2">
-                                            <div className="ring-background size-8 ring-4">
-                                                <div className="size-full rounded-full bg-green-500"></div>
+                                            <div className="ring-background size-8 ring-4 transition-all duration-300 hover:ring-4 hover:ring-green-200 hover:scale-110">
+                                                <div className="size-full rounded-full bg-green-500 transition-all duration-300 hover:bg-green-600"></div>
                                             </div>
-                                            <span className="block h-fit rounded border px-2 py-1 text-xs shadow-sm">
+                                            <span className="block h-fit rounded border px-2 py-1 text-xs shadow-sm transition-all duration-300 hover:bg-green-100 hover:border-green-300 hover:scale-105 dark:hover:bg-green-900/30">
                                                 Dynamic Programming
                                             </span>
                                         </div>
                                         <div className="relative flex w-[calc(50%+0.875rem)] items-center justify-end gap-2">
-                                            <span className="block h-fit rounded border px-2 py-1 text-xs shadow-sm">
+                                            <span className="block h-fit rounded border px-2 py-1 text-xs shadow-sm transition-all duration-300 hover:bg-purple-100 hover:border-purple-300 hover:scale-105 dark:hover:bg-purple-900/30">
                                                 Graphs
                                             </span>
-                                            <div className="ring-background size-7 ring-4">
-                                                <div className="size-full rounded-full bg-purple-500"></div>
+                                            <div className="ring-background size-7 ring-4 transition-all duration-300 hover:ring-4 hover:ring-purple-200 hover:scale-110">
+                                                <div className="size-full rounded-full bg-purple-500 transition-all duration-300 hover:bg-purple-600"></div>
                                             </div>
                                         </div>
                                     </div>
