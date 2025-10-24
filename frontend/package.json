@@ -30,6 +30,7 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-resizable-panels": "^3.0.6",
+    "rough-notation": "^0.5.1",
     "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
