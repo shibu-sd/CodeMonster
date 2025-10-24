@@ -8,7 +8,7 @@ export function Testimonials() {
             <div className="container mx-auto px-4">
                 <div className="text-center mb-16">
                     <h2 className="text-balance text-4xl font-semibold lg:text-5xl">
-                        Loved by users Worldwide
+                        Loved by users worldwide
                     </h2>
                     <p className="mt-4 text-foreground max-w-2xl mx-auto">
                         See what users are saying about their experience with
