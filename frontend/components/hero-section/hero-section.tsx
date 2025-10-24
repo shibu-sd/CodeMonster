@@ -5,8 +5,7 @@ import { HeroHeader } from "@/components/header/header";
 import { HeroAnnouncement } from "./hero-announcement";
 import { HeroContent } from "./hero-content";
 import { HeroDemo } from "./hero-demo";
-import HeroFeatures from "../hero-features";
-import { HeroPartners } from "./hero-partners";
+import HeroFeatures from "./hero-features";
 import styles from "./hero-grid.module.css";
 
 const CELL_SIZE = 120; // px
@@ -151,7 +150,6 @@ export default function HeroSection() {
                     </div>
                 </section>
                 <HeroFeatures />
-                <HeroPartners />
             </main>
         </>
     );
