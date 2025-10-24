@@ -11,7 +11,7 @@ export default function HeroFeatures() {
                         Everything you need to{" "}
                         <Highlighter
                             action="underline"
-                            color="#f97316"
+                            color="#e78a53"
                             strokeWidth={2}
                             animationDuration={800}
                             isView={true}
