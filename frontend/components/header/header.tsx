@@ -55,8 +55,9 @@ export const HeroHeader: React.FC = () => {
                 )}
             >
                 <div className="mx-auto max-w-7xl px-6 transition-all duration-300">
-                    <div className="relative flex items-center justify-between py-3 lg:py-4">
-                        <div className="flex items-center">
+                    <div className="grid grid-cols-3 items-center py-3 lg:py-4">
+                        {/* Left: Logo */}
+                        <div className="flex justify-start">
                             <Link
                                 href="/"
                                 aria-label="home"
@@ -66,7 +67,8 @@ export const HeroHeader: React.FC = () => {
                             </Link>
                         </div>
 
-                        <div className="hidden lg:flex lg:flex-1 lg:justify-center">
+                        {/* Center: Navigation links */}
+                        <div className="hidden lg:flex justify-center">
                             <ul className="flex gap-8 text-base">
                                 {HEADER_MENU_ITEMS.filter(
                                     (item) => !item.requireAuth || isSignedIn
@@ -92,70 +94,75 @@ export const HeroHeader: React.FC = () => {
                             </ul>
                         </div>
 
-                        <button
-                            onClick={toggleMenu}
-                            aria-label={menuState ? "Close Menu" : "Open Menu"}
-                            className="relative z-20 -m-2.5 -mr-4 block cursor-pointer p-2.5 lg:hidden"
-                        >
-                            <Menu className="in-data-[state=active]:rotate-180 in-data-[state=active]:scale-0 in-data-[state=active]:opacity-0 m-auto size-6 duration-200" />
-                            <X className="in-data-[state=active]:rotate-0 in-data-[state=active]:scale-100 in-data-[state=active]:opacity-100 absolute inset-0 m-auto size-6 -rotate-180 scale-0 opacity-0 duration-200" />
-                        </button>
-
-                        <div className="hidden lg:flex lg:items-center lg:gap-3">
-                            <SignedOut>
-                                <Link href="/auth/sign-in">
-                                    <Button variant="outline" size="sm">
-                                        Login
-                                    </Button>
-                                </Link>
-                                <Link href="/auth/sign-up">
-                                    <Button size="sm">Sign Up</Button>
-                                </Link>
-                            </SignedOut>
-                            <SignedIn>
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <button className="relative h-8 w-8 rounded-full overflow-hidden border-2 border-primary/20 hover:border-primary transition-colors cursor-pointer">
-                                            {user?.imageUrl ? (
-                                                <img
-                                                    src={user.imageUrl}
-                                                    alt={
-                                                        user.firstName || "User"
-                                                    }
-                                                    className="h-full w-full object-cover"
-                                                />
-                                            ) : (
-                                                <div className="h-full w-full bg-primary/10 flex items-center justify-center">
-                                                    <User className="h-4 w-4" />
-                                                </div>
-                                            )}
-                                        </button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent
-                                        align="end"
-                                        alignOffset={-5}
-                                        sideOffset={5}
-                                        className="w-48"
-                                        collisionPadding={10}
-                                    >
-                                        <DropdownMenuItem
-                                            onClick={() =>
-                                                router.push("/dashboard")
-                                            }
+                        {/* Right: Buttons and mobile menu */}
+                        <div className="flex justify-end items-center gap-3">
+                            {/* Buttons on desktop */}
+                            <div className="hidden lg:flex lg:items-center lg:gap-3">
+                                <SignedOut>
+                                    <Link href="/auth/sign-in">
+                                        <Button variant="outline" size="sm">
+                                            Login
+                                        </Button>
+                                    </Link>
+                                    <Link href="/auth/sign-up">
+                                        <Button size="sm">Sign Up</Button>
+                                    </Link>
+                                </SignedOut>
+                                <SignedIn>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <button className="relative h-8 w-8 rounded-full overflow-hidden border-2 border-primary/20 hover:border-primary transition-colors cursor-pointer">
+                                                {user?.imageUrl ? (
+                                                    <img
+                                                        src={user.imageUrl}
+                                                        alt={
+                                                            user.firstName || "User"
+                                                        }
+                                                        className="h-full w-full object-cover"
+                                                    />
+                                                ) : (
+                                                    <div className="h-full w-full bg-primary/10 flex items-center justify-center">
+                                                        <User className="h-4 w-4" />
+                                                    </div>
+                                                )}
+                                            </button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent
+                                            align="end"
+                                            alignOffset={-5}
+                                            sideOffset={5}
+                                            className="w-48"
+                                            collisionPadding={10}
                                         >
-                                            <User className="mr-2 h-4 w-4" />
-                                            Profile
-                                        </DropdownMenuItem>
-                                        <DropdownMenuSeparator />
-                                        <SignOutButton>
-                                            <DropdownMenuItem>
-                                                <LogOut className="mr-2 h-4 w-4" />
-                                                Sign Out
+                                            <DropdownMenuItem
+                                                onClick={() =>
+                                                    router.push("/dashboard")
+                                                }
+                                            >
+                                                <User className="mr-2 h-4 w-4" />
+                                                Profile
                                             </DropdownMenuItem>
-                                        </SignOutButton>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </SignedIn>
+                                            <DropdownMenuSeparator />
+                                            <SignOutButton>
+                                                <DropdownMenuItem>
+                                                    <LogOut className="mr-2 h-4 w-4" />
+                                                    Sign Out
+                                                </DropdownMenuItem>
+                                            </SignOutButton>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </SignedIn>
+                            </div>
+
+                            {/* Mobile menu button */}
+                            <button
+                                onClick={toggleMenu}
+                                aria-label={menuState ? "Close Menu" : "Open Menu"}
+                                className="relative z-20 block cursor-pointer p-2.5 lg:hidden"
+                            >
+                                <Menu className="in-data-[state=active]:rotate-180 in-data-[state=active]:scale-0 in-data-[state=active]:opacity-0 m-auto size-6 duration-200" />
+                                <X className="in-data-[state=active]:rotate-0 in-data-[state=active]:scale-100 in-data-[state=active]:opacity-100 absolute inset-0 m-auto size-6 -rotate-180 scale-0 opacity-0 duration-200" />
+                            </button>
                         </div>
 
                         <div className="bg-background in-data-[state=active]:block mb-6 hidden w-full rounded-3xl border p-6 shadow-2xl shadow-zinc-300/20 lg:hidden dark:shadow-none">
