@@ -50,7 +50,7 @@ export const HeroHeader: React.FC = () => {
             <nav
                 data-state={menuState && "active"}
                 className={cn(
-                    "fixed z-20 w-full transition-colors duration-150",
+                    "fixed top-0 left-0 right-0 z-50 w-full transition-colors duration-150",
                     scrolled && "bg-background/50 backdrop-blur-3xl border-b"
                 )}
             >
@@ -165,7 +165,7 @@ export const HeroHeader: React.FC = () => {
                             </button>
                         </div>
 
-                        <div className="bg-background in-data-[state=active]:block mb-6 hidden w-full rounded-3xl border p-6 shadow-2xl shadow-zinc-300/20 lg:hidden dark:shadow-none">
+                        <div className="bg-background in-data-[state=active]:block mb-6 hidden fixed top-20 left-4 right-4 w-full rounded-3xl border p-6 shadow-2xl shadow-zinc-300/20 lg:hidden dark:shadow-none z-40">
                             <div className="space-y-6">
                                 <ul className="space-y-6 text-lg">
                                     {HEADER_MENU_ITEMS.filter(
