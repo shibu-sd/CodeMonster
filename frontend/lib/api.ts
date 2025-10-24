@@ -39,6 +39,54 @@ export interface ProblemStats {
     hard: number;
 }
 
+// Leaderboard types
+export interface LeaderboardEntry {
+    rank: number;
+    id: string;
+    username: string | null;
+    firstName: string | null;
+    profileImageUrl: string | null;
+    problemsSolved: number;
+    acceptedSubmissions: number;
+    totalSubmissions: number;
+    acceptanceRate: number;
+    createdAt: string;
+    isCurrentUser?: boolean;
+}
+
+export interface LeaderboardStats {
+    totalUsers: number;
+    totalProblemsSolved: number;
+    averageProblemsSolved: number;
+    topUserProblemsSolved: number;
+    activeUsersThisMonth: number;
+}
+
+export interface LeaderboardResponse {
+    success: boolean;
+    data: {
+        users: LeaderboardEntry[];
+        pagination: {
+            page: number;
+            limit: number;
+            total: number;
+            totalPages: number;
+            hasNext: boolean;
+            hasPrev: boolean;
+        };
+        stats?: LeaderboardStats;
+    };
+}
+
+export interface UserRankResponse {
+    success: boolean;
+    data: {
+        user: LeaderboardEntry;
+        rank: number;
+        percentile: number;
+    };
+}
+
 export interface ApiResponse<T> {
     success: boolean;
     message: string;
@@ -224,6 +272,55 @@ class ApiClient {
     async getUserSolution(problemId: string): Promise<ApiResponse<any>> {
         return this.request(`/api/users/solutions/${problemId}`);
     }
+
+    // Leaderboard-related API calls
+    async getLeaderboard(params?: {
+        page?: number;
+        limit?: number;
+        search?: string;
+    }): Promise<ApiResponse<LeaderboardResponse["data"]>> {
+        const searchParams = new URLSearchParams();
+
+        if (params?.page) searchParams.append("page", params.page.toString());
+        if (params?.limit)
+            searchParams.append("limit", params.limit.toString());
+        if (params?.search) searchParams.append("search", params.search);
+
+        const query = searchParams.toString();
+        const endpoint = `/api/leaderboard${query ? `?${query}` : ""}`;
+
+        return this.request<LeaderboardResponse["data"]>(endpoint);
+    }
+
+    async searchLeaderboardUsers(params: {
+        query: string;
+        page?: number;
+        limit?: number;
+    }): Promise<ApiResponse<LeaderboardResponse["data"]>> {
+        const searchParams = new URLSearchParams();
+
+        searchParams.append("q", params.query);
+        if (params?.page) searchParams.append("page", params.page.toString());
+        if (params?.limit)
+            searchParams.append("limit", params.limit.toString());
+
+        return this.request<LeaderboardResponse["data"]>(
+            `/api/leaderboard/search?${searchParams.toString()}`
+        );
+    }
+
+    async getLeaderboardStats(): Promise<ApiResponse<LeaderboardStats>> {
+        return this.request<LeaderboardStats>("/api/leaderboard/stats");
+    }
+
+    async getUserRank(
+        userId?: string
+    ): Promise<ApiResponse<UserRankResponse["data"]>> {
+        const endpoint = userId
+            ? `/api/leaderboard/rank/${userId}`
+            : "/api/leaderboard/rank";
+        return this.request<UserRankResponse["data"]>(endpoint);
+    }
 }
 
 export const apiClient = new ApiClient(API_BASE_URL);
@@ -247,6 +344,15 @@ export const api = {
     getUserDashboard: () => apiClient.getUserDashboard(),
     getUserSolution: (problemId: string) =>
         apiClient.getUserSolution(problemId),
+
+    // Leaderboard API methods
+    getLeaderboard: (params?: Parameters<typeof apiClient.getLeaderboard>[0]) =>
+        apiClient.getLeaderboard(params),
+    searchLeaderboardUsers: (
+        params: Parameters<typeof apiClient.searchLeaderboardUsers>[0]
+    ) => apiClient.searchLeaderboardUsers(params),
+    getLeaderboardStats: () => apiClient.getLeaderboardStats(),
+    getUserRank: (userId?: string) => apiClient.getUserRank(userId),
 
     healthCheck: () => apiClient.healthCheck(),
     setAuthToken: (token: string) => apiClient.setAuthToken(token),

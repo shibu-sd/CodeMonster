@@ -11,6 +11,7 @@ interface MonacoEditorProps {
     readOnly?: boolean;
     height?: string;
     className?: string;
+    tabSize?: number;
 }
 
 export function MonacoEditor({
@@ -20,6 +21,7 @@ export function MonacoEditor({
     readOnly = false,
     height = "400px",
     className = "",
+    tabSize = 4,
 }: MonacoEditorProps) {
     const { theme, resolvedTheme } = useTheme();
     const [isLoading, setIsLoading] = useState(true);
@@ -54,7 +56,7 @@ export function MonacoEditor({
             minimap: { enabled: false },
             scrollBeyondLastLine: false,
             automaticLayout: true,
-            tabSize: 2,
+            tabSize: tabSize,
             insertSpaces: true,
             wordWrap: "on",
             lineNumbers: "on",

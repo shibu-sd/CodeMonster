@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { AnimatedGroup } from "@/components/ui/animated-group";
+import { AnimatedGradientText } from "@/components/ui/animated-gradient-text";
 
 const transitionVariants = {
     item: {
@@ -25,26 +26,19 @@ const transitionVariants = {
 
 export const HeroAnnouncement: React.FC = () => {
     return (
-        <AnimatedGroup variants={transitionVariants}>
+        <AnimatedGroup
+            variants={transitionVariants}
+            className="pointer-events-auto"
+        >
             <Link
                 href="#link"
-                className="hover:bg-background dark:hover:border-t-border bg-muted group mx-auto flex w-fit items-center gap-4 rounded-full border p-1 pl-4 shadow-md shadow-zinc-950/5 transition-colors duration-300 dark:border-t-transparent dark:shadow-zinc-950"
+                className="group mx-auto flex w-fit items-center gap-3 rounded-full border border-neutral-200 bg-white/50 px-4 py-2 shadow-lg backdrop-blur-sm transition-all duration-300 hover:border-neutral-300 hover:shadow-xl dark:border-neutral-800 dark:bg-black/50 dark:hover:border-neutral-700"
             >
-                <span className="text-foreground text-sm">
+                <AnimatedGradientText className="font-semibold">
                     New Contest Platform & Judge System
-                </span>
-                <span className="dark:border-background block h-4 w-0.5 border-l bg-zinc-300 dark:bg-zinc-700"></span>
-
-                <div className="bg-background group-hover:bg-muted size-6 overflow-hidden rounded-full duration-500">
-                    <div className="flex w-12 -translate-x-1/2 duration-500 ease-in-out group-hover:translate-x-0">
-                        <span className="flex size-6">
-                            <ArrowRight className="m-auto size-3" />
-                        </span>
-                        <span className="flex size-6">
-                            <ArrowRight className="m-auto size-3" />
-                        </span>
-                    </div>
-                </div>
+                </AnimatedGradientText>
+                <span className="block h-4 w-px bg-neutral-300 dark:bg-neutral-600"></span>
+                <ArrowRight className="size-4 text-neutral-600 transition-transform duration-300 group-hover:translate-x-1 dark:text-neutral-400" />
             </Link>
         </AnimatedGroup>
     );

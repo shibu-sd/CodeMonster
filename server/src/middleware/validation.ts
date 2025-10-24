@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { ValidationError } from "./errorHandler";
 import { config } from "../config";
 
-interface ValidationRule {
+export interface ValidationRule {
     field: string;
     required?: boolean;
     type?: "string" | "number" | "boolean" | "array" | "object";

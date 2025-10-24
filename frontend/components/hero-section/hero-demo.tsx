@@ -1,5 +1,10 @@
 import React from "react";
 import { AnimatedGroup } from "@/components/ui/animated-group";
+import {
+    Terminal,
+    TypingAnimation,
+    AnimatedSpan,
+} from "@/components/ui/terminal";
 
 const transitionVariants = {
     item: {
@@ -36,33 +41,59 @@ export const HeroDemo: React.FC = () => {
                 ...transitionVariants,
             }}
         >
-            <div className="relative -mr-56 mt-8 overflow-hidden px-2 sm:mr-0 sm:mt-12 md:mt-20">
-                <div
-                    aria-hidden
-                    className="bg-linear-to-b to-background absolute inset-0 z-10 from-transparent from-35%"
-                />
-                <div className="inset-shadow-2xs ring-background dark:inset-shadow-zinc-800/20 bg-background relative mx-auto max-w-6xl overflow-hidden rounded-2xl border p-4 shadow-lg shadow-zinc-950/15 ring-1">
-                    <div className="bg-background aspect-15/8 relative hidden rounded-2xl dark:block flex items-center justify-center">
-                        <div className="text-muted-foreground text-center">
-                            <div className="text-4xl mb-2">
-                                ⚡
-                            </div>
-                            <div className="text-sm">
-                                Online Judge
-                            </div>
-                        </div>
-                    </div>
-                    <div className="z-2 border-border/25 aspect-15/8 relative rounded-2xl border dark:hidden flex items-center justify-center">
-                        <div className="text-muted-foreground text-center">
-                            <div className="text-4xl mb-2">
-                                ⚡
-                            </div>
-                            <div className="text-sm">
-                                Online Judge
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div className="relative -mr-56 mt-8 px-2 sm:mr-0 sm:mt-12 md:mt-13">
+                <Terminal
+                    className="w-full max-w-6xl mx-auto h-[70vh]"
+                    startOnView={true}
+                    isLoop={true}
+                    loopDelay={2000}
+                >
+                    <TypingAnimation className="text-green-400">
+                        $ codemonster init
+                    </TypingAnimation>
+                    <TypingAnimation className="text-blue-400">
+                        🚀 Initializing CodeMonster environment...
+                    </TypingAnimation>
+                    <AnimatedSpan className="text-gray-400">
+                        ✓ Loading problem database
+                    </AnimatedSpan>
+                    <AnimatedSpan className="text-gray-400">
+                        ✓ Setting up test runner
+                    </AnimatedSpan>
+                    <AnimatedSpan className="text-gray-400">
+                        ✓ Configuring code editor
+                    </AnimatedSpan>
+                    <TypingAnimation className="text-green-400">
+                        $ codemonster run --problem "two-sum"
+                    </TypingAnimation>
+                    <TypingAnimation className="text-blue-400">
+                        🔄 Running test cases for two-sum...
+                    </TypingAnimation>
+                    <AnimatedSpan className="text-gray-400">
+                        Test 1: [2,7,11,15], target=9
+                    </AnimatedSpan>
+                    <AnimatedSpan className="text-green-400">
+                        ✓ Passed (returned [0,1])
+                    </AnimatedSpan>
+                    <AnimatedSpan className="text-gray-400">
+                        Test 2: [3,2,4], target=6
+                    </AnimatedSpan>
+                    <AnimatedSpan className="text-green-400">
+                        ✓ Passed (returned [1,2])
+                    </AnimatedSpan>
+                    <AnimatedSpan className="text-gray-400">
+                        Test 3: [3,3], target=6
+                    </AnimatedSpan>
+                    <AnimatedSpan className="text-green-400">
+                        ✓ Passed (returned [0,1])
+                    </AnimatedSpan>
+                    <TypingAnimation className="text-cyan-400">
+                        ⚡ Compiling your solution...
+                    </TypingAnimation>
+                    <TypingAnimation className="text-yellow-400">
+                        🎉 All tests passed! Problem solved in 0.234s
+                    </TypingAnimation>
+                </Terminal>
             </div>
         </AnimatedGroup>
     );

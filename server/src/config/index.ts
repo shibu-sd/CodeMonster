@@ -33,14 +33,12 @@ export const config = {
     // Judge Service Configuration
     judge: {
         url: process.env.JUDGE_URL || "http://localhost:3001",
-        timeout: parseInt(process.env.JUDGE_TIMEOUT || "30000"),
+        timeout: 30000, // 30 seconds - hardcoded
     },
 
     // Authentication Configuration
     auth: {
-        clerkApiKey: process.env.CLERK_API_KEY || "",
         clerkSecretKey: process.env.CLERK_SECRET_KEY || "",
-        jwtKey: process.env.CLERK_JWT_KEY || "",
         testToken: process.env.TEST_TOKEN || "test-token",
         testEmail: process.env.TEST_EMAIL || "test@codemonster.dev",
     },
@@ -49,7 +47,7 @@ export const config = {
     cors: {
         origin:
             process.env.NODE_ENV === "production"
-                ? [process.env.FRONTEND_URL || "https://your-domain.com"]
+                ? ["https://your-domain.com"] // Update this in production
                 : ["http://localhost:3000"],
         credentials: true,
     },
@@ -86,7 +84,7 @@ export const config = {
 
     // Logging Configuration
     logging: {
-        level: process.env.LOG_LEVEL || "info",
+        level: "info", // Hardcoded for development
         format: process.env.NODE_ENV === "production" ? "json" : "dev",
     },
 
@@ -118,7 +116,6 @@ export const validateConfig = (): void => {
     // Warn about optional but recommended vars in production
     if (config.server.nodeEnv === "production") {
         const recommendedVars = [
-            "CLERK_API_KEY",
             "CLERK_SECRET_KEY",
             "REDIS_HOST",
             "JUDGE_URL",

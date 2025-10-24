@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
     Search,
@@ -25,6 +25,7 @@ import {
     formatAcceptanceRate,
     formatSubmissionCount,
 } from "@/lib/api";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function ProblemsPageContent() {
     const api = useApiWithAuth();
@@ -33,6 +34,8 @@ function ProblemsPageContent() {
     const [stats, setStats] = useState<ProblemStats | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [showSkeleton, setShowSkeleton] = useState(true);
+    const skeletonStartTime = useRef<number>(Date.now());
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedDifficulty, setSelectedDifficulty] = useState<string>("");
     const [currentPage, setCurrentPage] = useState(1);
@@ -68,6 +71,30 @@ function ProblemsPageContent() {
             fetchSolvedProblems();
         }
     }, [authReady, isSignedIn]);
+
+    // Handle minimum skeleton display time
+    useEffect(() => {
+        if (!loading && showSkeleton) {
+            const elapsedTime = Date.now() - skeletonStartTime.current;
+            const minimumDisplayTime = 500; // 0.5 second minimum
+
+            if (elapsedTime < minimumDisplayTime) {
+                const remainingTime = minimumDisplayTime - elapsedTime;
+                const timer = setTimeout(() => {
+                    setShowSkeleton(false);
+                }, remainingTime);
+
+                return () => clearTimeout(timer);
+            } else {
+                setShowSkeleton(false);
+            }
+        }
+
+        if (loading && !showSkeleton) {
+            setShowSkeleton(true);
+            skeletonStartTime.current = Date.now();
+        }
+    }, [loading, showSkeleton]);
 
     // Fetch problems and stats
     useEffect(() => {
@@ -150,18 +177,102 @@ function ProblemsPageContent() {
         setCurrentPage(1);
     };
 
-    if (loading && problems.length === 0) {
+    if (showSkeleton) {
         return (
             <div className="min-h-screen bg-background">
                 <HeroHeader />
-                <div className="container mx-auto px-4 pt-24 pb-16">
-                    <div className="flex items-center justify-center min-h-[400px]">
-                        <div className="text-center">
-                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-                            <p className="text-muted-foreground">
-                                Loading problems...
-                            </p>
+                <div className="container mx-auto px-4 pt-32 pb-16">
+                    <div className="mb-8">
+                        <Skeleton className="h-12 w-48 mb-4" />
+                        <Skeleton className="h-6 w-96 mb-6" />
+
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                            {[...Array(4)].map((_, i) => (
+                                <div
+                                    key={i}
+                                    className="bg-card rounded-lg p-4 border"
+                                >
+                                    <div className="flex items-center space-x-2 mb-2">
+                                        <Skeleton className="h-5 w-5" />
+                                        <Skeleton className="h-4 w-12" />
+                                    </div>
+                                    <Skeleton className="h-8 w-16" />
+                                </div>
+                            ))}
                         </div>
+
+                        <div className="flex flex-col md:flex-row gap-4 mb-6">
+                            <div className="flex-1">
+                                <div className="relative">
+                                    <Skeleton className="h-10 w-full rounded-md" />
+                                </div>
+                            </div>
+                            <div className="flex gap-2">
+                                {[...Array(3)].map((_, i) => (
+                                    <Skeleton key={i} className="h-10 w-16" />
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-card rounded-lg border overflow-hidden">
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead className="bg-muted/50">
+                                    <tr>
+                                        <th className="text-left py-3 px-4 font-medium">
+                                            <Skeleton className="h-5 w-20" />
+                                        </th>
+                                        <th className="text-center py-3 px-4 font-medium">
+                                            <Skeleton className="h-5 w-20 mx-auto" />
+                                        </th>
+                                        <th className="text-center py-3 px-4 font-medium">
+                                            <Skeleton className="h-5 w-20 mx-auto" />
+                                        </th>
+                                        <th className="text-center py-3 px-4 font-medium">
+                                            <Skeleton className="h-5 w-20 mx-auto" />
+                                        </th>
+                                        <th className="text-center py-3 px-4 font-medium">
+                                            <Skeleton className="h-5 w-16 mx-auto" />
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {[...Array(10)].map((_, index) => (
+                                        <tr key={index} className="border-t">
+                                            <td className="py-4 px-4">
+                                                <div className="flex items-center space-x-2">
+                                                    <Skeleton className="h-4 w-6" />
+                                                    <Skeleton className="h-5 w-48" />
+                                                </div>
+                                            </td>
+                                            <td className="py-4 px-4 text-center">
+                                                <Skeleton className="h-6 w-16 mx-auto rounded-full" />
+                                            </td>
+                                            <td className="py-4 px-4 text-center">
+                                                <Skeleton className="h-4 w-12 mx-auto" />
+                                            </td>
+                                            <td className="py-4 px-4 text-center">
+                                                <Skeleton className="h-4 w-16 mx-auto" />
+                                            </td>
+                                            <td className="py-4 px-4 text-center">
+                                                <Skeleton className="h-5 w-5 mx-auto" />
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div className="flex justify-center items-center space-x-2 mt-8">
+                        <Skeleton className="h-10 w-20" />
+                        <div className="flex space-x-1">
+                            {[...Array(5)].map((_, i) => (
+                                <Skeleton key={i} className="h-10 w-10" />
+                            ))}
+                        </div>
+                        <Skeleton className="h-10 w-12" />
                     </div>
                 </div>
                 <FooterSection />
@@ -196,7 +307,7 @@ function ProblemsPageContent() {
         <div className="min-h-screen bg-background">
             <HeroHeader />
 
-            <main className="container mx-auto px-4 pt-24 pb-16">
+            <main className="container mx-auto px-4 pt-32 pb-16">
                 {/* Header Section */}
                 <div className="mb-8">
                     <h1 className="text-4xl font-bold mb-4">Problem Set</h1>
