@@ -86,6 +86,7 @@ export function CodeEditorPanel({
                     language={selectedLanguage}
                     height="100%"
                     className="w-full h-full"
+                    tabSize={4}
                 />
             </div>
         </div>
