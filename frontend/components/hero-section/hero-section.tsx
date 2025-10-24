@@ -5,6 +5,7 @@ import { HeroHeader } from "@/components/header/header";
 import { HeroAnnouncement } from "./hero-announcement";
 import { HeroContent } from "./hero-content";
 import { HeroDemo } from "./hero-demo";
+import HeroFeatures from "../hero-features";
 import { HeroPartners } from "./hero-partners";
 import styles from "./hero-grid.module.css";
 
@@ -149,6 +150,7 @@ export default function HeroSection() {
                         </div>
                     </div>
                 </section>
+                <HeroFeatures />
                 <HeroPartners />
             </main>
         </>
