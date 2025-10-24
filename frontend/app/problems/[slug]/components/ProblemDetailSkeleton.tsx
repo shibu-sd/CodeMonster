@@ -85,16 +85,25 @@ export function ProblemDetailSkeleton() {
                                             <Skeleton className="h-6 w-36 mb-3" />
                                             <div className="bg-muted p-4 rounded-md border">
                                                 <div className="space-y-2 font-mono text-sm">
-                                                    {[...Array(5)].map((_, i) => (
-                                                        <div key={i} className="flex items-center space-x-2">
-                                                            <Skeleton
-                                                                className="flex-1 h-4"
-                                                                style={{
-                                                                    width: `${Math.random() * 30 + 50}%`
-                                                                }}
-                                                            />
-                                                        </div>
-                                                    ))}
+                                                    {[...Array(5)].map(
+                                                        (_, i) => (
+                                                            <div
+                                                                key={i}
+                                                                className="flex items-center space-x-2"
+                                                            >
+                                                                <Skeleton
+                                                                    className="flex-1 h-4"
+                                                                    style={{
+                                                                        width: `${
+                                                                            Math.random() *
+                                                                                30 +
+                                                                            50
+                                                                        }%`,
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                        )
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>
@@ -128,7 +137,10 @@ export function ProblemDetailSkeleton() {
                                 <div className="h-full font-mono text-sm p-4">
                                     <div className="space-y-1">
                                         {[...Array(25)].map((_, i) => (
-                                            <div key={i} className="flex items-center">
+                                            <div
+                                                key={i}
+                                                className="flex items-center"
+                                            >
                                                 {/* Line numbers */}
                                                 <span className="text-muted-foreground w-8 text-right mr-4 select-none">
                                                     {i + 1}
@@ -137,8 +149,16 @@ export function ProblemDetailSkeleton() {
                                                 <Skeleton
                                                     className="h-4"
                                                     style={{
-                                                        width: `${Math.random() * 35 + 45}%`,
-                                                        marginLeft: i % 3 === 0 ? '0px' : i % 3 === 1 ? '16px' : '32px'
+                                                        width: `${
+                                                            Math.random() * 35 +
+                                                            45
+                                                        }%`,
+                                                        marginLeft:
+                                                            i % 3 === 0
+                                                                ? "0px"
+                                                                : i % 3 === 1
+                                                                ? "16px"
+                                                                : "32px",
                                                     }}
                                                 />
                                             </div>

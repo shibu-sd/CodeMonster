@@ -32,9 +32,7 @@ export function CodeEditorPanel({
             {/* Editor Header */}
             <div className="flex items-center justify-between bg-card rounded-lg p-3 border flex-shrink-0">
                 <div className="flex items-center space-x-4">
-                    <label className="text-sm font-medium">
-                        Language:
-                    </label>
+                    <label className="text-sm font-medium">Language:</label>
                     <select
                         value={selectedLanguage}
                         onChange={(e) => onLanguageChange(e.target.value)}

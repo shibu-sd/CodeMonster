@@ -25,9 +25,7 @@ export function ProblemHeader({ problem }: ProblemHeaderProps) {
             </div>
 
             <div className="mb-6">
-                <h1 className="text-3xl font-bold mb-2">
-                    {problem.title}
-                </h1>
+                <h1 className="text-3xl font-bold mb-2">{problem.title}</h1>
                 <div className="flex flex-col space-y-3">
                     <div className="flex items-center space-x-4">
                         <span
@@ -39,15 +37,11 @@ export function ProblemHeader({ problem }: ProblemHeaderProps) {
                         </span>
                         <span className="text-sm text-muted-foreground">
                             Acceptance Rate:{" "}
-                            {formatAcceptanceRate(
-                                problem?.acceptanceRate
-                            )}
+                            {formatAcceptanceRate(problem?.acceptanceRate)}
                         </span>
                         <span className="text-sm text-muted-foreground">
                             Submissions:{" "}
-                            {formatSubmissionCount(
-                                problem?.totalSubmissions
-                            )}
+                            {formatSubmissionCount(problem?.totalSubmissions)}
                         </span>
                     </div>
 

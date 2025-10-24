@@ -16,13 +16,9 @@ export function ProblemErrorState({ error, onGoBack }: ProblemErrorStateProps) {
                         <h2 className="text-2xl font-bold mb-2">
                             Problem Not Found
                         </h2>
-                        <p className="text-muted-foreground mb-4">
-                            {error}
-                        </p>
+                        <p className="text-muted-foreground mb-4">{error}</p>
                         <div className="space-x-4">
-                            <Button onClick={onGoBack}>
-                                Go Back
-                            </Button>
+                            <Button onClick={onGoBack}>Go Back</Button>
                             <Link href="/problems">
                                 <Button variant="outline">
                                     View All Problems
