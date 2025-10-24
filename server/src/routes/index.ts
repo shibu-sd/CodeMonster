@@ -3,6 +3,7 @@ import { problemRoutes } from "./problems";
 import { userRoutes } from "./users";
 import { submissionRoutes } from "./submissions";
 import { judgeRoutes } from "./judge";
+import leaderboardRoutes from "./leaderboard";
 
 const router = Router();
 
@@ -10,6 +11,7 @@ router.use("/problems", problemRoutes);
 router.use("/users", userRoutes);
 router.use("/submissions", submissionRoutes);
 router.use("/judge", judgeRoutes);
+router.use("/leaderboard", leaderboardRoutes);
 
 router.get("/", (_req, res) => {
     res.json({
@@ -38,6 +40,15 @@ router.get("/", (_req, res) => {
                 "GET /api/submissions/:id/status": "Get submission status",
                 "GET /api/problems/:problemId/submissions":
                     "Get submissions for a problem",
+            },
+            leaderboard: {
+                "GET /api/leaderboard": "Get main leaderboard with pagination",
+                "GET /api/leaderboard/search": "Search users by username",
+                "GET /api/leaderboard/stats":
+                    "Get global leaderboard statistics",
+                "GET /api/leaderboard/rank":
+                    "Get current user's rank (auth required)",
+                "GET /api/leaderboard/rank/:userId": "Get specific user's rank",
             },
         },
         documentation: "https://docs.codemonster.dev",
