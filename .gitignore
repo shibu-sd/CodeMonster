@@ -46,3 +46,8 @@ stop-all-local.bat
 check-services.bat
 build-docker-images.bat
 docker-compose.yml
+package.json
+package-lock.json
+components.json
+.mcp.json
+CLAUDE.md
