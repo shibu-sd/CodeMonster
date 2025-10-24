@@ -181,7 +181,7 @@ function ProblemsPageContent() {
         return (
             <div className="min-h-screen bg-background">
                 <HeroHeader />
-                <div className="container mx-auto px-4 pt-24 pb-16">
+                <div className="container mx-auto px-4 pt-32 pb-16">
                     <div className="mb-8">
                         <Skeleton className="h-12 w-48 mb-4" />
                         <Skeleton className="h-6 w-96 mb-6" />
@@ -307,7 +307,7 @@ function ProblemsPageContent() {
         <div className="min-h-screen bg-background">
             <HeroHeader />
 
-            <main className="container mx-auto px-4 pt-24 pb-16">
+            <main className="container mx-auto px-4 pt-32 pb-16">
                 {/* Header Section */}
                 <div className="mb-8">
                     <h1 className="text-4xl font-bold mb-4">Problem Set</h1>
