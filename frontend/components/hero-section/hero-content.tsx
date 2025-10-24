@@ -72,7 +72,8 @@ export const HeroContent: React.FC = () => {
                 }}
                 className="mt-8 text-6xl md:text-7xl lg:mt-16 xl:text-[5.25rem] leading-tight"
             >
-                The Monster inside<br />
+                The Monster inside
+                <br />
                 you codes{" "}
                 <AnimatePresence mode="wait">
                     <motion.span
@@ -81,6 +82,7 @@ export const HeroContent: React.FC = () => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -50 }}
                         transition={{ duration: 0.25, ease: "easeOut" }}
+                        className="text-primary"
                     >
                         {words[currentWord]}
                     </motion.span>
@@ -94,10 +96,9 @@ export const HeroContent: React.FC = () => {
                 as="p"
                 className="mx-auto mt-8 max-w-2xl text-balance text-lg"
             >
-                Solve algorithmic problems, compete with others, and improve
-                your programming skills. Practice data structures, algorithms,
-                and competitive programming with instant feedback from our
-                online judge.
+                Solve algorithmic challenges, compete on leaderboards, and
+                master DSA through real-time battles. Train your logic, track
+                your progress, and evolve into an unstoppable coding monster.
             </TextEffect>
 
             <AnimatedGroup
