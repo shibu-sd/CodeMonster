@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { TextEffect } from "@/components/ui/text-effect";
 import { AnimatedGroup } from "@/components/ui/animated-group";
+import { AnimatePresence } from "motion/react";
+import { motion } from "motion/react";
 import { useAuth } from "@clerk/nextjs";
 
 const transitionVariants = {
@@ -27,6 +29,16 @@ const transitionVariants = {
 
 export const HeroContent: React.FC = () => {
     const { isSignedIn, isLoaded } = useAuth();
+    const [currentWord, setCurrentWord] = useState(0);
+    const words = ["Harder", "Faster", "Deeper"];
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentWord((prev) => (prev + 1) % words.length);
+        }, 2500);
+
+        return () => clearInterval(interval);
+    }, []);
 
     const getPrimaryActionUrl = () => {
         if (!isLoaded) return "/auth/sign-up";
@@ -50,14 +62,30 @@ export const HeroContent: React.FC = () => {
 
     return (
         <div className="text-center sm:mx-auto lg:mr-auto lg:mt-0">
-            <TextEffect
-                preset="fade-in-blur"
-                speedSegment={0.3}
-                as="h1"
-                className="mt-8 text-balance text-6xl md:text-7xl lg:mt-16 xl:text-[5.25rem]"
+            <motion.h1
+                initial={{ opacity: 0, filter: "blur(12px)", y: 20 }}
+                animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+                transition={{
+                    duration: 1.5,
+                    ease: "easeOut",
+                    delay: 0.3,
+                }}
+                className="mt-8 text-6xl md:text-7xl lg:mt-16 xl:text-[5.25rem] leading-tight"
             >
-                Master Coding Through Practice
-            </TextEffect>
+                The Monster inside<br />
+                you codes{" "}
+                <AnimatePresence mode="wait">
+                    <motion.span
+                        key={words[currentWord]}
+                        initial={{ opacity: 0, y: 50 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -50 }}
+                        transition={{ duration: 0.25, ease: "easeOut" }}
+                    >
+                        {words[currentWord]}
+                    </motion.span>
+                </AnimatePresence>
+            </motion.h1>
             <TextEffect
                 per="line"
                 preset="fade-in-blur"
