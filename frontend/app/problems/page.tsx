@@ -76,7 +76,7 @@ function ProblemsPageContent() {
     useEffect(() => {
         if (!loading && showSkeleton) {
             const elapsedTime = Date.now() - skeletonStartTime.current;
-            const minimumDisplayTime = 1000; // 1 second minimum
+            const minimumDisplayTime = 500; // 0.5 second minimum
 
             if (elapsedTime < minimumDisplayTime) {
                 const remainingTime = minimumDisplayTime - elapsedTime;
