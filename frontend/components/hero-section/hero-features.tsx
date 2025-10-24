@@ -1,4 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
+import { Highlighter } from "@/components/ui/highlighter";
 import { Code, Trophy, Target, Swords, Zap } from "lucide-react";
 
 export default function HeroFeatures() {
@@ -7,7 +8,16 @@ export default function HeroFeatures() {
             <div className="mx-auto max-w-5xl px-6">
                 <div className="text-center mb-12">
                     <h2 className="text-balance text-4xl font-semibold lg:text-5xl">
-                        Built to cover your needs
+                        Everything you need to{" "}
+                        <Highlighter
+                            action="underline"
+                            color="#f97316"
+                            strokeWidth={2}
+                            animationDuration={800}
+                            isView={true}
+                        >
+                            dominate
+                        </Highlighter>
                     </h2>
                     <p className="mt-4">
                         Master algorithms, compete globally, and level up your
