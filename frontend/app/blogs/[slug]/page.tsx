@@ -12,6 +12,7 @@ import { ArrowLeft, ArrowRight, Clock, User } from "lucide-react";
 import Link from "next/link";
 import { HeroHeader } from "@/components/header/header";
 import FooterSection from "@/components/footer/footer";
+import { ScrollProgress } from "@/components/ui/scroll-progress";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function BlogPostPage() {
@@ -151,6 +152,7 @@ export default function BlogPostPage() {
             <ProtectedPage>
                 <div className="min-h-screen bg-background">
                     <HeroHeader />
+                    <ScrollProgress />
                     <main className="container mx-auto px-4 pt-32 pb-16">
                         {/* Back Button Skeleton */}
                         <div className="mb-6">
@@ -291,6 +293,7 @@ export default function BlogPostPage() {
             <ProtectedPage>
                 <div className="min-h-screen bg-background">
                     <HeroHeader />
+                    <ScrollProgress />
                     <main className="container mx-auto px-4 pt-32 pb-16">
                         <div className="text-center py-12">
                             <h1 className="text-2xl font-bold mb-4">
@@ -322,6 +325,7 @@ export default function BlogPostPage() {
         <ProtectedPage>
             <div className="min-h-screen bg-background">
                 <HeroHeader />
+                <ScrollProgress />
                 <main className="container mx-auto px-4 pt-32 pb-16">
                     {/* Back Button */}
                     <div className="mb-6">
