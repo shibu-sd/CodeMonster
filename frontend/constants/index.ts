@@ -71,7 +71,7 @@ export const SOCIAL_LINKS: SocialLink[] = [
 export const FOOTER_LINKS: FooterLinkGroup[] = [
     {
         group: "Practice",
-        items: [{ title: "All Problems", href: "/problems" }],
+        items: [{ title: "Problemset", href: "/problems" }],
     },
     {
         group: "Compete",
@@ -82,15 +82,13 @@ export const FOOTER_LINKS: FooterLinkGroup[] = [
     },
     {
         group: "Learn",
-        items: [{ title: "Blog", href: "/blogs" }],
+        items: [{ title: "Blogs", href: "/blogs" }],
     },
     {
         group: "Company",
         items: [
-            { title: "About Us", href: "#about" },
-            { title: "Contact", href: "#contact" },
-            { title: "Privacy Policy", href: "#privacy" },
-            { title: "Terms of Service", href: "#terms" },
+            { title: "About Us", href: "/about" },
+            { title: "Privacy Policy", href: "/privacy" },
         ],
     },
 ] as const;
