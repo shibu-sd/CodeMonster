@@ -339,9 +339,8 @@ function LeaderboardPageContent() {
                                 <Trophy className="w-10 h-10 text-yellow-500" />
                             </div>
                             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                                Compete with the best programmers on
-                                CodeMonster. Climb the rankings by solving more
-                                problems and improving your skills.
+                                Competition never sleeps and neither do the
+                                monsters
                             </p>
                             <div className="flex justify-center items-center space-x-2 text-sm text-muted-foreground">
                                 <Target className="w-4 h-4" />
