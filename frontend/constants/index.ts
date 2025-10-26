@@ -71,44 +71,24 @@ export const SOCIAL_LINKS: SocialLink[] = [
 export const FOOTER_LINKS: FooterLinkGroup[] = [
     {
         group: "Practice",
-        items: [
-            { title: "All Problems", href: "#problems" },
-            { title: "Easy Problems", href: "#easy" },
-            { title: "Medium Problems", href: "#medium" },
-            { title: "Hard Problems", href: "#hard" },
-            { title: "Algorithms", href: "#algorithms" },
-            { title: "Data Structures", href: "#data-structures" },
-        ],
+        items: [{ title: "Problemset", href: "/problems" }],
     },
     {
         group: "Compete",
         items: [
-            { title: "Live Contests", href: "#contests" },
-            { title: "Past Contests", href: "#past-contests" },
-            { title: "Leaderboard", href: "#leaderboard" },
-            { title: "Rankings", href: "#rankings" },
-            { title: "Achievements", href: "#achievements" },
-            { title: "Statistics", href: "#stats" },
+            { title: "Leaderboard", href: "/leaderboard" },
+            { title: "Statistics", href: "/dashboard" },
         ],
     },
     {
         group: "Learn",
-        items: [
-            { title: "Tutorials", href: "#tutorials" },
-            { title: "Interview Prep", href: "#interview" },
-            { title: "Study Plans", href: "#study-plans" },
-            { title: "Discussion", href: "#discussion" },
-            { title: "Blog", href: "#blog" },
-            { title: "Help Center", href: "#help" },
-        ],
+        items: [{ title: "Blogs", href: "/blogs" }],
     },
     {
         group: "Company",
         items: [
-            { title: "About Us", href: "#about" },
-            { title: "Contact", href: "#contact" },
-            { title: "Privacy Policy", href: "#privacy" },
-            { title: "Terms of Service", href: "#terms" },
+            { title: "About Us", href: "/about" },
+            { title: "Privacy Policy", href: "/privacy" },
         ],
     },
 ] as const;
@@ -116,9 +96,8 @@ export const FOOTER_LINKS: FooterLinkGroup[] = [
 // Header menu items
 export const HEADER_MENU_ITEMS: MenuItem[] = [
     { name: "Problems", href: "/problems", requireAuth: true },
-    { name: "Contests", href: "#contests", requireAuth: true },
     { name: "Leaderboard", href: "/leaderboard", requireAuth: true },
-    { name: "Learn", href: "#learn", requireAuth: true },
+    { name: "Blogs", href: "/blogs", requireAuth: true },
 ];
 
 // Partner logos

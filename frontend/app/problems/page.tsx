@@ -312,8 +312,7 @@ function ProblemsPageContent() {
                 <div className="mb-8">
                     <h1 className="text-4xl font-bold mb-4">Problem Set</h1>
                     <p className="text-xl text-muted-foreground mb-6">
-                        Challenge yourself with coding problems from easy to
-                        hard
+                        Every problem solved feeds the monster inside you
                     </p>
 
                     {/* Stats Cards */}
