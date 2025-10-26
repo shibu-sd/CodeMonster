@@ -182,9 +182,9 @@ function ProblemsPageContent() {
             <div className="min-h-screen bg-background">
                 <HeroHeader />
                 <div className="container mx-auto px-4 pt-32 pb-16">
-                    <div className="mb-8">
-                        <Skeleton className="h-12 w-48 mb-4" />
-                        <Skeleton className="h-6 w-96 mb-6" />
+                    <div className="mb-8 text-center">
+                        <Skeleton className="h-12 w-48 mb-4 mx-auto" />
+                        <Skeleton className="h-6 w-96 mb-6 mx-auto" />
 
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                             {[...Array(4)].map((_, i) => (
@@ -284,7 +284,7 @@ function ProblemsPageContent() {
         return (
             <div className="min-h-screen bg-background">
                 <HeroHeader />
-                <div className="container mx-auto px-4 pt-24 pb-16">
+                <div className="container mx-auto px-4 pt-32 pb-16">
                     <div className="flex items-center justify-center min-h-[400px]">
                         <div className="text-center">
                             <div className="text-red-500 mb-4">❌</div>
@@ -309,9 +309,9 @@ function ProblemsPageContent() {
 
             <main className="container mx-auto px-4 pt-32 pb-16">
                 {/* Header Section */}
-                <div className="mb-8">
+                <div className="mb-8 text-center">
                     <h1 className="text-4xl font-bold mb-4">Problem Set</h1>
-                    <p className="text-xl text-muted-foreground mb-6">
+                    <p className="text-xl text-muted-foreground mb-6 max-w-2xl mx-auto">
                         Every problem solved feeds the monster inside you
                     </p>
 
