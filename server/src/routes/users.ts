@@ -17,6 +17,12 @@ router.get(
     UserController.getUserSolution
 );
 
+router.get(
+    "/contributions",
+    authenticateUser,
+    UserController.getUserContributionData
+);
+
 router.get("/:id/stats", UserController.getUserStats);
 router.get("/:id/progress", UserController.getUserProgress);
 
