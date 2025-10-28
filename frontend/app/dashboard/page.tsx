@@ -24,6 +24,10 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { getDifficultyBadgeColor } from "@/lib/api";
+import {
+    ContributionData,
+    ContributionGraph,
+} from "@/components/ui/ContributionGraph";
 
 interface DashboardData {
     user: {
@@ -88,6 +92,13 @@ function DashboardPageContent() {
         null
     );
     const [error, setError] = useState<string | null>(null);
+    const [contributionData, setContributionData] = useState<
+        ContributionData[]
+    >([]);
+    const [contributionYear, setContributionYear] = useState(
+        new Date().getFullYear()
+    );
+    const [loadingContribution, setLoadingContribution] = useState(false);
 
     useEffect(() => {
         const initDashboard = async () => {
@@ -96,7 +107,10 @@ function DashboardPageContent() {
                     const token = await getToken();
                     if (token) {
                         api.setAuthToken(token);
-                        await loadDashboard();
+                        await Promise.all([
+                            loadDashboard(),
+                            loadContributionData(),
+                        ]);
                     }
                 } catch (err) {
                     console.error("Failed to get token:", err);
@@ -132,6 +146,24 @@ function DashboardPageContent() {
             setError("Failed to load dashboard");
         } finally {
             setLoading(false);
+        }
+    };
+
+    const loadContributionData = async (year: number = contributionYear) => {
+        try {
+            setLoadingContribution(true);
+            const response = await api.getUserContributionData(year);
+
+            if (response.success && response.data) {
+                setContributionData(response.data);
+                setContributionYear(year);
+            } else {
+                console.error("Failed to load contribution data");
+            }
+        } catch (err) {
+            console.error("Error loading contribution data:", err);
+        } finally {
+            setLoadingContribution(false);
         }
     };
 
@@ -388,7 +420,63 @@ function DashboardPageContent() {
                         </Card>
                     </div>
 
-                    <div className="lg:col-span-2">
+                    <div className="lg:col-span-2 space-y-6">
+                        <Card className="p-6">
+                            <h2 className="text-xl font-bold mb-4 flex items-center">
+                                <Calendar className="h-5 w-5 mr-2" />
+                                Contribution Activity
+                            </h2>
+                            <div className="space-y-4">
+                                {loadingContribution ? (
+                                    <div className="flex items-center justify-center py-12">
+                                        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-sm text-muted-foreground">
+                                                {contributionYear}
+                                            </span>
+                                            <div className="flex gap-2">
+                                                <button
+                                                    onClick={() =>
+                                                        loadContributionData(
+                                                            contributionYear - 1
+                                                        )
+                                                    }
+                                                    className="text-xs px-2 py-1 rounded bg-secondary hover:bg-secondary/80 transition-colors"
+                                                >
+                                                    ← {contributionYear - 1}
+                                                </button>
+                                                {contributionYear !==
+                                                    new Date().getFullYear() && (
+                                                    <button
+                                                        onClick={() =>
+                                                            loadContributionData(
+                                                                new Date().getFullYear()
+                                                            )
+                                                        }
+                                                        className="text-xs px-2 py-1 rounded bg-secondary hover:bg-secondary/80 transition-colors"
+                                                    >
+                                                        Current
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className="bg-background max-w-4xl rounded-lg border p-2 mx-auto">
+                                            <ContributionGraph
+                                                data={contributionData}
+                                                year={contributionYear}
+                                                showLegend={true}
+                                                showTooltips={true}
+                                                className="w-full"
+                                            />
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        </Card>
+
                         <Card className="p-6">
                             <div className="flex items-center justify-between mb-4">
                                 <h2 className="text-xl font-bold flex items-center">
