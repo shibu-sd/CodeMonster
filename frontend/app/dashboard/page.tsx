@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@clerk/nextjs";
 import { ProtectedPage } from "@/components/auth/protected-page";
 import { HeroHeader } from "@/components/header/header";
+import FooterSection from "@/components/footer/footer";
 import {
     Trophy,
     Target,
@@ -316,6 +317,7 @@ function DashboardPageContent() {
                         </div>
                     </div>
                 </div>
+                <FooterSection />
             </div>
         );
     }
@@ -366,6 +368,7 @@ function DashboardPageContent() {
                         <Button onClick={loadDashboard}>Try Again</Button>
                     </div>
                 </div>
+                <FooterSection />
             </div>
         );
     }
@@ -695,6 +698,7 @@ function DashboardPageContent() {
                     </div>
                 </div>
             </div>
+            <FooterSection />
         </div>
     );
 }
