@@ -34,8 +34,10 @@ export const HeroAnnouncement: React.FC = () => {
                 href="#link"
                 className="group mx-auto flex w-fit items-center gap-3 rounded-full border border-neutral-200 bg-white/50 px-4 py-2 shadow-lg backdrop-blur-sm transition-all duration-300 hover:border-neutral-300 hover:shadow-xl dark:border-neutral-800 dark:bg-black/50 dark:hover:border-neutral-700"
             >
+                ⚔️{" "}
+                <span className="block h-4 w-px bg-neutral-300 dark:bg-neutral-600"></span>
                 <AnimatedGradientText className="font-semibold">
-                    New Contest Platform & Judge System
+                    New 1v1 Code Battle Mode Live Now
                 </AnimatedGradientText>
                 <span className="block h-4 w-px bg-neutral-300 dark:bg-neutral-600"></span>
                 <ArrowRight className="size-4 text-neutral-600 transition-transform duration-300 group-hover:translate-x-1 dark:text-neutral-400" />
