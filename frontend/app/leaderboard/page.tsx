@@ -205,10 +205,8 @@ function LeaderboardPageContent() {
                     <div className="space-y-8">
                         <div className="mb-8">
                             <div className="text-center space-y-4">
-                                <div className="flex justify-center items-center space-x-3">
-                                    <Skeleton className="h-10 w-10" />
+                                <div className="flex justify-center items-center">
                                     <Skeleton className="h-10 w-48" />
-                                    <Skeleton className="h-10 w-10" />
                                 </div>
                                 <Skeleton className="h-6 w-96 mx-auto" />
                                 <div className="flex justify-center items-center space-x-2">
@@ -332,11 +330,9 @@ function LeaderboardPageContent() {
                     <div className="mb-8">
                         <div className="text-center space-y-4">
                             <div className="flex justify-center items-center space-x-3">
-                                <Trophy className="w-10 h-10 text-yellow-500" />
                                 <h1 className="text-4xl font-bold text-foreground">
                                     Leaderboard
                                 </h1>
-                                <Trophy className="w-10 h-10 text-yellow-500" />
                             </div>
                             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
                                 Competition never sleeps and neither do the
