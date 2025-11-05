@@ -118,7 +118,6 @@ export default function BlogsPage() {
                         {/* Header Skeleton */}
                         <div className="text-center mb-10">
                             <div className="flex items-center justify-center gap-3 mb-4">
-                                <Skeleton className="h-8 w-8" />
                                 <Skeleton className="h-12 w-32" />
                             </div>
                             <Skeleton className="h-6 w-96 mb-6 mx-auto" />
@@ -309,7 +308,6 @@ export default function BlogsPage() {
                     {/* Header */}
                     <div className="text-center mb-10">
                         <div className="flex items-center justify-center gap-3 mb-4">
-                            <BookOpen className="h-8 w-8 text-primary" />
                             <h1 className="text-4xl font-bold">Blogs</h1>
                         </div>
                         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">

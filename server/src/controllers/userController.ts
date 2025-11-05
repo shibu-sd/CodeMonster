@@ -604,4 +604,88 @@ export class UserController {
             });
         }
     }
+
+    static async getUserContributionData(
+        req: Request,
+        res: Response
+    ): Promise<void> {
+        try {
+            const userId = req.user?.id;
+            const { year = new Date().getFullYear() } = req.query;
+
+            if (!userId) {
+                res.status(401).json({
+                    success: false,
+                    error: "Unauthorized",
+                });
+                return;
+            }
+
+            const startOfYear = new Date(Number(year), 0, 1);
+            const endOfYear = new Date(Number(year), 11, 31, 23, 59, 59, 999);
+
+            // Get all submissions for the user in the specified year
+            const submissions = await prisma.submission.findMany({
+                where: {
+                    userId: userId,
+                    submittedAt: {
+                        gte: startOfYear,
+                        lte: endOfYear,
+                    },
+                },
+                select: {
+                    submittedAt: true,
+                    status: true,
+                },
+            });
+
+            // Group submissions by date and count
+            const submissionsByDate = new Map<string, number>();
+
+            submissions.forEach((submission) => {
+                const dateStr = submission.submittedAt
+                    .toISOString()
+                    .split("T")[0];
+                const currentCount = submissionsByDate.get(dateStr) || 0;
+                submissionsByDate.set(dateStr, currentCount + 1);
+            });
+
+            // Generate contribution data for the entire year
+            const contributionData = [];
+            const currentDate = new Date(startOfYear);
+
+            while (currentDate <= endOfYear) {
+                const dateStr = currentDate.toISOString().split("T")[0];
+                const count = submissionsByDate.get(dateStr) || 0;
+
+                // Calculate contribution level (0-4 based on count)
+                let level = 0;
+                if (count >= 1 && count <= 2) level = 1;
+                else if (count >= 3 && count <= 5) level = 2;
+                else if (count >= 6 && count <= 9) level = 3;
+                else if (count >= 10) level = 4;
+
+                contributionData.push({
+                    date: dateStr,
+                    count,
+                    level,
+                });
+
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+
+            const response: ApiResponse = {
+                success: true,
+                data: contributionData,
+            };
+
+            res.status(200).json(response);
+        } catch (error) {
+            console.error("Error fetching user contribution data:", error);
+            res.status(500).json({
+                success: false,
+                error: "Failed to fetch contribution data",
+            });
+        }
+    }
 }

@@ -273,6 +273,11 @@ class ApiClient {
         return this.request(`/api/users/solutions/${problemId}`);
     }
 
+    async getUserContributionData(year?: number): Promise<ApiResponse<any[]>> {
+        const query = year ? `?year=${year}` : "";
+        return this.request(`/api/users/contributions${query}`);
+    }
+
     // Leaderboard-related API calls
     async getLeaderboard(params?: {
         page?: number;
@@ -344,6 +349,8 @@ export const api = {
     getUserDashboard: () => apiClient.getUserDashboard(),
     getUserSolution: (problemId: string) =>
         apiClient.getUserSolution(problemId),
+    getUserContributionData: (year?: number) =>
+        apiClient.getUserContributionData(year),
 
     // Leaderboard API methods
     getLeaderboard: (params?: Parameters<typeof apiClient.getLeaderboard>[0]) =>
