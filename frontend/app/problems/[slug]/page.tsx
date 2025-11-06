@@ -15,6 +15,8 @@ import { ResultsPanel } from "./components/ResultsPanel";
 import { ProblemErrorState } from "./components/ProblemErrorState";
 import { useBattle } from "@/contexts/BattleContext";
 import { BattleEndDialog } from "@/components/battle/BattleEndDialog";
+import { BattleChatBox } from "@/components/battle/BattleChatBox";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface TestCaseResult {
     passed: boolean;
@@ -61,6 +63,7 @@ function ProblemDetailPageContent() {
         runCode: runBattleCode,
         submitCode: submitBattleCode,
         forfeitBattle,
+        sendMessage,
         clearBattleState,
     } = useBattle();
 
@@ -104,8 +107,10 @@ function ProblemDetailPageContent() {
         Array<{
             id: string;
             message: string;
-            type: "run" | "submit";
+            type: "run" | "submit" | "message";
             timestamp: number;
+            avatarUrl?: string;
+            username?: string;
         }>
     >([]);
     const [showBattleEndDialog, setShowBattleEndDialog] = useState(false);
@@ -287,6 +292,36 @@ function ProblemDetailPageContent() {
                 message,
                 type,
                 timestamp: Date.now(),
+                avatarUrl: battleState.currentBattle?.opponent?.profileImageUrl,
+                username: opponentName,
+            };
+
+            setBattleNotifications((prev) => [...prev, notification]);
+
+            setTimeout(() => {
+                setBattleNotifications((prev) =>
+                    prev.filter((n) => n.id !== notification.id)
+                );
+            }, 5000);
+        };
+
+        const handleMessageReceived = (event: any) => {
+            const { userId, message: text } = event.detail;
+
+            if (battleState.currentBattle?.opponent?.id !== userId) {
+                return;
+            }
+
+            const opponentName =
+                battleState.currentBattle?.opponent?.username || "Opponent";
+
+            const notification = {
+                id: `${Date.now()}-${Math.random()}`,
+                message: text,
+                type: "message" as const,
+                timestamp: Date.now(),
+                avatarUrl: battleState.currentBattle?.opponent?.profileImageUrl,
+                username: opponentName,
             };
 
             setBattleNotifications((prev) => [...prev, notification]);
@@ -299,11 +334,19 @@ function ProblemDetailPageContent() {
         };
 
         window.addEventListener("battle-opponent-action", handleOpponentAction);
+        window.addEventListener(
+            "battle-message-received",
+            handleMessageReceived
+        );
 
         return () => {
             window.removeEventListener(
                 "battle-opponent-action",
                 handleOpponentAction
+            );
+            window.removeEventListener(
+                "battle-message-received",
+                handleMessageReceived
             );
         };
     }, [battleState.currentBattle]);
@@ -751,17 +794,29 @@ function ProblemDetailPageContent() {
 
                 {/* Battle Notifications */}
                 {battleNotifications.length > 0 && (
-                    <div className="fixed bottom-4 right-4 z-50 space-y-2">
+                    <div className="fixed bottom-20 right-4 z-50 space-y-2">
                         {battleNotifications.map((notification) => (
                             <div
                                 key={notification.id}
                                 className={`px-4 py-3 rounded-lg shadow-lg border animate-in slide-in-from-right ${
                                     notification.type === "run"
                                         ? "bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800"
+                                        : notification.type === "message"
+                                        ? "bg-purple-50 dark:bg-purple-950 border-purple-200 dark:border-purple-800"
                                         : "bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-800"
                                 }`}
                             >
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-3">
+                                    <Avatar className="h-8 w-8 border-2">
+                                        <AvatarImage
+                                            src={notification.avatarUrl}
+                                        />
+                                        <AvatarFallback className="text-xs">
+                                            {notification.username
+                                                ?.charAt(0)
+                                                ?.toUpperCase() || "O"}
+                                        </AvatarFallback>
+                                    </Avatar>
                                     <span className="text-sm font-medium">
                                         {notification.message}
                                     </span>
@@ -781,6 +836,24 @@ function ProblemDetailPageContent() {
                         onClose={handleBattleEndDialogClose}
                     />
                 )}
+
+                {/* Battle Chat Box */}
+                {battleState.currentBattle &&
+                    battleState.currentBattle.status === "active" && (
+                        <BattleChatBox
+                            battleId={battleState.currentBattle.id}
+                            currentUserId={user?.id || ""}
+                            opponentUsername={
+                                battleState.currentBattle.opponent?.username
+                            }
+                            onSendMessage={(message) =>
+                                sendMessage(
+                                    battleState.currentBattle!.id,
+                                    message
+                                )
+                            }
+                        />
+                    )}
             </main>
         </div>
     );
