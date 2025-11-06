@@ -13,6 +13,7 @@ import FooterSection from "@/components/footer/footer";
 import {
     Trophy,
     Target,
+    Swords,
     Code,
     CheckCircle,
     XCircle,
@@ -40,7 +41,7 @@ interface DashboardData {
         email: string;
         profileImageUrl: string;
         problemsSolved: number;
-        contestsJoined: number;
+        battlesWon: number;
         totalSubmissions: number;
         acceptedSubmissions: number;
         acceptanceRate: number;
@@ -449,13 +450,13 @@ function DashboardPageContent() {
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm text-muted-foreground">
-                                    Contests Joined
+                                    Battles Won
                                 </p>
                                 <p className="text-3xl font-bold">
-                                    {user.contestsJoined}
+                                    {user.battlesWon}
                                 </p>
                             </div>
-                            <Target className="h-10 w-10 text-orange-500" />
+                            <Swords className="h-10 w-10 text-orange-500" />
                         </div>
                     </Card>
                 </div>
