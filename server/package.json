@@ -30,6 +30,7 @@
         "@clerk/clerk-sdk-node": "^4.13.23",
         "@clerk/nextjs": "^6.31.9",
         "@prisma/client": "^6.15.0",
+        "@types/socket.io": "^3.0.1",
         "bullmq": "^5.58.5",
         "compression": "^1.8.1",
         "cors": "^2.8.5",
@@ -42,6 +43,8 @@
         "ioredis": "^5.7.0",
         "morgan": "^1.10.1",
         "prisma": "^6.15.0",
+        "socket.io": "^4.8.1",
+        "socket.io-redis-adapter": "^8.4.6",
         "uuid": "^12.0.0"
     },
     "devDependencies": {
