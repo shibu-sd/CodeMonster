@@ -37,6 +37,7 @@ export interface BattleEvents {
         language: string;
     }) => void;
     "battle-sledge": (data: { battleId: string; message: string }) => void;
+    "battle-forfeit": (battleId: string) => void;
 
     // Server to Client
     "battle-matched": (data: {
@@ -410,6 +411,15 @@ export function useBattleSocket() {
         [socket, connected]
     );
 
+    const forfeitBattle = useCallback(
+        (battleId: string) => {
+            if (socket && connected) {
+                socket.emit("battle-forfeit", battleId);
+            }
+        },
+        [socket, connected]
+    );
+
     const clearBattleState = useCallback(() => {
         updateBattleState({
             isInQueue: false,
@@ -445,6 +455,7 @@ export function useBattleSocket() {
         runCode,
         submitCode,
         sendSledge,
+        forfeitBattle,
         clearBattleState,
     };
 }
