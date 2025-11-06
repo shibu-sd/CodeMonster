@@ -133,9 +133,7 @@ function BattlePage() {
                             </h1>
                         </div>
                         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                            Challenge opponents to intense 1v1 coding duels.
-                            Test your skills in real-time battles where speed
-                            and accuracy determine victory!
+                            Face fierce monsters in live 1v1 coding duels
                         </p>
                         <div className="flex justify-center items-center space-x-2 text-sm text-muted-foreground">
                             <Target className="w-4 h-4" />
