@@ -4,9 +4,10 @@ import { useState, useEffect, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ProtectedPage } from "@/components/auth/protected-page";
 import { HeroHeader } from "@/components/header/header";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
 import { useBattle } from "@/contexts/BattleContext";
 import { BattleQueue } from "@/components/battle/BattleQueue";
+import { BattleStartingAnimation } from "@/components/battle/BattleStartingAnimation";
 import {
     Card,
     CardContent,
@@ -21,6 +22,7 @@ import FooterSection from "@/components/footer/footer";
 
 function BattlePage() {
     const { isSignedIn } = useAuth();
+    const { user } = useUser();
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
     const battleSocket = useBattle();
@@ -58,7 +60,7 @@ function BattlePage() {
                         `/problems/${problem.slug}?battleId=${battleId}`
                     );
                 });
-            }, 500);
+            }, 5000);
         }
     }, [battleState.currentBattle, router]);
 
@@ -98,24 +100,19 @@ function BattlePage() {
 
     if (isRedirecting) {
         return (
-            <div className="min-h-screen bg-background flex items-center justify-center">
-                <div className="text-center space-y-6">
-                    <div className="relative w-24 h-24 mx-auto">
-                        <Swords className="w-24 h-24 text-primary animate-pulse" />
-                        <div className="absolute inset-0 animate-ping">
-                            <Swords className="w-24 h-24 text-primary opacity-20" />
-                        </div>
-                    </div>
-                    <div className="space-y-2">
-                        <h2 className="text-2xl font-bold text-foreground">
-                            Battle Starting!
-                        </h2>
-                        <p className="text-muted-foreground">
-                            Preparing the arena...
-                        </p>
-                    </div>
-                </div>
-            </div>
+            <BattleStartingAnimation
+                currentUser={{
+                    username: user?.username || user?.firstName || "You",
+                    profileImageUrl: user?.imageUrl,
+                }}
+                opponent={{
+                    username:
+                        battleState.currentBattle?.opponent?.username ||
+                        "Opponent",
+                    profileImageUrl:
+                        battleState.currentBattle?.opponent?.profileImageUrl,
+                }}
+            />
         );
     }
 
