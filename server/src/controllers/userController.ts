@@ -282,6 +282,7 @@ export class UserController {
                     profileImageUrl: true,
                     problemsSolved: true,
                     contestsJoined: true,
+                    battlesWon: true,
                     totalSubmissions: true,
                     acceptedSubmissions: true,
                     createdAt: true,

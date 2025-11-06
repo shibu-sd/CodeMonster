@@ -247,6 +247,18 @@ export class BattleService {
                 },
             });
 
+            if (winnerId) {
+                await prisma.user.update({
+                    where: { id: winnerId },
+                    data: {
+                        battlesWon: {
+                            increment: 1,
+                        },
+                    },
+                });
+                logger.info(`Incremented battlesWon for user ${winnerId}`);
+            }
+
             logger.info(
                 `Battle ${battleId} finished. Winner: ${winnerId || "Draw"}`
             );
