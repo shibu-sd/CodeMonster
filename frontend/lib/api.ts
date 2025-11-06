@@ -47,6 +47,7 @@ export interface LeaderboardEntry {
     firstName: string | null;
     profileImageUrl: string | null;
     problemsSolved: number;
+    battlesWon: number;
     acceptedSubmissions: number;
     totalSubmissions: number;
     acceptanceRate: number;
