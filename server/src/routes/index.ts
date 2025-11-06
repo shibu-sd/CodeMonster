@@ -4,6 +4,7 @@ import { userRoutes } from "./users";
 import { submissionRoutes } from "./submissions";
 import { judgeRoutes } from "./judge";
 import leaderboardRoutes from "./leaderboard";
+import { battleRoutes } from "./battles";
 
 const router = Router();
 
@@ -12,6 +13,7 @@ router.use("/users", userRoutes);
 router.use("/submissions", submissionRoutes);
 router.use("/judge", judgeRoutes);
 router.use("/leaderboard", leaderboardRoutes);
+router.use("/battles", battleRoutes);
 
 router.get("/", (_req, res) => {
     res.json({
@@ -49,6 +51,17 @@ router.get("/", (_req, res) => {
                 "GET /api/leaderboard/rank":
                     "Get current user's rank (auth required)",
                 "GET /api/leaderboard/rank/:userId": "Get specific user's rank",
+            },
+            battles: {
+                "POST /api/battles/queue": "Join battle matchmaking queue",
+                "DELETE /api/battles/queue": "Leave battle matchmaking queue",
+                "GET /api/battles/queue/status": "Get queue status",
+                "POST /api/battles": "Create new battle",
+                "POST /api/battles/:id/join": "Join existing battle",
+                "GET /api/battles/:id": "Get battle details",
+                "GET /api/battles": "Get battles for user",
+                "POST /api/battles/:id/submit": "Submit code for battle",
+                "POST /api/battles/:id/finish": "Finish battle manually",
             },
         },
         documentation: "https://docs.codemonster.dev",

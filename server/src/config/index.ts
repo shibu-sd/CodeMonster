@@ -99,6 +99,13 @@ export const config = {
         ttl: 5 * 60 * 1000, // 5 minutes
         maxSize: 1000,
     },
+
+    // Battle Configuration
+    battle: {
+        enabled: process.env.FEATURE_BATTLES === "true",
+        timeLimit: parseInt(process.env.BATTLE_TIME_LIMIT || "1800"), // 30 minutes
+        queueTimeout: parseInt(process.env.BATTLE_QUEUE_TIMEOUT || "300"), // 5 minutes
+    },
 };
 
 // Validation helper
@@ -115,11 +122,7 @@ export const validateConfig = (): void => {
 
     // Warn about optional but recommended vars in production
     if (config.server.nodeEnv === "production") {
-        const recommendedVars = [
-            "CLERK_SECRET_KEY",
-            "REDIS_HOST",
-            "JUDGE_URL",
-        ];
+        const recommendedVars = ["CLERK_SECRET_KEY", "REDIS_HOST", "JUDGE_URL"];
 
         const missingRecommended = recommendedVars.filter(
             (varName) => !process.env[varName]
