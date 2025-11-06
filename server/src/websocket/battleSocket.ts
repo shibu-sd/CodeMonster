@@ -39,7 +39,7 @@ export interface BattleEvents {
         code: string;
         language: string;
     }) => void;
-    "battle-sledge": (data: { battleId: string; message: string }) => void;
+    "battle-message": (data: { battleId: string; message: string }) => void;
     "battle-forfeit": (battleId: string) => void;
     disconnect: () => void;
 
@@ -55,7 +55,7 @@ export interface BattleEvents {
     "battle-finish": (data: { winnerId?: string; reason: string }) => void;
     "battle-opponent-disconnected": (data: { userId: string }) => void;
     "battle-opponent-reconnected": (data: { userId: string }) => void;
-    "battle-sledge-received": (data: {
+    "battle-message-received": (data: {
         userId: string;
         message: string;
         timestamp: number;
@@ -69,8 +69,8 @@ const clerk = Clerk({ apiKey: config.auth.clerkSecretKey });
 export class BattleSocket {
     private io: SocketIOServer<BattleEvents>;
     private connectedUsers: Map<string, BattleSocketUser> = new Map();
-    private sledgeCooldowns: Map<string, number> = new Map();
-    private SLEDGE_COOLDOWN = 3000; // 3 seconds
+    private messageCooldowns: Map<string, number> = new Map();
+    private MESSAGE_COOLDOWN = 60000; // 60 seconds
     private disconnectionTimers: Map<string, NodeJS.Timeout> = new Map(); // userId -> timer
     private RECONNECTION_GRACE_PERIOD = 10000; // 10 seconds to reconnect
 
@@ -169,8 +169,8 @@ export class BattleSocket {
                 await this.handleBattleSubmit(socket, data);
             });
 
-            socket.on("battle-sledge", async (data) => {
-                await this.handleBattleSledge(socket, data);
+            socket.on("battle-message", async (data) => {
+                await this.handleBattleMessage(socket, data);
             });
 
             socket.on("battle-forfeit", async (battleId) => {
@@ -384,7 +384,7 @@ export class BattleSocket {
         }
     }
 
-    private async handleBattleSledge(
+    private async handleBattleMessage(
         socket: any,
         data: { battleId: string; message: string }
     ) {
@@ -392,29 +392,42 @@ export class BattleSocket {
             const user = socket.data.user as BattleSocketUser;
             const cooldownKey = `${user.id}:${data.battleId}`;
 
-            const lastSledge = this.sledgeCooldowns.get(cooldownKey);
-            if (lastSledge && Date.now() - lastSledge < this.SLEDGE_COOLDOWN) {
+            const lastMessage = this.messageCooldowns.get(cooldownKey);
+            if (
+                lastMessage &&
+                Date.now() - lastMessage < this.MESSAGE_COOLDOWN
+            ) {
+                const timeLeft = Math.ceil(
+                    (this.MESSAGE_COOLDOWN - (Date.now() - lastMessage)) / 1000
+                );
                 socket.emit("battle-error", {
-                    message: "Please wait before sending another message",
+                    message: `Please wait ${timeLeft} seconds before sending another message`,
                 });
                 return;
             }
 
-            this.sledgeCooldowns.set(cooldownKey, Date.now());
+            if (!data.message || data.message.length > 100) {
+                socket.emit("battle-error", {
+                    message: "Message must be between 1 and 100 characters",
+                });
+                return;
+            }
 
-            socket.to(data.battleId).emit("battle-sledge-received", {
+            this.messageCooldowns.set(cooldownKey, Date.now());
+
+            socket.to(data.battleId).emit("battle-message-received", {
                 userId: user.id,
                 message: data.message,
                 timestamp: Date.now(),
             });
 
             logger.info(
-                `User ${user.username || "Unknown"} sent sledge in battle ${
+                `User ${user.username || "Unknown"} sent message in battle ${
                     data.battleId
                 }: ${data.message}`
             );
         } catch (error) {
-            logger.error("Failed to handle battle sledge:", error);
+            logger.error("Failed to handle battle message:", error);
             socket.emit("battle-error", { message: "Failed to send message" });
         }
     }
