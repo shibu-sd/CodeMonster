@@ -22,6 +22,7 @@ model User {
   // User statistics
   problemsSolved  Int      @default(0)
   contestsJoined  Int      @default(0)
+  battlesWon      Int      @default(0)
   totalSubmissions Int     @default(0)
   acceptedSubmissions Int  @default(0)
   
