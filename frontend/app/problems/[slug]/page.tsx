@@ -4,21 +4,17 @@ import { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { HeroHeader } from "@/components/header/header";
 import { ProtectedPage } from "@/components/auth/protected-page";
-import { useAuth } from "@clerk/nextjs";
-import {
-    ResizablePanelGroup,
-    ResizablePanel,
-} from "@/components/ui/resizable";
-import {
-    useApiWithAuth,
-    Problem,
-} from "@/lib/api";
+import { useAuth, useUser } from "@clerk/nextjs";
+import { ResizablePanelGroup, ResizablePanel } from "@/components/ui/resizable";
+import { useApiWithAuth, Problem } from "@/lib/api";
 import { ProblemDetailSkeleton } from "./components/ProblemDetailSkeleton";
 import { ProblemHeader } from "./components/ProblemHeader";
 import { ProblemContentTabs } from "./components/ProblemContentTabs";
 import { CodeEditorPanel } from "./components/CodeEditorPanel";
 import { ResultsPanel } from "./components/ResultsPanel";
 import { ProblemErrorState } from "./components/ProblemErrorState";
+import { useBattle } from "@/contexts/BattleContext";
+import { BattleEndDialog } from "@/components/battle/BattleEndDialog";
 
 interface TestCaseResult {
     passed: boolean;
@@ -36,6 +32,7 @@ interface RunResult {
     testCasesPassed?: number;
     totalTestCases?: number;
     error?: string;
+    message?: string;
 }
 
 interface SubmissionResult {
@@ -49,6 +46,7 @@ interface SubmissionResult {
     error?: string;
     progress?: number;
     currentTestCase?: number | null;
+    message?: string;
 }
 
 function ProblemDetailPageContent() {
@@ -57,6 +55,13 @@ function ProblemDetailPageContent() {
     const slug = params.slug as string;
     const api = useApiWithAuth();
     const { isLoaded, isSignedIn, getToken } = useAuth();
+    const { user } = useUser();
+    const {
+        battleState,
+        runCode: runBattleCode,
+        submitCode: submitBattleCode,
+        clearBattleState,
+    } = useBattle();
 
     const [problem, setProblem] = useState<Problem | null>(null);
     const [loading, setLoading] = useState(true);
@@ -92,6 +97,27 @@ function ProblemDetailPageContent() {
     const [showRunPanel, setShowRunPanel] = useState(false);
     const [showSubmitPanel, setShowSubmitPanel] = useState(false);
     const [activeTestCase, setActiveTestCase] = useState(0);
+
+    // Battle mode state
+    const [battleNotifications, setBattleNotifications] = useState<
+        Array<{
+            id: string;
+            message: string;
+            type: "run" | "submit";
+            timestamp: number;
+        }>
+    >([]);
+    const [showBattleEndDialog, setShowBattleEndDialog] = useState(false);
+    const [battleEndData, setBattleEndData] = useState<{
+        isWinner: boolean;
+        isDraw: boolean;
+        opponentName?: string;
+    } | null>(null);
+
+    // Get battle start time from persisted state
+    const battleStartTime = battleState.currentBattle?.startTime
+        ? new Date(battleState.currentBattle.startTime)
+        : null;
 
     const availableLanguages = [
         { id: "PYTHON", name: "Python", extension: "py" },
@@ -164,6 +190,128 @@ function ProblemDetailPageContent() {
         }
     }, [problem, authReady, isSignedIn]);
 
+    // Handle battle end
+    useEffect(() => {
+        if (battleState.currentBattle?.status === "finished") {
+            const winnerId = battleState.currentBattle.winnerId;
+            const opponentId = battleState.currentBattle.opponent?.id;
+            const opponentName = battleState.currentBattle.opponent?.username;
+
+            // Debug logging
+            console.log("🏆 Battle finished - Winner detection:", {
+                winnerId,
+                opponentId,
+                winnerIdType: typeof winnerId,
+                opponentIdType: typeof opponentId,
+                opponentMatch: winnerId === opponentId,
+            });
+
+            const isDraw = !winnerId;
+            const isWinner = Boolean(
+                winnerId && opponentId && winnerId !== opponentId
+            );
+
+            console.log("🏆 Final determination:", { isWinner, isDraw });
+
+            setBattleEndData({
+                isWinner,
+                isDraw,
+                opponentName,
+            });
+            setShowBattleEndDialog(true);
+        }
+    }, [
+        battleState.currentBattle?.status,
+        battleState.currentBattle?.winnerId,
+        battleState.currentBattle?.opponent,
+    ]);
+
+    // Handle battle end dialog close
+    const handleBattleEndDialogClose = () => {
+        setShowBattleEndDialog(false);
+        clearBattleState();
+    };
+
+    // Listen for opponent actions in battle
+    useEffect(() => {
+        if (!battleState.currentBattle) {
+            return;
+        }
+
+        const handleOpponentAction = (event: any) => {
+            const { type, userId, result } = event.detail;
+
+            // Only show notification if the userId is the OPPONENT's ID, not our own
+            if (battleState.currentBattle?.opponent?.id !== userId) {
+                return;
+            }
+
+            const opponentName =
+                battleState.currentBattle?.opponent?.username || "Opponent";
+
+            // Create message based on result
+            let message = "";
+            if (result) {
+                const status = result.status;
+                const testsPassed = result.testCasesPassed || 0;
+                const totalTests = result.totalTestCases || 0;
+
+                if (type === "run") {
+                    if (status === "ACCEPTED") {
+                        message = `${opponentName} ran code - ✅ All tests passed (${testsPassed}/${totalTests})`;
+                    } else if (status === "WRONG_ANSWER") {
+                        message = `${opponentName} ran code - ❌ Wrong answer (${testsPassed}/${totalTests})`;
+                    } else {
+                        message = `${opponentName} ran code - ${status}`;
+                    }
+                } else {
+                    if (status === "ACCEPTED") {
+                        message = `${opponentName} submitted - ✅ Accepted!`;
+                    } else if (status === "WRONG_ANSWER") {
+                        message = `${opponentName} submitted - ❌ Wrong answer`;
+                    } else {
+                        message = `${opponentName} submitted - ${status}`;
+                    }
+                }
+            } else {
+                // Fallback for old events without result
+                message =
+                    type === "run"
+                        ? `${opponentName} ran their code`
+                        : `${opponentName} submitted their code`;
+            }
+
+            const notification = {
+                id: `${Date.now()}-${Math.random()}`,
+                message,
+                type,
+                timestamp: Date.now(),
+            };
+
+            setBattleNotifications((prev) => [...prev, notification]);
+
+            setTimeout(() => {
+                setBattleNotifications((prev) =>
+                    prev.filter((n) => n.id !== notification.id)
+                );
+            }, 5000);
+        };
+
+        window.addEventListener("battle-opponent-action", handleOpponentAction);
+
+        return () => {
+            window.removeEventListener(
+                "battle-opponent-action",
+                handleOpponentAction
+            );
+        };
+    }, [battleState.currentBattle]);
+
+    const handleExitBattle = () => {
+        clearBattleState();
+        router.replace("/battle");
+    };
+
     const loadAcceptedSolution = async () => {
         if (!problem || !isSignedIn) return;
 
@@ -230,6 +378,15 @@ function ProblemDetailPageContent() {
             return;
         }
 
+        if (
+            battleState.currentBattle &&
+            battleState.currentBattle.status === "active"
+        ) {
+            console.log("⚔️ Running code in battle mode!");
+
+            runBattleCode(battleState.currentBattle.id, code, selectedLanguage);
+        }
+
         console.log(`🔧 Running code for problem: ${problem.id}`);
         console.log(`📝 Language: ${selectedLanguage}`);
         console.log(`💻 Code length: ${code.length} characters`);
@@ -250,6 +407,7 @@ function ProblemDetailPageContent() {
                 problemId: problem.id,
                 language: selectedLanguage,
                 code: code,
+                battleId: battleState.currentBattle?.id,
             });
 
             console.log("📊 Run API response:", response);
@@ -295,6 +453,19 @@ function ProblemDetailPageContent() {
             return;
         }
 
+        if (
+            battleState.currentBattle &&
+            battleState.currentBattle.status === "active"
+        ) {
+            console.log("⚔️ Submitting code in battle mode!");
+
+            submitBattleCode(
+                battleState.currentBattle.id,
+                code,
+                selectedLanguage
+            );
+        }
+
         console.log(`🔧 Submitting code for problem: ${problem.id}`);
         console.log(`📝 Language: ${selectedLanguage}`);
         console.log(`💻 Code length: ${code.length} characters`);
@@ -316,6 +487,7 @@ function ProblemDetailPageContent() {
                 problemId: problem.id,
                 language: selectedLanguage,
                 code: code,
+                battleId: battleState.currentBattle?.id,
             });
 
             console.log("📊 Submit API response:", response);
@@ -445,7 +617,6 @@ function ProblemDetailPageContent() {
         poll();
     };
 
-    
     const getStarterCodeForLanguage = (language: string) => {
         if (!problem?.starterCode) return "";
         const starterCode = problem.starterCode.find(
@@ -497,8 +668,23 @@ function ProblemDetailPageContent() {
         <div className="h-screen bg-background flex flex-col overflow-hidden">
             <HeroHeader />
 
-            <main className="flex-1 w-full px-6 pt-10 pb-6 flex flex-col overflow-hidden">
-                <ProblemHeader problem={problem} />
+            <main className="flex-1 w-full px-6 pt-10 pb-6 flex flex-col overflow-hidden relative">
+                <ProblemHeader
+                    problem={problem}
+                    battleInfo={
+                        battleState.currentBattle
+                            ? {
+                                  id: battleState.currentBattle.id,
+                                  opponent: battleState.currentBattle.opponent,
+                                  timeLimit:
+                                      battleState.currentBattle.timeLimit,
+                                  status: battleState.currentBattle.status,
+                                  startTime: battleStartTime || undefined,
+                              }
+                            : undefined
+                    }
+                    onExitBattle={handleExitBattle}
+                />
 
                 {/* Split Layout - Fixed left/right panels */}
                 <div className="flex-1 overflow-hidden flex">
@@ -545,18 +731,51 @@ function ProblemDetailPageContent() {
                             </ResizablePanel>
 
                             <ResultsPanel
-                            showRunPanel={showRunPanel}
-                            showSubmitPanel={showSubmitPanel}
-                            runResult={runResult}
-                            submissionResult={submissionResult}
-                            activeTestCase={activeTestCase}
-                            onTestCaseChange={setActiveTestCase}
-                            onClose={closeResultPanel}
-                            pollingAttempts={pollingAttempts}
-                        />
+                                showRunPanel={showRunPanel}
+                                showSubmitPanel={showSubmitPanel}
+                                runResult={runResult}
+                                submissionResult={submissionResult}
+                                activeTestCase={activeTestCase}
+                                onTestCaseChange={setActiveTestCase}
+                                onClose={closeResultPanel}
+                                pollingAttempts={pollingAttempts}
+                            />
                         </ResizablePanelGroup>
                     </div>
                 </div>
+
+                {/* Battle Notifications */}
+                {battleNotifications.length > 0 && (
+                    <div className="fixed bottom-4 right-4 z-50 space-y-2">
+                        {battleNotifications.map((notification) => (
+                            <div
+                                key={notification.id}
+                                className={`px-4 py-3 rounded-lg shadow-lg border animate-in slide-in-from-right ${
+                                    notification.type === "run"
+                                        ? "bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800"
+                                        : "bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-800"
+                                }`}
+                            >
+                                <div className="flex items-center gap-2">
+                                    <span className="text-sm font-medium">
+                                        {notification.message}
+                                    </span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                {/* Battle End Dialog */}
+                {battleEndData && (
+                    <BattleEndDialog
+                        open={showBattleEndDialog}
+                        isWinner={battleEndData.isWinner}
+                        isDraw={battleEndData.isDraw}
+                        opponentName={battleEndData.opponentName}
+                        onClose={handleBattleEndDialogClose}
+                    />
+                )}
             </main>
         </div>
     );
