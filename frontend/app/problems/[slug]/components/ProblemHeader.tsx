@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { ArrowLeft, Swords, X } from "lucide-react";
+import { useState } from "react";
+import { ArrowLeft, Swords, X, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Problem } from "@/lib/api";
@@ -9,6 +10,14 @@ import {
     formatSubmissionCount,
 } from "@/lib/api";
 import { BattleTimer } from "@/components/battle/BattleTimer";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
 
 interface BattleInfo {
     id: string;
@@ -33,6 +42,21 @@ export function ProblemHeader({
     battleInfo,
     onExitBattle,
 }: ProblemHeaderProps) {
+    const [showQuitDialog, setShowQuitDialog] = useState(false);
+
+    const handleQuitClick = () => {
+        if (battleInfo && battleInfo.status === "active") {
+            setShowQuitDialog(true);
+        } else {
+            onExitBattle?.();
+        }
+    };
+
+    const handleConfirmQuit = () => {
+        setShowQuitDialog(false);
+        onExitBattle?.();
+    };
+
     return (
         <div className="mb-3 px-2">
             {/* Regular Navigation */}
@@ -99,7 +123,7 @@ export function ProblemHeader({
                                 {/* Exit Button */}
                                 {onExitBattle && (
                                     <Button
-                                        onClick={onExitBattle}
+                                        onClick={handleQuitClick}
                                         variant="destructive"
                                         size="sm"
                                     >
@@ -144,6 +168,36 @@ export function ProblemHeader({
                     )}
                 </div>
             </div>
+
+            {/* Quit Battle Confirmation Dialog */}
+            <Dialog open={showQuitDialog} onOpenChange={setShowQuitDialog}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2 text-destructive">
+                            <AlertTriangle className="w-5 h-5" />
+                            Forfeit Battle?
+                        </DialogTitle>
+                        <DialogDescription className="text-base pt-2">
+                            Are you sure you want to quit this battle? You will
+                            lose and your opponent will be declared the winner.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter className="gap-2 sm:gap-0">
+                        <Button
+                            variant="outline"
+                            onClick={() => setShowQuitDialog(false)}
+                        >
+                            Continue Fighting
+                        </Button>
+                        <Button
+                            variant="destructive"
+                            onClick={handleConfirmQuit}
+                        >
+                            Forfeit Battle
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
