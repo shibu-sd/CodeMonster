@@ -40,6 +40,7 @@ export interface BattleEvents {
         language: string;
     }) => void;
     "battle-sledge": (data: { battleId: string; message: string }) => void;
+    "battle-forfeit": (battleId: string) => void;
     disconnect: () => void;
 
     // Server to Client
@@ -170,6 +171,10 @@ export class BattleSocket {
 
             socket.on("battle-sledge", async (data) => {
                 await this.handleBattleSledge(socket, data);
+            });
+
+            socket.on("battle-forfeit", async (battleId) => {
+                await this.handleBattleForfeit(socket, battleId);
             });
 
             socket.on("disconnect", () => {
@@ -411,6 +416,47 @@ export class BattleSocket {
         } catch (error) {
             logger.error("Failed to handle battle sledge:", error);
             socket.emit("battle-error", { message: "Failed to send message" });
+        }
+    }
+
+    private async handleBattleForfeit(socket: any, battleId: string) {
+        try {
+            const user = socket.data.user as BattleSocketUser;
+
+            logger.info(
+                `User ${
+                    user.username || "Unknown"
+                } forfeited battle ${battleId}`
+            );
+
+            const battle = await BattleService.getBattle(battleId);
+            if (!battle) {
+                socket.emit("battle-error", { message: "Battle not found" });
+                return;
+            }
+
+            const opponent = battle.participants.find(
+                (p) => p.userId !== user.id
+            );
+
+            if (!opponent) {
+                logger.warn(`No opponent found in battle ${battleId}`);
+            }
+
+            await BattleService.finishBattle(battleId, opponent?.userId);
+
+            this.broadcastBattleFinish(battleId, opponent?.userId, "forfeit");
+
+            logger.info(
+                `Battle ${battleId} ended due to forfeit by ${
+                    user.username || "Unknown"
+                }. Winner: ${opponent?.userId || "none"}`
+            );
+        } catch (error) {
+            logger.error("Failed to handle battle forfeit:", error);
+            socket.emit("battle-error", {
+                message: "Failed to forfeit battle",
+            });
         }
     }
 
