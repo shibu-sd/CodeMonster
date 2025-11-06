@@ -96,6 +96,7 @@ export const FOOTER_LINKS: FooterLinkGroup[] = [
 // Header menu items
 export const HEADER_MENU_ITEMS: MenuItem[] = [
     { name: "Problems", href: "/problems", requireAuth: true },
+    { name: "Battle", href: "/battle", requireAuth: true },
     { name: "Leaderboard", href: "/leaderboard", requireAuth: true },
     { name: "Blogs", href: "/blogs", requireAuth: true },
 ];
