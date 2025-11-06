@@ -60,6 +60,7 @@ function ProblemDetailPageContent() {
         battleState,
         runCode: runBattleCode,
         submitCode: submitBattleCode,
+        forfeitBattle,
         clearBattleState,
     } = useBattle();
 
@@ -308,8 +309,12 @@ function ProblemDetailPageContent() {
     }, [battleState.currentBattle]);
 
     const handleExitBattle = () => {
-        clearBattleState();
-        router.replace("/battle");
+        if (
+            battleState.currentBattle &&
+            battleState.currentBattle.status === "active"
+        ) {
+            forfeitBattle(battleState.currentBattle.id);
+        }
     };
 
     const loadAcceptedSolution = async () => {
