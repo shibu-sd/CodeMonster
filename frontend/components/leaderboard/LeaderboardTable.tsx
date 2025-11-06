@@ -149,6 +149,9 @@ export function LeaderboardTable({
                         <div className="w-10">User</div>
                         <div className="flex-1">Username</div>
                         <div className="w-20 text-center">Solved</div>
+                        <div className="w-28 text-center whitespace-nowrap">
+                            Battles Won
+                        </div>
                         <div className="w-24 text-center">Submissions</div>
                         <div className="w-20 text-center">Acceptance</div>
                     </div>
@@ -214,6 +217,12 @@ export function LeaderboardTable({
                             <div className="w-20 text-center">
                                 <div className="font-semibold text-foreground">
                                     {user.problemsSolved.toLocaleString()}
+                                </div>
+                            </div>
+
+                            <div className="w-28 text-center">
+                                <div className="font-semibold text-primary">
+                                    {user.battlesWon.toLocaleString()}
                                 </div>
                             </div>
 
