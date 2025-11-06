@@ -18,7 +18,12 @@ export class SubmissionController {
                 return;
             }
 
-            const { problemId, language, code }: SubmissionRequest = req.body;
+            const {
+                problemId,
+                language,
+                code,
+                battleId,
+            }: SubmissionRequest & { battleId?: string } = req.body;
 
             if (!problemId || !language || !code) {
                 res.status(400).json({
@@ -68,6 +73,47 @@ export class SubmissionController {
                     },
                 },
             });
+
+            if (battleId) {
+                console.log(
+                    `⚔️ Battle submission detected for battle ${battleId}`
+                );
+                try {
+                    const {
+                        BattleService,
+                    } = require("../services/battleService");
+                    const battle = await BattleService.getBattle(battleId);
+
+                    if (battle && battle.status === "ACTIVE") {
+                        const participant = battle.participants.find(
+                            (p: any) => p.userId === userId
+                        );
+
+                        if (participant) {
+                            await prisma.battleSubmission.create({
+                                data: {
+                                    battleId,
+                                    participantId: participant.id,
+                                    userId,
+                                    submissionId: submission.id,
+                                    language: language as any,
+                                    code,
+                                    status: "PENDING" as any,
+                                    totalTestCases: problem.testCases.length,
+                                },
+                            });
+                            console.log(
+                                `✅ Created battle submission for battle ${battleId}`
+                            );
+                        }
+                    }
+                } catch (battleError) {
+                    console.error(
+                        "Failed to create battle submission:",
+                        battleError
+                    );
+                }
+            }
 
             await prisma.user.update({
                 where: { id: userId },
@@ -278,6 +324,32 @@ export class SubmissionController {
                     `📤 Response data:`,
                     JSON.stringify(responseData, null, 2)
                 );
+
+                const battleId = (req.body as any).battleId;
+                if (battleId) {
+                    console.log(
+                        `⚔️ Battle run detected for battle ${battleId}, broadcasting result to opponent`
+                    );
+                    try {
+                        const globalAny = global as any;
+                        if (globalAny.battleSocket) {
+                            globalAny.battleSocket.broadcastSubmissionResult(
+                                battleId,
+                                userId,
+                                responseData,
+                                true // isRun = true
+                            );
+                            console.log(
+                                `✅ Broadcasted run result to opponents in battle ${battleId}`
+                            );
+                        }
+                    } catch (socketError) {
+                        console.error(
+                            "Failed to broadcast battle run result:",
+                            socketError
+                        );
+                    }
+                }
 
                 res.json({
                     success: true,
