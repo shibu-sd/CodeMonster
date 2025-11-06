@@ -36,7 +36,7 @@ export interface BattleEvents {
         code: string;
         language: string;
     }) => void;
-    "battle-sledge": (data: { battleId: string; message: string }) => void;
+    "battle-message": (data: { battleId: string; message: string }) => void;
     "battle-forfeit": (battleId: string) => void;
 
     // Server to Client
@@ -51,7 +51,7 @@ export interface BattleEvents {
     "battle-finish": (data: { winnerId?: string; reason: string }) => void;
     "battle-opponent-disconnected": (data: { userId: string }) => void;
     "battle-opponent-reconnected": (data: { userId: string }) => void;
-    "battle-sledge-received": (data: {
+    "battle-message-received": (data: {
         userId: string;
         message: string;
         timestamp: number;
@@ -334,7 +334,14 @@ export function useBattleSocket() {
 
             newSocket.on("battle-opponent-reconnected", (data) => {});
 
-            newSocket.on("battle-sledge-received", (data) => {});
+            newSocket.on("battle-message-received", (data) => {
+                if (typeof window !== "undefined") {
+                    const event = new CustomEvent("battle-message-received", {
+                        detail: data,
+                    });
+                    window.dispatchEvent(event);
+                }
+            });
 
             newSocket.on("battle-error", (data) => {
                 console.error("Battle error:", data);
@@ -402,10 +409,10 @@ export function useBattleSocket() {
         [socket, connected]
     );
 
-    const sendSledge = useCallback(
+    const sendMessage = useCallback(
         (battleId: string, message: string) => {
             if (socket && connected) {
-                socket.emit("battle-sledge", { battleId, message });
+                socket.emit("battle-message", { battleId, message });
             }
         },
         [socket, connected]
@@ -454,7 +461,7 @@ export function useBattleSocket() {
         leaveQueue,
         runCode,
         submitCode,
-        sendSledge,
+        sendMessage,
         forfeitBattle,
         clearBattleState,
     };
