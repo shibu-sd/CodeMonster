@@ -484,7 +484,6 @@ export class BattleSocket {
             `Broadcasting battle-start event for battle ${battleId} with timeLimit ${timeLimit}`
         );
 
-        this.io.emit("battle-start", { battleId, timeLimit });
         this.io.to(battleId).emit("battle-start", { battleId, timeLimit });
     }
 
