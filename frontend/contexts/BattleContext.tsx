@@ -16,7 +16,7 @@ interface BattleContextValue {
     leaveQueue: () => void;
     runCode: (battleId: string, code: string, language: string) => void;
     submitCode: (battleId: string, code: string, language: string) => void;
-    sendSledge: (battleId: string, message: string) => void;
+    sendMessage: (battleId: string, message: string) => void;
     forfeitBattle: (battleId: string) => void;
     clearBattleState: () => void;
 }
