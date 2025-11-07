@@ -51,13 +51,8 @@ export const HeroContent: React.FC = () => {
     };
 
     const getPrimaryActionText = () => {
-        if (!isLoaded) return "Get Started";
-        return isSignedIn ? "Start Solving" : "Get Started";
-    };
-
-    const getSecondaryActionText = () => {
-        if (!isLoaded) return "Sign In";
-        return isSignedIn ? "Browse Problems" : "Sign In";
+        if (!isLoaded) return "Go Monster Mode";
+        return isSignedIn ? "Go Monster Mode" : "Go Monster Mode";
     };
 
     return (
@@ -131,19 +126,6 @@ export const HeroContent: React.FC = () => {
                         </Link>
                     </Button>
                 </div>
-                <Button
-                    key={2}
-                    asChild
-                    size="lg"
-                    variant="ghost"
-                    className="h-10.5 rounded-xl px-5"
-                >
-                    <Link href={getSecondaryActionUrl()}>
-                        <span className="text-nowrap">
-                            {getSecondaryActionText()}
-                        </span>
-                    </Link>
-                </Button>
             </AnimatedGroup>
         </div>
     );
