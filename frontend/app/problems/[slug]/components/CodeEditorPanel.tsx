@@ -2,6 +2,16 @@ import { Button } from "@/components/ui/button";
 import { RotateCcw, Play, Send } from "lucide-react";
 import { MonacoEditor } from "@/components/code-editor/monaco-editor";
 import { useState } from "react";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface CodeEditorPanelProps {
     selectedLanguage: string;
@@ -29,8 +39,19 @@ export function CodeEditorPanel({
     availableLanguages,
 }: CodeEditorPanelProps) {
     const [fontSize, setFontSize] = useState(14);
+    const [showResetDialog, setShowResetDialog] = useState(false);
 
     const fontSizes = [12, 14, 16, 18, 20, 22, 24];
+
+    const handleResetClick = () => {
+        setShowResetDialog(true);
+    };
+
+    const handleResetConfirm = () => {
+        onCodeReset();
+        setShowResetDialog(false);
+    };
+
     return (
         <div className="flex flex-col h-full space-y-3">
             {/* Editor Header */}
@@ -77,8 +98,9 @@ export function CodeEditorPanel({
                     <Button
                         variant="outline"
                         size="sm"
-                        onClick={onCodeReset}
+                        onClick={handleResetClick}
                         disabled={isSubmitting}
+                        className="transform hover:scale-105 transition-all duration-200"
                     >
                         <RotateCcw className="h-4 w-4 mr-2" />
                         Reset
@@ -89,6 +111,7 @@ export function CodeEditorPanel({
                         size="sm"
                         onClick={onRunCode}
                         disabled={isSubmitting || isRunning || !code.trim()}
+                        className="transform hover:scale-105 transition-all duration-200"
                     >
                         <Play className="h-4 w-4 mr-2" />
                         {isRunning ? "Running..." : "Run"}
@@ -98,6 +121,7 @@ export function CodeEditorPanel({
                         size="sm"
                         onClick={onSubmitCode}
                         disabled={isSubmitting || isRunning || !code.trim()}
+                        className="transform hover:scale-105 transition-all duration-200"
                     >
                         <Send className="h-4 w-4 mr-2" />
                         {isSubmitting ? "Submitting..." : "Submit"}
@@ -117,6 +141,29 @@ export function CodeEditorPanel({
                     fontSize={fontSize}
                 />
             </div>
+
+            {/* Reset Confirmation Dialog */}
+            <AlertDialog
+                open={showResetDialog}
+                onOpenChange={setShowResetDialog}
+            >
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Reset Code?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This will reset your code to the starter template.
+                            All your current changes will be lost. Do you really
+                            want to do this?
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleResetConfirm}>
+                            Reset Code
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }
