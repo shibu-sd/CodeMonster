@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { RotateCcw, Play } from "lucide-react";
 import { MonacoEditor } from "@/components/code-editor/monaco-editor";
+import { useState } from "react";
 
 interface CodeEditorPanelProps {
     selectedLanguage: string;
@@ -27,24 +28,49 @@ export function CodeEditorPanel({
     isRunning,
     availableLanguages,
 }: CodeEditorPanelProps) {
+    const [fontSize, setFontSize] = useState(14);
+
+    const fontSizes = [12, 14, 16, 18, 20, 22, 24];
     return (
         <div className="flex flex-col h-full space-y-3">
             {/* Editor Header */}
             <div className="flex items-center justify-between bg-card rounded-lg p-3 border flex-shrink-0">
-                <div className="flex items-center space-x-4">
-                    <label className="text-sm font-medium">Language:</label>
-                    <select
-                        value={selectedLanguage}
-                        onChange={(e) => onLanguageChange(e.target.value)}
-                        className="px-3 py-1 border border-border rounded-md bg-background text-sm"
-                        disabled={isSubmitting}
-                    >
-                        {availableLanguages.map((lang) => (
-                            <option key={lang.id} value={lang.id}>
-                                {lang.name}
-                            </option>
-                        ))}
-                    </select>
+                <div className="flex items-center gap-10">
+                    <div className="flex items-center space-x-2">
+                        <label className="text-sm font-medium">Language:</label>
+                        <select
+                            value={selectedLanguage}
+                            onChange={(e) => onLanguageChange(e.target.value)}
+                            className="px-3 py-1 border border-border rounded-md bg-background text-sm"
+                            disabled={isSubmitting}
+                        >
+                            {availableLanguages.map((lang) => (
+                                <option key={lang.id} value={lang.id}>
+                                    {lang.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                        <label className="text-sm font-medium">
+                            Font Size:
+                        </label>
+                        <select
+                            value={fontSize}
+                            onChange={(e) =>
+                                setFontSize(Number(e.target.value))
+                            }
+                            className="px-3 py-1 border border-border rounded-md bg-background text-sm"
+                            disabled={isSubmitting}
+                        >
+                            {fontSizes.map((size) => (
+                                <option key={size} value={size}>
+                                    {size}px
+                                </option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
 
                 <div className="flex items-center space-x-2">
@@ -59,7 +85,7 @@ export function CodeEditorPanel({
                     </Button>
 
                     <Button
-                        variant="outline"
+                        variant="secondary"
                         size="sm"
                         onClick={onRunCode}
                         disabled={isSubmitting || isRunning || !code.trim()}
@@ -87,6 +113,7 @@ export function CodeEditorPanel({
                     height="100%"
                     className="w-full h-full"
                     tabSize={4}
+                    fontSize={fontSize}
                 />
             </div>
         </div>
