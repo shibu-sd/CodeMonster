@@ -28,6 +28,24 @@ export function BattleChatBox({
     const MAX_MESSAGE_LENGTH = 100;
     const COOLDOWN_SECONDS = 60;
 
+    useEffect(() => {
+        const storageKey = `battle-message-cooldown-${battleId}`;
+        const stored = localStorage.getItem(storageKey);
+
+        if (stored) {
+            const lastTime = parseInt(stored, 10);
+            const elapsed = Math.floor((Date.now() - lastTime) / 1000);
+            const remaining = COOLDOWN_SECONDS - elapsed;
+
+            if (remaining > 0) {
+                setLastMessageTime(lastTime);
+                setCooldownRemaining(remaining);
+            } else {
+                localStorage.removeItem(storageKey);
+            }
+        }
+    }, [battleId]);
+
     // Cooldown timer
     useEffect(() => {
         if (lastMessageTime) {
@@ -40,6 +58,8 @@ export function BattleChatBox({
                 if (remaining <= 0) {
                     setCooldownRemaining(0);
                     setLastMessageTime(null);
+                    const storageKey = `battle-message-cooldown-${battleId}`;
+                    localStorage.removeItem(storageKey);
                 } else {
                     setCooldownRemaining(remaining);
                 }
@@ -47,15 +67,19 @@ export function BattleChatBox({
 
             return () => clearInterval(timer);
         }
-    }, [lastMessageTime]);
+    }, [lastMessageTime, battleId]);
 
     const handleSendMessage = () => {
         if (!message.trim() || cooldownRemaining > 0) return;
 
+        const now = Date.now();
+        const storageKey = `battle-message-cooldown-${battleId}`;
+
         onSendMessage(message.trim());
         setMessage("");
-        setLastMessageTime(Date.now());
+        setLastMessageTime(now);
         setCooldownRemaining(COOLDOWN_SECONDS);
+        localStorage.setItem(storageKey, now.toString());
         setIsOpen(false);
     };
 
