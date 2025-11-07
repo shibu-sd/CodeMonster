@@ -748,6 +748,10 @@ function ProblemDetailPageContent() {
                                 setSelectedLanguage(language);
                                 setActiveTab("description");
                             }}
+                            isBattleMode={
+                                !!battleState.currentBattle &&
+                                battleState.currentBattle.status === "active"
+                            }
                         />
                     </div>
 
