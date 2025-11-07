@@ -81,34 +81,67 @@ export function LeaderboardTable({
 
     if (isLoading) {
         return (
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                        <Trophy className="w-5 h-5" />
-                        <span>Leaderboard</span>
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="space-y-3">
-                        {[1, 2, 3, 4, 5].map((i) => (
-                            <div
-                                key={i}
-                                className="flex items-center space-x-4 p-3"
-                            >
-                                <div className="h-8 w-8 bg-muted rounded-full animate-pulse" />
-                                <div className="h-10 w-10 bg-muted rounded-full animate-pulse" />
-                                <div className="flex-1 space-y-1">
-                                    <div className="h-4 w-32 bg-muted rounded animate-pulse" />
-                                    <div className="h-3 w-24 bg-muted rounded animate-pulse" />
-                                </div>
-                                <div className="h-6 w-16 bg-muted rounded animate-pulse" />
-                                <div className="h-6 w-20 bg-muted rounded animate-pulse" />
-                                <div className="h-6 w-24 bg-muted rounded animate-pulse" />
-                            </div>
-                        ))}
-                    </div>
-                </CardContent>
-            </Card>
+            <div className="bg-card rounded-xl border shadow-lg overflow-hidden">
+                <div className="overflow-x-auto">
+                    <table className="w-full">
+                        <thead className="bg-gradient-to-r from-muted/80 to-muted/60">
+                            <tr>
+                                <th className="text-left py-4 px-6">
+                                    <div className="h-4 w-12 bg-muted rounded animate-pulse" />
+                                </th>
+                                <th className="text-left py-4 px-6" colSpan={2}>
+                                    <div className="h-4 w-16 bg-muted rounded animate-pulse" />
+                                </th>
+                                <th className="text-center py-4 px-6">
+                                    <div className="h-4 w-16 bg-muted rounded animate-pulse mx-auto" />
+                                </th>
+                                <th className="text-center py-4 px-6">
+                                    <div className="h-4 w-24 bg-muted rounded animate-pulse mx-auto" />
+                                </th>
+                                <th className="text-center py-4 px-6">
+                                    <div className="h-4 w-24 bg-muted rounded animate-pulse mx-auto" />
+                                </th>
+                                <th className="text-center py-4 px-6">
+                                    <div className="h-4 w-20 bg-muted rounded animate-pulse mx-auto" />
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                                <tr
+                                    key={i}
+                                    className="border-t border-border/50"
+                                >
+                                    <td className="py-5 px-6">
+                                        <div className="h-8 w-8 bg-muted rounded-full animate-pulse" />
+                                    </td>
+                                    <td className="py-5 px-4">
+                                        <div className="h-10 w-10 bg-muted rounded-full animate-pulse" />
+                                    </td>
+                                    <td className="py-5 px-2">
+                                        <div className="space-y-1">
+                                            <div className="h-4 w-32 bg-muted rounded animate-pulse" />
+                                            <div className="h-3 w-20 bg-muted rounded animate-pulse" />
+                                        </div>
+                                    </td>
+                                    <td className="py-5 px-6 text-center">
+                                        <div className="h-6 w-12 bg-muted rounded animate-pulse mx-auto" />
+                                    </td>
+                                    <td className="py-5 px-6 text-center">
+                                        <div className="h-6 w-12 bg-muted rounded animate-pulse mx-auto" />
+                                    </td>
+                                    <td className="py-5 px-6 text-center">
+                                        <div className="h-4 w-16 bg-muted rounded animate-pulse mx-auto" />
+                                    </td>
+                                    <td className="py-5 px-6 text-center">
+                                        <div className="h-4 w-12 bg-muted rounded animate-pulse mx-auto" />
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         );
     }
 
@@ -130,147 +163,153 @@ export function LeaderboardTable({
     }
 
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                    <Trophy className="w-5 h-5" />
-                    <span>Rankings</span>
-                    {pagination && (
-                        <Badge variant="secondary" className="ml-2">
-                            {pagination.total.toLocaleString()} participants
-                        </Badge>
-                    )}
-                </CardTitle>
-            </CardHeader>
-            <CardContent>
-                <div className="space-y-1">
-                    <div className="flex items-center space-x-4 p-3 text-sm font-medium text-muted-foreground border-b">
-                        <div className="w-8 text-center">Rank</div>
-                        <div className="w-10">User</div>
-                        <div className="flex-1">Username</div>
-                        <div className="w-20 text-center">Solved</div>
-                        <div className="w-28 text-center whitespace-nowrap">
-                            Battles Won
-                        </div>
-                        <div className="w-24 text-center">Submissions</div>
-                        <div className="w-20 text-center">Acceptance</div>
-                    </div>
-
-                    {users.map((user) => (
-                        <div
-                            key={user.id}
-                            className={`flex items-center space-x-4 p-3 rounded-lg hover:bg-muted/50 transition-colors ${
-                                user.isCurrentUser
-                                    ? "bg-primary/5 border border-primary/20"
-                                    : ""
-                            }`}
-                        >
-                            <div className="w-8 flex justify-center">
-                                {getRankBadge(user.rank)}
-                            </div>
-                            <div className="w-10">
-                                <Avatar className="w-8 h-8">
-                                    <AvatarImage
-                                        src={user.profileImageUrl || undefined}
-                                        alt={
-                                            user.username ||
-                                            user.firstName ||
-                                            "User"
-                                        }
-                                    />
-                                    <AvatarFallback className="text-xs">
-                                        {(
-                                            user.username ||
-                                            user.firstName ||
-                                            "User"
-                                        )
-                                            .slice(0, 2)
-                                            .toUpperCase()}
-                                    </AvatarFallback>
-                                </Avatar>
-                            </div>
-
-                            <div className="flex-1">
-                                <div className="flex items-center space-x-2">
-                                    <span className="font-medium text-foreground">
-                                        {user.username ||
-                                            user.firstName ||
-                                            "User"}
+        <div className="bg-card rounded-xl border shadow-lg overflow-hidden">
+            <div className="overflow-x-auto">
+                <table className="w-full">
+                    <thead className="bg-gradient-to-r from-muted/80 to-muted/60">
+                        <tr>
+                            <th className="text-left py-4 px-6 font-semibold text-sm uppercase tracking-wide">
+                                Rank
+                            </th>
+                            <th
+                                className="text-left py-4 px-6 font-semibold text-sm uppercase tracking-wide"
+                                colSpan={2}
+                            >
+                                User
+                            </th>
+                            <th className="text-center py-4 px-6 font-semibold text-sm uppercase tracking-wide">
+                                Solved
+                            </th>
+                            <th className="text-center py-4 px-6 font-semibold text-sm uppercase tracking-wide">
+                                Battles Won
+                            </th>
+                            <th className="text-center py-4 px-6 font-semibold text-sm uppercase tracking-wide">
+                                Submissions
+                            </th>
+                            <th className="text-center py-4 px-6 font-semibold text-sm uppercase tracking-wide">
+                                Acceptance
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {users.map((user) => (
+                            <tr
+                                key={user.id}
+                                className={`border-t border-border/50 hover:bg-muted/20 transition-all duration-200 group ${
+                                    user.isCurrentUser ? "bg-primary/10" : ""
+                                }`}
+                            >
+                                <td className="py-5 px-6">
+                                    {getRankBadge(user.rank)}
+                                </td>
+                                <td className="py-5 px-4">
+                                    <Avatar className="w-10 h-10 border-2 border-primary/20">
+                                        <AvatarImage
+                                            src={
+                                                user.profileImageUrl ||
+                                                undefined
+                                            }
+                                            alt={
+                                                user.username ||
+                                                user.firstName ||
+                                                "User"
+                                            }
+                                        />
+                                        <AvatarFallback className="text-sm font-medium">
+                                            {(
+                                                user.username ||
+                                                user.firstName ||
+                                                "User"
+                                            )
+                                                .slice(0, 2)
+                                                .toUpperCase()}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                </td>
+                                <td className="py-5 px-2">
+                                    <div>
+                                        <div className="flex items-center space-x-2">
+                                            <span className="font-semibold text-base">
+                                                {user.username ||
+                                                    user.firstName ||
+                                                    "User"}
+                                            </span>
+                                            {user.isCurrentUser && (
+                                                <Badge
+                                                    variant="default"
+                                                    className="text-xs"
+                                                >
+                                                    You
+                                                </Badge>
+                                            )}
+                                        </div>
+                                        <div className="text-xs text-muted-foreground mt-0.5">
+                                            Joined{" "}
+                                            {new Date(
+                                                user.createdAt
+                                            ).toLocaleDateString()}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td className="py-5 px-6 text-center">
+                                    <span className="font-bold text-base">
+                                        {user.problemsSolved.toLocaleString()}
                                     </span>
-                                    {user.isCurrentUser && (
-                                        <Badge
-                                            variant="default"
-                                            className="text-xs"
-                                        >
-                                            You
-                                        </Badge>
-                                    )}
-                                </div>
-                                <div className="text-xs text-muted-foreground">
-                                    Joined{" "}
-                                    {new Date(
-                                        user.createdAt
-                                    ).toLocaleDateString()}
-                                </div>
-                            </div>
+                                </td>
+                                <td className="py-5 px-6 text-center">
+                                    <span className="font-bold text-base text-primary">
+                                        {user.battlesWon.toLocaleString()}
+                                    </span>
+                                </td>
+                                <td className="py-5 px-6 text-center">
+                                    <span className="text-sm font-medium text-muted-foreground">
+                                        {user.totalSubmissions.toLocaleString()}
+                                    </span>
+                                </td>
+                                <td className="py-5 px-6 text-center">
+                                    <span
+                                        className={`text-sm font-bold ${getAcceptanceRateColor(
+                                            user.acceptanceRate
+                                        )}`}
+                                    >
+                                        {formatAcceptanceRate(
+                                            user.acceptanceRate
+                                        )}
+                                    </span>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
 
-                            <div className="w-20 text-center">
-                                <div className="font-semibold text-foreground">
-                                    {user.problemsSolved.toLocaleString()}
-                                </div>
-                            </div>
-
-                            <div className="w-28 text-center">
-                                <div className="font-semibold text-primary">
-                                    {user.battlesWon.toLocaleString()}
-                                </div>
-                            </div>
-
-                            <div className="w-24 text-center">
-                                <div className="text-sm text-muted-foreground">
-                                    {user.totalSubmissions.toLocaleString()}
-                                </div>
-                            </div>
-
-                            <div className="w-20 text-center">
-                                <div
-                                    className={`text-sm font-medium ${getAcceptanceRateColor(
-                                        user.acceptanceRate
-                                    )}`}
-                                >
-                                    {formatAcceptanceRate(user.acceptanceRate)}
-                                </div>
-                            </div>
-                        </div>
-                    ))}
+            {pagination && pagination.totalPages > 1 && (
+                <div className="flex justify-center items-center space-x-4 px-6 py-4 border-t bg-muted/20">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={onPrevPage}
+                        disabled={!pagination.hasPrev}
+                        className="transform hover:scale-105 transition-all duration-200"
+                    >
+                        <ChevronLeft className="w-4 h-4 mr-1" />
+                        Previous
+                    </Button>
+                    <span className="text-sm font-medium text-muted-foreground">
+                        Page {pagination.page} of {pagination.totalPages}
+                    </span>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={onNextPage}
+                        disabled={!pagination.hasNext}
+                        className="transform hover:scale-105 transition-all duration-200"
+                    >
+                        Next
+                        <ChevronRight className="w-4 h-4 ml-1" />
+                    </Button>
                 </div>
-
-                {pagination && pagination.totalPages > 1 && (
-                    <div className="flex justify-center items-center space-x-4 mt-6 pt-4 border-t">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={onPrevPage}
-                            disabled={!pagination.hasPrev}
-                        >
-                            <ChevronLeft className="w-4 h-4 mr-1" />
-                            Previous
-                        </Button>
-                        <span className="text-sm text-muted-foreground">
-                            Page {pagination.page} of {pagination.totalPages}
-                        </span>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={onNextPage}
-                            disabled={!pagination.hasNext}
-                        >
-                            Next
-                            <ChevronRight className="w-4 h-4 ml-1" />
-                        </Button>
-                    </div>
-                )}
-            </CardContent>
-        </Card>
+            )}
+        </div>
     );
 }
