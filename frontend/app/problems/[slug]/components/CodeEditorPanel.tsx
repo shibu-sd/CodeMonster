@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { RotateCcw, Play } from "lucide-react";
+import { RotateCcw, Play, Send } from "lucide-react";
 import { MonacoEditor } from "@/components/code-editor/monaco-editor";
 import { useState } from "react";
 
@@ -99,6 +99,7 @@ export function CodeEditorPanel({
                         onClick={onSubmitCode}
                         disabled={isSubmitting || isRunning || !code.trim()}
                     >
+                        <Send className="h-4 w-4 mr-2" />
                         {isSubmitting ? "Submitting..." : "Submit"}
                     </Button>
                 </div>
