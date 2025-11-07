@@ -218,79 +218,85 @@ function LeaderboardPageContent() {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                             {[1, 2, 3, 4].map((i) => (
-                                <Card key={i}>
-                                    <CardContent className="p-6">
-                                        <div className="space-y-2">
-                                            <Skeleton className="h-6 w-24" />
-                                            <Skeleton className="h-8 w-16" />
-                                        </div>
-                                    </CardContent>
-                                </Card>
+                                <div
+                                    key={i}
+                                    className="bg-muted/20 rounded-xl p-6 border shadow-lg"
+                                >
+                                    <div className="flex items-center justify-between mb-3">
+                                        <Skeleton className="h-4 w-24" />
+                                        <Skeleton className="h-9 w-9 rounded-lg" />
+                                    </div>
+                                    <Skeleton className="h-9 w-16 mx-auto" />
+                                </div>
                             ))}
                         </div>
 
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="flex items-center space-x-2">
-                                    <Skeleton className="h-5 w-5" />
-                                    <Skeleton className="h-6 w-32" />
-                                    <Skeleton className="h-5 w-32" />
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="space-y-1">
-                                    <div className="flex items-center space-x-4 p-3 text-sm font-medium text-muted-foreground border-b">
-                                        <div className="w-8 text-center">
-                                            <Skeleton className="h-4 w-8" />
-                                        </div>
-                                        <div className="w-10">
-                                            <Skeleton className="h-4 w-10" />
-                                        </div>
-                                        <div className="flex-1">
-                                            <Skeleton className="h-4 w-24" />
-                                        </div>
-                                        <div className="w-20 text-center">
-                                            <Skeleton className="h-4 w-20" />
-                                        </div>
-                                        <div className="w-24 text-center">
-                                            <Skeleton className="h-4 w-24" />
-                                        </div>
-                                        <div className="w-20 text-center">
-                                            <Skeleton className="h-4 w-20" />
-                                        </div>
-                                    </div>
-
-                                    {[1, 2, 3, 4, 5].map((i) => (
-                                        <div
-                                            key={i}
-                                            className="flex items-center space-x-4 p-3"
-                                        >
-                                            <div className="w-8 flex justify-center">
-                                                <Skeleton className="h-6 w-8 rounded-full" />
-                                            </div>
-                                            <div className="w-10">
-                                                <Skeleton className="h-8 w-8 rounded-full" />
-                                            </div>
-                                            <div className="flex-1 space-y-1">
-                                                <Skeleton className="h-4 w-32" />
-                                                <Skeleton className="h-3 w-16" />
-                                            </div>
-                                            <div className="w-20 text-center">
-                                                <Skeleton className="h-6 w-16" />
-                                            </div>
-                                            <div className="w-24 text-center">
-                                                <Skeleton className="h-6 w-20" />
-                                            </div>
-                                            <div className="w-20 text-center">
-                                                <Skeleton className="h-6 w-24" />
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </CardContent>
-                        </Card>
+                        <div className="bg-card rounded-xl border shadow-lg overflow-hidden">
+                            <div className="overflow-x-auto">
+                                <table className="w-full">
+                                    <thead className="bg-gradient-to-r from-muted/80 to-muted/60">
+                                        <tr>
+                                            <th className="text-left py-4 px-6">
+                                                <Skeleton className="h-4 w-12" />
+                                            </th>
+                                            <th
+                                                className="text-left py-4 px-6"
+                                                colSpan={2}
+                                            >
+                                                <Skeleton className="h-4 w-16" />
+                                            </th>
+                                            <th className="text-center py-4 px-6">
+                                                <Skeleton className="h-4 w-16 mx-auto" />
+                                            </th>
+                                            <th className="text-center py-4 px-6">
+                                                <Skeleton className="h-4 w-24 mx-auto" />
+                                            </th>
+                                            <th className="text-center py-4 px-6">
+                                                <Skeleton className="h-4 w-24 mx-auto" />
+                                            </th>
+                                            <th className="text-center py-4 px-6">
+                                                <Skeleton className="h-4 w-20 mx-auto" />
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                                            <tr
+                                                key={i}
+                                                className="border-t border-border/50"
+                                            >
+                                                <td className="py-5 px-6">
+                                                    <Skeleton className="h-8 w-8 rounded-full" />
+                                                </td>
+                                                <td className="py-5 px-4">
+                                                    <Skeleton className="h-10 w-10 rounded-full" />
+                                                </td>
+                                                <td className="py-5 px-2">
+                                                    <div className="space-y-1">
+                                                        <Skeleton className="h-4 w-32" />
+                                                        <Skeleton className="h-3 w-20" />
+                                                    </div>
+                                                </td>
+                                                <td className="py-5 px-6 text-center">
+                                                    <Skeleton className="h-6 w-12 mx-auto" />
+                                                </td>
+                                                <td className="py-5 px-6 text-center">
+                                                    <Skeleton className="h-6 w-12 mx-auto" />
+                                                </td>
+                                                <td className="py-5 px-6 text-center">
+                                                    <Skeleton className="h-4 w-16 mx-auto" />
+                                                </td>
+                                                <td className="py-5 px-6 text-center">
+                                                    <Skeleton className="h-4 w-12 mx-auto" />
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
 
                         <div className="flex justify-center space-x-2">
                             <Skeleton className="h-10 w-24" />
@@ -357,21 +363,21 @@ function LeaderboardPageContent() {
                     )}
 
                     {isSignedIn && currentUserRank && currentUserRank > 50 && (
-                        <Card className="border-primary">
-                            <CardContent className="p-6">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <h3 className="font-semibold text-lg">
-                                            Your Rank
-                                        </h3>
-                                        <p className="text-2xl font-bold text-primary">
-                                            #{currentUserRank}
-                                        </p>
-                                    </div>
+                        <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl p-6 border border-primary/30 shadow-lg">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <h3 className="font-semibold text-sm uppercase tracking-wide text-primary mb-2">
+                                        Your Rank
+                                    </h3>
+                                    <p className="text-4xl font-bold text-primary">
+                                        #{currentUserRank}
+                                    </p>
+                                </div>
+                                <div className="p-3 bg-primary/20 rounded-lg">
                                     <Trophy className="w-8 h-8 text-primary" />
                                 </div>
-                            </CardContent>
-                        </Card>
+                            </div>
+                        </div>
                     )}
 
                     <LeaderboardTable
