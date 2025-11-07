@@ -17,6 +17,7 @@ import { useBattle } from "@/contexts/BattleContext";
 import { BattleEndDialog } from "@/components/battle/BattleEndDialog";
 import { BattleChatBox } from "@/components/battle/BattleChatBox";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { DotPattern } from "@/components/ui/dot-pattern";
 
 interface TestCaseResult {
     passed: boolean;
@@ -702,21 +703,25 @@ function ProblemDetailPageContent() {
 
     if (error || !problem) {
         return (
-            <div className="min-h-screen bg-background">
+            <div className="min-h-screen bg-background relative">
+                <DotPattern className="opacity-30" />
                 <HeroHeader />
-                <ProblemErrorState
-                    error={error}
-                    onGoBack={() => router.back()}
-                />
+                <div className="relative z-10">
+                    <ProblemErrorState
+                        error={error}
+                        onGoBack={() => router.back()}
+                    />
+                </div>
             </div>
         );
     }
 
     return (
-        <div className="h-screen bg-background flex flex-col overflow-hidden">
+        <div className="h-screen bg-background flex flex-col overflow-hidden relative">
+            <DotPattern className="opacity-30" />
             <HeroHeader />
 
-            <main className="flex-1 w-full px-6 pt-10 pb-6 flex flex-col overflow-hidden relative">
+            <main className="flex-1 w-full px-6 pt-10 pb-6 flex flex-col overflow-hidden relative z-10">
                 <ProblemHeader
                     problem={problem}
                     battleInfo={

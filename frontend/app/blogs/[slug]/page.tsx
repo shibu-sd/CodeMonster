@@ -14,6 +14,7 @@ import { HeroHeader } from "@/components/header/header";
 import FooterSection from "@/components/footer/footer";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
 import { Skeleton } from "@/components/ui/skeleton";
+import { DotPattern } from "@/components/ui/dot-pattern";
 
 export default function BlogPostPage() {
     const params = useParams();
@@ -150,10 +151,11 @@ export default function BlogPostPage() {
     if (showSkeleton) {
         return (
             <ProtectedPage>
-                <div className="min-h-screen bg-background">
+                <div className="min-h-screen bg-background relative">
+                    <DotPattern className="opacity-30" />
                     <HeroHeader />
                     <ScrollProgress />
-                    <main className="container mx-auto px-4 pt-32 pb-16">
+                    <main className="container mx-auto px-4 pt-32 pb-16 relative z-10">
                         {/* Back Button Skeleton */}
                         <div className="mb-6">
                             <Skeleton className="h-10 w-24" />
@@ -291,10 +293,11 @@ export default function BlogPostPage() {
     if (error || !blogPost) {
         return (
             <ProtectedPage>
-                <div className="min-h-screen bg-background">
+                <div className="min-h-screen bg-background relative">
+                    <DotPattern className="opacity-30" />
                     <HeroHeader />
                     <ScrollProgress />
-                    <main className="container mx-auto px-4 pt-32 pb-16">
+                    <main className="container mx-auto px-4 pt-32 pb-16 relative z-10">
                         <div className="text-center py-12">
                             <h1 className="text-2xl font-bold mb-4">
                                 Blog Post Not Found
@@ -323,10 +326,11 @@ export default function BlogPostPage() {
 
     return (
         <ProtectedPage>
-            <div className="min-h-screen bg-background">
+            <div className="min-h-screen bg-background relative">
+                <DotPattern className="opacity-30" />
                 <HeroHeader />
                 <ScrollProgress />
-                <main className="container mx-auto px-4 pt-32 pb-16">
+                <main className="container mx-auto px-4 pt-32 pb-16 relative z-10">
                     {/* Back Button */}
                     <div className="mb-6">
                         <Button variant="ghost" asChild>

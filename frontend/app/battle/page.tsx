@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Swords, Users, Clock, Trophy, Target } from "lucide-react";
 import FooterSection from "@/components/footer/footer";
+import { DotPattern } from "@/components/ui/dot-pattern";
 
 function BattlePage() {
     const { isSignedIn } = useAuth();
@@ -77,10 +78,11 @@ function BattlePage() {
 
     if (!isSignedIn) {
         return (
-            <div className="min-h-screen bg-background">
+            <div className="min-h-screen bg-background relative">
+                <DotPattern className="opacity-30" />
                 <HeroHeader />
 
-                <main className="container mx-auto px-4 pt-32 pb-16">
+                <main className="container mx-auto px-4 pt-32 pb-16 relative z-10">
                     <Card className="max-w-2xl mx-auto">
                         <CardHeader className="text-center">
                             <CardTitle className="text-3xl font-bold">
@@ -117,10 +119,11 @@ function BattlePage() {
     }
 
     return (
-        <div className="min-h-screen bg-background">
+        <div className="min-h-screen bg-background relative">
+            <DotPattern className="opacity-30" />
             <HeroHeader />
 
-            <main className="container mx-auto px-4 pt-32 pb-16">
+            <main className="container mx-auto px-4 pt-32 pb-16 relative z-10">
                 <div className="space-y-8">
                     {/* Header */}
                     <div className="text-center space-y-4">
