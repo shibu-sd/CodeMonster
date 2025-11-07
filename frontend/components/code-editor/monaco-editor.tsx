@@ -12,6 +12,7 @@ interface MonacoEditorProps {
     height?: string;
     className?: string;
     tabSize?: number;
+    fontSize?: number;
 }
 
 export function MonacoEditor({
@@ -22,6 +23,7 @@ export function MonacoEditor({
     height = "400px",
     className = "",
     tabSize = 4,
+    fontSize = 14,
 }: MonacoEditorProps) {
     const { theme, resolvedTheme } = useTheme();
     const [isLoading, setIsLoading] = useState(true);
@@ -32,6 +34,14 @@ export function MonacoEditor({
         const currentTheme = theme === "system" ? resolvedTheme : theme;
         setEditorTheme(currentTheme === "dark" ? "vs-dark" : "light");
     }, [theme, resolvedTheme]);
+
+    React.useEffect(() => {
+        if (editorRef.current) {
+            (editorRef.current as any).updateOptions({
+                fontSize: fontSize,
+            });
+        }
+    }, [fontSize]);
 
     const getMonacoLanguage = (lang: string) => {
         const languageMap: Record<string, string> = {
@@ -50,7 +60,7 @@ export function MonacoEditor({
         setIsLoading(false);
 
         editor.updateOptions({
-            fontSize: 14,
+            fontSize: fontSize,
             lineHeight: 1.6,
             fontFamily: "JetBrains Mono, Fira Code, Monaco, Menlo, monospace",
             minimap: { enabled: false },
@@ -98,7 +108,7 @@ export function MonacoEditor({
                     scrollBeyondLastLine: false,
                     wordWrap: "on",
                     minimap: { enabled: false },
-                    fontSize: 14,
+                    fontSize: fontSize,
                     lineHeight: 1.6,
                     fontFamily:
                         "JetBrains Mono, Fira Code, Monaco, Menlo, monospace",
