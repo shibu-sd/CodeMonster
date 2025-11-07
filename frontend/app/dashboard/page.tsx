@@ -215,17 +215,18 @@ function DashboardPageContent() {
                     </div>
 
                     {/* Stats Cards Skeleton */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                         {[...Array(4)].map((_, i) => (
-                            <Card key={i} className="p-6">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex-1">
-                                        <Skeleton className="h-4 w-32 mb-2" />
-                                        <Skeleton className="h-8 w-16" />
-                                    </div>
-                                    <Skeleton className="h-10 w-10" />
+                            <div
+                                key={i}
+                                className="bg-muted/20 rounded-xl p-6 border shadow-lg"
+                            >
+                                <div className="flex items-center justify-between mb-3">
+                                    <Skeleton className="h-4 w-32" />
+                                    <Skeleton className="h-9 w-9 rounded-lg" />
                                 </div>
-                            </Card>
+                                <Skeleton className="h-9 w-16 mx-auto" />
+                            </div>
                         ))}
                     </div>
 
@@ -407,62 +408,62 @@ function DashboardPageContent() {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                    <Card className="p-6 border-l-4 border-l-green-500">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm text-muted-foreground">
-                                    Problems Solved
-                                </p>
-                                <p className="text-3xl font-bold">
-                                    {user.problemsSolved}
-                                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950/30 dark:to-green-900/20 rounded-xl p-6 border border-green-200 dark:border-green-800 shadow-lg text-center">
+                        <div className="flex items-center justify-between mb-3">
+                            <span className="text-sm font-semibold text-green-700 dark:text-green-400 uppercase tracking-wide">
+                                Problems Solved
+                            </span>
+                            <div className="p-2 bg-green-200 dark:bg-green-800/50 rounded-lg">
+                                <Target className="h-5 w-5 text-green-600 dark:text-green-400" />
                             </div>
-                            <Trophy className="h-10 w-10 text-green-500" />
                         </div>
-                    </Card>
+                        <p className="text-3xl font-bold text-green-700 dark:text-green-300">
+                            {user.problemsSolved}
+                        </p>
+                    </div>
 
-                    <Card className="p-6 border-l-4 border-l-blue-500">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm text-muted-foreground">
-                                    Total Submissions
-                                </p>
-                                <p className="text-3xl font-bold">
-                                    {user.totalSubmissions}
-                                </p>
+                    <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/30 dark:to-blue-900/20 rounded-xl p-6 border border-blue-200 dark:border-blue-800 shadow-lg text-center">
+                        <div className="flex items-center justify-between mb-3">
+                            <span className="text-sm font-semibold text-blue-700 dark:text-blue-400 uppercase tracking-wide">
+                                Total Submissions
+                            </span>
+                            <div className="p-2 bg-blue-200 dark:bg-blue-800/50 rounded-lg">
+                                <Code className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                             </div>
-                            <Code className="h-10 w-10 text-blue-500" />
                         </div>
-                    </Card>
+                        <p className="text-3xl font-bold text-blue-700 dark:text-blue-300">
+                            {user.totalSubmissions}
+                        </p>
+                    </div>
 
-                    <Card className="p-6 border-l-4 border-l-purple-500">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm text-muted-foreground">
-                                    Acceptance Rate
-                                </p>
-                                <p className="text-3xl font-bold">
-                                    {user.acceptanceRate}%
-                                </p>
+                    <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/30 dark:to-purple-900/20 rounded-xl p-6 border border-purple-200 dark:border-purple-800 shadow-lg text-center">
+                        <div className="flex items-center justify-between mb-3">
+                            <span className="text-sm font-semibold text-purple-700 dark:text-purple-400 uppercase tracking-wide">
+                                Acceptance Rate
+                            </span>
+                            <div className="p-2 bg-purple-200 dark:bg-purple-800/50 rounded-lg">
+                                <TrendingUp className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                             </div>
-                            <TrendingUp className="h-10 w-10 text-purple-500" />
                         </div>
-                    </Card>
+                        <p className="text-3xl font-bold text-purple-700 dark:text-purple-300">
+                            {user.acceptanceRate}%
+                        </p>
+                    </div>
 
-                    <Card className="p-6 border-l-4 border-l-orange-500">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm text-muted-foreground">
-                                    Battles Won
-                                </p>
-                                <p className="text-3xl font-bold">
-                                    {user.battlesWon}
-                                </p>
+                    <div className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-950/30 dark:to-orange-900/20 rounded-xl p-6 border border-orange-200 dark:border-orange-800 shadow-lg text-center">
+                        <div className="flex items-center justify-between mb-3">
+                            <span className="text-sm font-semibold text-orange-700 dark:text-orange-400 uppercase tracking-wide">
+                                Battles Won
+                            </span>
+                            <div className="p-2 bg-orange-200 dark:bg-orange-800/50 rounded-lg">
+                                <Swords className="h-5 w-5 text-orange-600 dark:text-orange-400" />
                             </div>
-                            <Swords className="h-10 w-10 text-orange-500" />
                         </div>
-                    </Card>
+                        <p className="text-3xl font-bold text-orange-700 dark:text-orange-300">
+                            {user.battlesWon}
+                        </p>
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
