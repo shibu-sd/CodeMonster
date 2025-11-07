@@ -50,7 +50,10 @@ export const SOCIAL_LINKS: SocialLink[] = [
 export const FOOTER_LINKS: FooterLinkGroup[] = [
     {
         group: "Practice",
-        items: [{ title: "Problemset", href: "/problems" }],
+        items: [
+            { title: "Problemset", href: "/problems" },
+            { title: "Battle", href: "/battle" },
+        ],
     },
     {
         group: "Compete",

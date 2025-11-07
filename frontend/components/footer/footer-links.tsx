@@ -10,14 +10,25 @@ interface FooterLinksProps {
 export const FooterLinks: React.FC<FooterLinksProps> = ({ className }) => {
     const { isSignedIn, isLoaded } = useAuth();
 
-    const handleProtectedLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    const handleProtectedLinkClick = (
+        e: React.MouseEvent<HTMLAnchorElement>,
+        href: string
+    ) => {
         if (!isSignedIn && isLoaded) {
             e.preventDefault();
-            window.location.href = `/auth/sign-in?redirect_url=${encodeURIComponent(href)}`;
+            window.location.href = `/auth/sign-in?redirect_url=${encodeURIComponent(
+                href
+            )}`;
         }
     };
 
-    const protectedRoutes = ['/problems', '/leaderboard', '/dashboard', '/blogs'];
+    const protectedRoutes = [
+        "/problems",
+        "/battle",
+        "/leaderboard",
+        "/dashboard",
+        "/blogs",
+    ];
 
     return (
         <div className={className}>
@@ -28,7 +39,9 @@ export const FooterLinks: React.FC<FooterLinksProps> = ({ className }) => {
                             {linkGroup.group}
                         </span>
                         {linkGroup.items.map((item, itemIndex) => {
-                            const isProtected = protectedRoutes.some(route => item.href.startsWith(route));
+                            const isProtected = protectedRoutes.some((route) =>
+                                item.href.startsWith(route)
+                            );
 
                             return (
                                 <Link
@@ -37,7 +50,11 @@ export const FooterLinks: React.FC<FooterLinksProps> = ({ className }) => {
                                     className="text-muted-foreground hover:text-primary block duration-150"
                                     onClick={
                                         isProtected
-                                            ? (e) => handleProtectedLinkClick(e, item.href)
+                                            ? (e) =>
+                                                  handleProtectedLinkClick(
+                                                      e,
+                                                      item.href
+                                                  )
                                             : undefined
                                     }
                                 >

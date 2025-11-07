@@ -21,10 +21,7 @@ export const SocialLinks: React.FC = () => {
                         height="1em"
                         viewBox="0 0 24 24"
                     >
-                        <path
-                            fill="currentColor"
-                            d={link.svgPath}
-                        />
+                        <path fill="currentColor" d={link.svgPath} />
                     </svg>
                 </Link>
             ))}
