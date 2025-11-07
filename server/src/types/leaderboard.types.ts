@@ -4,8 +4,10 @@ export interface LeaderboardEntry {
     rank: number;
     id: string;
     username: string | null;
+    firstName: string | null;
     profileImageUrl: string | null;
     problemsSolved: number;
+    battlesWon: number;
     acceptedSubmissions: number;
     totalSubmissions: number;
     acceptanceRate: number;

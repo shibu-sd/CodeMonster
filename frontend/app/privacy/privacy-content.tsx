@@ -4,12 +4,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { HeroHeader } from "@/components/header/header";
 import FooterSection from "@/components/footer/footer";
 import { motion } from "motion/react";
+import { DotPattern } from "@/components/ui/dot-pattern";
 
 export default function PrivacyContent() {
     return (
-        <div className="min-h-screen bg-background">
+        <div className="min-h-screen bg-background relative">
+            <DotPattern className="opacity-30" />
             <HeroHeader />
-            <div className="container mx-auto px-6 pt-32 pb-16">
+            <div className="container mx-auto px-6 pt-32 pb-16 relative z-10">
                 {/* Header */}
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}

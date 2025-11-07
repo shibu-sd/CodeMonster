@@ -31,7 +31,7 @@ export const HeroAnnouncement: React.FC = () => {
             className="pointer-events-auto"
         >
             <Link
-                href="#link"
+                href="/battle"
                 className="group mx-auto flex w-fit items-center gap-3 rounded-full border border-neutral-200 bg-white/50 px-4 py-2 shadow-lg backdrop-blur-sm transition-all duration-300 hover:border-neutral-300 hover:shadow-xl dark:border-neutral-800 dark:bg-black/50 dark:hover:border-neutral-700"
             >
                 ⚔️{" "}

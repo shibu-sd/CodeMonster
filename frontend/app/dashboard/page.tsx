@@ -13,6 +13,7 @@ import FooterSection from "@/components/footer/footer";
 import {
     Trophy,
     Target,
+    Swords,
     Code,
     CheckCircle,
     XCircle,
@@ -30,6 +31,7 @@ import {
     ContributionData,
     ContributionGraph,
 } from "@/components/ui/ContributionGraph";
+import { DotPattern } from "@/components/ui/dot-pattern";
 
 interface DashboardData {
     user: {
@@ -40,7 +42,7 @@ interface DashboardData {
         email: string;
         profileImageUrl: string;
         problemsSolved: number;
-        contestsJoined: number;
+        battlesWon: number;
         totalSubmissions: number;
         acceptedSubmissions: number;
         acceptanceRate: number;
@@ -197,9 +199,10 @@ function DashboardPageContent() {
 
     if (showSkeleton) {
         return (
-            <div className="min-h-screen bg-background">
+            <div className="min-h-screen bg-background relative">
+                <DotPattern className="opacity-30" />
                 <HeroHeader />
-                <div className="flex-1 container mx-auto px-4 pt-32 pb-8 max-w-7xl">
+                <div className="flex-1 container mx-auto px-4 pt-32 pb-8 max-w-7xl relative z-10">
                     {/* User Profile Skeleton */}
                     <div className="mb-8">
                         <div className="flex items-center gap-4 mb-4">
@@ -324,9 +327,10 @@ function DashboardPageContent() {
 
     if (error || !dashboardData) {
         return (
-            <div className="min-h-screen flex flex-col">
+            <div className="min-h-screen flex flex-col relative">
+                <DotPattern className="opacity-30" />
                 <HeroHeader />
-                <div className="flex-1 flex items-center justify-center pt-20">
+                <div className="flex-1 flex items-center justify-center pt-20 relative z-10">
                     <div className="text-center max-w-md mx-auto px-4">
                         <XCircle className="h-12 w-12 mx-auto mb-4 text-destructive" />
                         <p className="text-lg font-medium mb-2">
@@ -377,9 +381,10 @@ function DashboardPageContent() {
     const { difficultyBreakdown, topTags } = stats;
 
     return (
-        <div className="min-h-screen flex flex-col">
+        <div className="min-h-screen flex flex-col relative">
+            <DotPattern className="opacity-30" />
             <HeroHeader />
-            <div className="flex-1 container mx-auto px-4 pt-32 pb-8 max-w-7xl">
+            <div className="flex-1 container mx-auto px-4 pt-32 pb-8 max-w-7xl relative z-10">
                 <div className="mb-8">
                     <div className="flex items-center gap-4 mb-4">
                         {user.profileImageUrl && (
@@ -449,13 +454,13 @@ function DashboardPageContent() {
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm text-muted-foreground">
-                                    Contests Joined
+                                    Battles Won
                                 </p>
                                 <p className="text-3xl font-bold">
-                                    {user.contestsJoined}
+                                    {user.battlesWon}
                                 </p>
                             </div>
-                            <Target className="h-10 w-10 text-orange-500" />
+                            <Swords className="h-10 w-10 text-orange-500" />
                         </div>
                     </Card>
                 </div>

@@ -47,6 +47,7 @@ export interface LeaderboardEntry {
     firstName: string | null;
     profileImageUrl: string | null;
     problemsSolved: number;
+    battlesWon: number;
     acceptedSubmissions: number;
     totalSubmissions: number;
     acceptanceRate: number;
@@ -209,6 +210,7 @@ class ApiClient {
         problemId: string;
         language: string;
         code: string;
+        battleId?: string;
     }): Promise<
         ApiResponse<{
             submissionId: string;
@@ -232,6 +234,7 @@ class ApiClient {
         problemId: string;
         language: string;
         code: string;
+        battleId?: string;
     }): Promise<ApiResponse<any>> {
         return this.request<any>("/api/submissions/run", {
             method: "POST",
@@ -326,6 +329,17 @@ class ApiClient {
             : "/api/leaderboard/rank";
         return this.request<UserRankResponse["data"]>(endpoint);
     }
+
+    async getUserBattles(userId?: string): Promise<ApiResponse<any>> {
+        const endpoint = userId
+            ? `/api/battles?userId=${userId}`
+            : "/api/battles";
+        return this.request<any>(endpoint);
+    }
+
+    async getBattle(battleId: string): Promise<ApiResponse<any>> {
+        return this.request<any>(`/api/battles/${battleId}`);
+    }
 }
 
 export const apiClient = new ApiClient(API_BASE_URL);
@@ -360,6 +374,10 @@ export const api = {
     ) => apiClient.searchLeaderboardUsers(params),
     getLeaderboardStats: () => apiClient.getLeaderboardStats(),
     getUserRank: (userId?: string) => apiClient.getUserRank(userId),
+
+    // Battle API methods
+    getUserBattles: (userId?: string) => apiClient.getUserBattles(userId),
+    getBattle: (battleId: string) => apiClient.getBattle(battleId),
 
     healthCheck: () => apiClient.healthCheck(),
     setAuthToken: (token: string) => apiClient.setAuthToken(token),

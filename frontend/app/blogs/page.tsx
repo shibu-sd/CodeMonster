@@ -13,6 +13,7 @@ import { useSearchParams } from "next/navigation";
 import { HeroHeader } from "@/components/header/header";
 import FooterSection from "@/components/footer/footer";
 import { Skeleton } from "@/components/ui/skeleton";
+import { DotPattern } from "@/components/ui/dot-pattern";
 
 export default function BlogsPage() {
     const searchParams = useSearchParams();
@@ -112,9 +113,10 @@ export default function BlogsPage() {
     if (showSkeleton) {
         return (
             <ProtectedPage>
-                <div className="min-h-screen bg-background">
+                <div className="min-h-screen bg-background relative">
+                    <DotPattern className="opacity-30" />
                     <HeroHeader />
-                    <main className="container mx-auto px-4 pt-32 pb-16">
+                    <main className="container mx-auto px-4 pt-32 pb-16 relative z-10">
                         {/* Header Skeleton */}
                         <div className="text-center mb-10">
                             <div className="flex items-center justify-center gap-3 mb-4">
@@ -302,9 +304,10 @@ export default function BlogsPage() {
 
     return (
         <ProtectedPage>
-            <div className="min-h-screen bg-background">
+            <div className="min-h-screen bg-background relative">
+                <DotPattern className="opacity-30" />
                 <HeroHeader />
-                <main className="container mx-auto px-4 pt-32 pb-16">
+                <main className="container mx-auto px-4 pt-32 pb-16 relative z-10">
                     {/* Header */}
                     <div className="text-center mb-10">
                         <div className="flex items-center justify-center gap-3 mb-4">

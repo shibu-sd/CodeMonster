@@ -531,6 +531,7 @@ export class UserRepository extends BaseRepository<User, string> {
                     updatedAt: true,
                     problemsSolved: true,
                     contestsJoined: true,
+                    battlesWon: true,
                     totalSubmissions: true,
                     acceptedSubmissions: true,
                 },

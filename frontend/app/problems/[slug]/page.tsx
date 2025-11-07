@@ -4,21 +4,20 @@ import { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { HeroHeader } from "@/components/header/header";
 import { ProtectedPage } from "@/components/auth/protected-page";
-import { useAuth } from "@clerk/nextjs";
-import {
-    ResizablePanelGroup,
-    ResizablePanel,
-} from "@/components/ui/resizable";
-import {
-    useApiWithAuth,
-    Problem,
-} from "@/lib/api";
+import { useAuth, useUser } from "@clerk/nextjs";
+import { ResizablePanelGroup, ResizablePanel } from "@/components/ui/resizable";
+import { useApiWithAuth, Problem } from "@/lib/api";
 import { ProblemDetailSkeleton } from "./components/ProblemDetailSkeleton";
 import { ProblemHeader } from "./components/ProblemHeader";
 import { ProblemContentTabs } from "./components/ProblemContentTabs";
 import { CodeEditorPanel } from "./components/CodeEditorPanel";
 import { ResultsPanel } from "./components/ResultsPanel";
 import { ProblemErrorState } from "./components/ProblemErrorState";
+import { useBattle } from "@/contexts/BattleContext";
+import { BattleEndDialog } from "@/components/battle/BattleEndDialog";
+import { BattleChatBox } from "@/components/battle/BattleChatBox";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { DotPattern } from "@/components/ui/dot-pattern";
 
 interface TestCaseResult {
     passed: boolean;
@@ -36,6 +35,7 @@ interface RunResult {
     testCasesPassed?: number;
     totalTestCases?: number;
     error?: string;
+    message?: string;
 }
 
 interface SubmissionResult {
@@ -49,6 +49,7 @@ interface SubmissionResult {
     error?: string;
     progress?: number;
     currentTestCase?: number | null;
+    message?: string;
 }
 
 function ProblemDetailPageContent() {
@@ -57,6 +58,15 @@ function ProblemDetailPageContent() {
     const slug = params.slug as string;
     const api = useApiWithAuth();
     const { isLoaded, isSignedIn, getToken } = useAuth();
+    const { user } = useUser();
+    const {
+        battleState,
+        runCode: runBattleCode,
+        submitCode: submitBattleCode,
+        forfeitBattle,
+        sendMessage,
+        clearBattleState,
+    } = useBattle();
 
     const [problem, setProblem] = useState<Problem | null>(null);
     const [loading, setLoading] = useState(true);
@@ -92,6 +102,29 @@ function ProblemDetailPageContent() {
     const [showRunPanel, setShowRunPanel] = useState(false);
     const [showSubmitPanel, setShowSubmitPanel] = useState(false);
     const [activeTestCase, setActiveTestCase] = useState(0);
+
+    // Battle mode state
+    const [battleNotifications, setBattleNotifications] = useState<
+        Array<{
+            id: string;
+            message: string;
+            type: "run" | "submit" | "message";
+            timestamp: number;
+            avatarUrl?: string;
+            username?: string;
+        }>
+    >([]);
+    const [showBattleEndDialog, setShowBattleEndDialog] = useState(false);
+    const [battleEndData, setBattleEndData] = useState<{
+        isWinner: boolean;
+        isDraw: boolean;
+        opponentName?: string;
+    } | null>(null);
+
+    // Get battle start time from persisted state
+    const battleStartTime = battleState.currentBattle?.startTime
+        ? new Date(battleState.currentBattle.startTime)
+        : null;
 
     const availableLanguages = [
         { id: "PYTHON", name: "Python", extension: "py" },
@@ -164,6 +197,170 @@ function ProblemDetailPageContent() {
         }
     }, [problem, authReady, isSignedIn]);
 
+    // Handle battle end
+    useEffect(() => {
+        if (battleState.currentBattle?.status === "finished") {
+            const winnerId = battleState.currentBattle.winnerId;
+            const opponentId = battleState.currentBattle.opponent?.id;
+            const opponentName = battleState.currentBattle.opponent?.username;
+
+            // Debug logging
+            console.log("🏆 Battle finished - Winner detection:", {
+                winnerId,
+                opponentId,
+                winnerIdType: typeof winnerId,
+                opponentIdType: typeof opponentId,
+                opponentMatch: winnerId === opponentId,
+            });
+
+            const isDraw = !winnerId;
+            const isWinner = Boolean(
+                winnerId && opponentId && winnerId !== opponentId
+            );
+
+            console.log("🏆 Final determination:", { isWinner, isDraw });
+
+            setBattleEndData({
+                isWinner,
+                isDraw,
+                opponentName,
+            });
+            setShowBattleEndDialog(true);
+        }
+    }, [
+        battleState.currentBattle?.status,
+        battleState.currentBattle?.winnerId,
+        battleState.currentBattle?.opponent,
+    ]);
+
+    // Handle battle end dialog close
+    const handleBattleEndDialogClose = () => {
+        setShowBattleEndDialog(false);
+        clearBattleState();
+    };
+
+    // Listen for opponent actions in battle
+    useEffect(() => {
+        if (!battleState.currentBattle) {
+            return;
+        }
+
+        const handleOpponentAction = (event: any) => {
+            const { type, userId, result } = event.detail;
+
+            // Only show notification if the userId is the OPPONENT's ID, not our own
+            if (battleState.currentBattle?.opponent?.id !== userId) {
+                return;
+            }
+
+            const opponentName =
+                battleState.currentBattle?.opponent?.username || "Opponent";
+
+            // Create message based on result
+            let message = "";
+            if (result) {
+                const status = result.status;
+                const testsPassed = result.testCasesPassed || 0;
+                const totalTests = result.totalTestCases || 0;
+
+                if (type === "run") {
+                    if (status === "ACCEPTED") {
+                        message = `${opponentName} ran code - ✅ All tests passed (${testsPassed}/${totalTests})`;
+                    } else if (status === "WRONG_ANSWER") {
+                        message = `${opponentName} ran code - ❌ Wrong answer (${testsPassed}/${totalTests})`;
+                    } else {
+                        message = `${opponentName} ran code - ${status}`;
+                    }
+                } else {
+                    if (status === "ACCEPTED") {
+                        message = `${opponentName} submitted - ✅ Accepted!`;
+                    } else if (status === "WRONG_ANSWER") {
+                        message = `${opponentName} submitted - ❌ Wrong answer`;
+                    } else {
+                        message = `${opponentName} submitted - ${status}`;
+                    }
+                }
+            } else {
+                // Fallback for old events without result
+                message =
+                    type === "run"
+                        ? `${opponentName} ran their code`
+                        : `${opponentName} submitted their code`;
+            }
+
+            const notification = {
+                id: `${Date.now()}-${Math.random()}`,
+                message,
+                type,
+                timestamp: Date.now(),
+                avatarUrl: battleState.currentBattle?.opponent?.profileImageUrl,
+                username: opponentName,
+            };
+
+            setBattleNotifications((prev) => [...prev, notification]);
+
+            setTimeout(() => {
+                setBattleNotifications((prev) =>
+                    prev.filter((n) => n.id !== notification.id)
+                );
+            }, 5000);
+        };
+
+        const handleMessageReceived = (event: any) => {
+            const { userId, message: text } = event.detail;
+
+            if (battleState.currentBattle?.opponent?.id !== userId) {
+                return;
+            }
+
+            const opponentName =
+                battleState.currentBattle?.opponent?.username || "Opponent";
+
+            const notification = {
+                id: `${Date.now()}-${Math.random()}`,
+                message: text,
+                type: "message" as const,
+                timestamp: Date.now(),
+                avatarUrl: battleState.currentBattle?.opponent?.profileImageUrl,
+                username: opponentName,
+            };
+
+            setBattleNotifications((prev) => [...prev, notification]);
+
+            setTimeout(() => {
+                setBattleNotifications((prev) =>
+                    prev.filter((n) => n.id !== notification.id)
+                );
+            }, 5000);
+        };
+
+        window.addEventListener("battle-opponent-action", handleOpponentAction);
+        window.addEventListener(
+            "battle-message-received",
+            handleMessageReceived
+        );
+
+        return () => {
+            window.removeEventListener(
+                "battle-opponent-action",
+                handleOpponentAction
+            );
+            window.removeEventListener(
+                "battle-message-received",
+                handleMessageReceived
+            );
+        };
+    }, [battleState.currentBattle]);
+
+    const handleExitBattle = () => {
+        if (
+            battleState.currentBattle &&
+            battleState.currentBattle.status === "active"
+        ) {
+            forfeitBattle(battleState.currentBattle.id);
+        }
+    };
+
     const loadAcceptedSolution = async () => {
         if (!problem || !isSignedIn) return;
 
@@ -230,6 +427,15 @@ function ProblemDetailPageContent() {
             return;
         }
 
+        if (
+            battleState.currentBattle &&
+            battleState.currentBattle.status === "active"
+        ) {
+            console.log("⚔️ Running code in battle mode!");
+
+            runBattleCode(battleState.currentBattle.id, code, selectedLanguage);
+        }
+
         console.log(`🔧 Running code for problem: ${problem.id}`);
         console.log(`📝 Language: ${selectedLanguage}`);
         console.log(`💻 Code length: ${code.length} characters`);
@@ -250,6 +456,7 @@ function ProblemDetailPageContent() {
                 problemId: problem.id,
                 language: selectedLanguage,
                 code: code,
+                battleId: battleState.currentBattle?.id,
             });
 
             console.log("📊 Run API response:", response);
@@ -295,6 +502,19 @@ function ProblemDetailPageContent() {
             return;
         }
 
+        if (
+            battleState.currentBattle &&
+            battleState.currentBattle.status === "active"
+        ) {
+            console.log("⚔️ Submitting code in battle mode!");
+
+            submitBattleCode(
+                battleState.currentBattle.id,
+                code,
+                selectedLanguage
+            );
+        }
+
         console.log(`🔧 Submitting code for problem: ${problem.id}`);
         console.log(`📝 Language: ${selectedLanguage}`);
         console.log(`💻 Code length: ${code.length} characters`);
@@ -316,6 +536,7 @@ function ProblemDetailPageContent() {
                 problemId: problem.id,
                 language: selectedLanguage,
                 code: code,
+                battleId: battleState.currentBattle?.id,
             });
 
             console.log("📊 Submit API response:", response);
@@ -445,7 +666,6 @@ function ProblemDetailPageContent() {
         poll();
     };
 
-    
     const getStarterCodeForLanguage = (language: string) => {
         if (!problem?.starterCode) return "";
         const starterCode = problem.starterCode.find(
@@ -483,22 +703,41 @@ function ProblemDetailPageContent() {
 
     if (error || !problem) {
         return (
-            <div className="min-h-screen bg-background">
+            <div className="min-h-screen bg-background relative">
+                <DotPattern className="opacity-30" />
                 <HeroHeader />
-                <ProblemErrorState
-                    error={error}
-                    onGoBack={() => router.back()}
-                />
+                <div className="relative z-10">
+                    <ProblemErrorState
+                        error={error}
+                        onGoBack={() => router.back()}
+                    />
+                </div>
             </div>
         );
     }
 
     return (
-        <div className="h-screen bg-background flex flex-col overflow-hidden">
+        <div className="h-screen bg-background flex flex-col overflow-hidden relative">
+            <DotPattern className="opacity-30" />
             <HeroHeader />
 
-            <main className="flex-1 w-full px-6 pt-10 pb-6 flex flex-col overflow-hidden">
-                <ProblemHeader problem={problem} />
+            <main className="flex-1 w-full px-6 pt-10 pb-6 flex flex-col overflow-hidden relative z-10">
+                <ProblemHeader
+                    problem={problem}
+                    battleInfo={
+                        battleState.currentBattle
+                            ? {
+                                  id: battleState.currentBattle.id,
+                                  opponent: battleState.currentBattle.opponent,
+                                  timeLimit:
+                                      battleState.currentBattle.timeLimit,
+                                  status: battleState.currentBattle.status,
+                                  startTime: battleStartTime || undefined,
+                              }
+                            : undefined
+                    }
+                    onExitBattle={handleExitBattle}
+                />
 
                 {/* Split Layout - Fixed left/right panels */}
                 <div className="flex-1 overflow-hidden flex">
@@ -514,6 +753,10 @@ function ProblemDetailPageContent() {
                                 setSelectedLanguage(language);
                                 setActiveTab("description");
                             }}
+                            isBattleMode={
+                                !!battleState.currentBattle &&
+                                battleState.currentBattle.status === "active"
+                            }
                         />
                     </div>
 
@@ -545,18 +788,81 @@ function ProblemDetailPageContent() {
                             </ResizablePanel>
 
                             <ResultsPanel
-                            showRunPanel={showRunPanel}
-                            showSubmitPanel={showSubmitPanel}
-                            runResult={runResult}
-                            submissionResult={submissionResult}
-                            activeTestCase={activeTestCase}
-                            onTestCaseChange={setActiveTestCase}
-                            onClose={closeResultPanel}
-                            pollingAttempts={pollingAttempts}
-                        />
+                                showRunPanel={showRunPanel}
+                                showSubmitPanel={showSubmitPanel}
+                                runResult={runResult}
+                                submissionResult={submissionResult}
+                                activeTestCase={activeTestCase}
+                                onTestCaseChange={setActiveTestCase}
+                                onClose={closeResultPanel}
+                                pollingAttempts={pollingAttempts}
+                            />
                         </ResizablePanelGroup>
                     </div>
                 </div>
+
+                {/* Battle Notifications */}
+                {battleNotifications.length > 0 && (
+                    <div className="fixed bottom-20 right-4 z-50 space-y-2">
+                        {battleNotifications.map((notification) => (
+                            <div
+                                key={notification.id}
+                                className={`px-4 py-3 rounded-lg shadow-lg border animate-in slide-in-from-right ${
+                                    notification.type === "run"
+                                        ? "bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800"
+                                        : notification.type === "message"
+                                        ? "bg-purple-50 dark:bg-purple-950 border-purple-200 dark:border-purple-800"
+                                        : "bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-800"
+                                }`}
+                            >
+                                <div className="flex items-center gap-3">
+                                    <Avatar className="h-8 w-8 border-2">
+                                        <AvatarImage
+                                            src={notification.avatarUrl}
+                                        />
+                                        <AvatarFallback className="text-xs">
+                                            {notification.username
+                                                ?.charAt(0)
+                                                ?.toUpperCase() || "O"}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    <span className="text-sm font-medium">
+                                        {notification.message}
+                                    </span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                {/* Battle End Dialog */}
+                {battleEndData && (
+                    <BattleEndDialog
+                        open={showBattleEndDialog}
+                        isWinner={battleEndData.isWinner}
+                        isDraw={battleEndData.isDraw}
+                        opponentName={battleEndData.opponentName}
+                        onClose={handleBattleEndDialogClose}
+                    />
+                )}
+
+                {/* Battle Chat Box */}
+                {battleState.currentBattle &&
+                    battleState.currentBattle.status === "active" && (
+                        <BattleChatBox
+                            battleId={battleState.currentBattle.id}
+                            currentUserId={user?.id || ""}
+                            opponentUsername={
+                                battleState.currentBattle.opponent?.username
+                            }
+                            onSendMessage={(message) =>
+                                sendMessage(
+                                    battleState.currentBattle!.id,
+                                    message
+                                )
+                            }
+                        />
+                    )}
             </main>
         </div>
     );

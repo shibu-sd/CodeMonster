@@ -32,6 +32,7 @@ interface ProblemContentTabsProps {
         solvedAt: string;
     } | null;
     onCodeLoad: (code: string, language: string) => void;
+    isBattleMode?: boolean;
 }
 
 function ProblemDescriptionContent({ description }: { description: string }) {
@@ -578,6 +579,7 @@ export function ProblemContentTabs({
     onTabChange,
     acceptedSolution,
     onCodeLoad,
+    isBattleMode = false,
 }: ProblemContentTabsProps) {
     return (
         <div className="flex flex-col h-full">
@@ -595,28 +597,32 @@ export function ProblemContentTabs({
                         <BookOpen className="h-4 w-4" />
                         Description
                     </button>
-                    <button
-                        onClick={() => onTabChange("submissions")}
-                        className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
-                            activeTab === "submissions"
-                                ? "border-primary text-primary"
-                                : "border-transparent text-muted-foreground hover:text-foreground"
-                        }`}
-                    >
-                        <Code className="h-4 w-4" />
-                        Submissions
-                    </button>
-                    <button
-                        onClick={() => onTabChange("editorial")}
-                        className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
-                            activeTab === "editorial"
-                                ? "border-primary text-primary"
-                                : "border-transparent text-muted-foreground hover:text-foreground"
-                        }`}
-                    >
-                        <TestTube className="h-4 w-4" />
-                        Editorial
-                    </button>
+                    {!isBattleMode && (
+                        <>
+                            <button
+                                onClick={() => onTabChange("submissions")}
+                                className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
+                                    activeTab === "submissions"
+                                        ? "border-primary text-primary"
+                                        : "border-transparent text-muted-foreground hover:text-foreground"
+                                }`}
+                            >
+                                <Code className="h-4 w-4" />
+                                Submissions
+                            </button>
+                            <button
+                                onClick={() => onTabChange("editorial")}
+                                className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
+                                    activeTab === "editorial"
+                                        ? "border-primary text-primary"
+                                        : "border-transparent text-muted-foreground hover:text-foreground"
+                                }`}
+                            >
+                                <TestTube className="h-4 w-4" />
+                                Editorial
+                            </button>
+                        </>
+                    )}
                 </div>
 
                 <div className="flex space-x-2">

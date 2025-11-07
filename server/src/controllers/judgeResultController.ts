@@ -4,6 +4,15 @@ import { SubmissionStatus } from "@prisma/client";
 import { JudgeJobResult } from "../types";
 import { SubmissionCleanupService } from "../services/submissionCleanupService";
 import { problemRepository } from "../repositories";
+import { BattleService } from "../services/battleService";
+import { config } from "../config";
+
+let battleSocket: any = null;
+try {
+    const socketModule = require("../websocket/battleSocket");
+} catch (error) {
+    console.log("Battle socket not available (battles disabled)");
+}
 
 export class JudgeResultController {
     static async handleJudgeResult(req: Request, res: Response): Promise<void> {
@@ -222,7 +231,142 @@ async function updateSubmissionResult(result: JudgeJobResult): Promise<void> {
         `📊 Updated submission ${submissionId} with status: ${judgeResult.status}`
     );
 
+    await handleBattleSubmission(submissionId, userId, judgeResult);
+
     SubmissionCleanupService.cleanupUserSubmissions(userId).catch((error) =>
         console.error("Error during submission cleanup:", error)
     );
+}
+
+async function handleBattleSubmission(
+    submissionId: string,
+    userId: string,
+    judgeResult: any
+): Promise<void> {
+    try {
+        if (!config.battle.enabled) {
+            return;
+        }
+
+        const battleSubmissions = await prisma.battleSubmission.findMany({
+            where: { submissionId },
+            include: {
+                battle: {
+                    include: {
+                        participants: {
+                            include: {
+                                user: true,
+                            },
+                        },
+                    },
+                },
+                participant: {
+                    include: {
+                        user: true,
+                    },
+                },
+            },
+        });
+
+        if (battleSubmissions.length === 0) {
+            return; // Not a battle submission
+        }
+
+        console.log(
+            `⚔️ Processing ${battleSubmissions.length} battle submission updates`
+        );
+
+        for (const battleSubmission of battleSubmissions) {
+            const battle = battleSubmission.battle;
+
+            if (battle.status !== "ACTIVE") {
+                continue; // Battle is not active
+            }
+
+            await prisma.battleSubmission.update({
+                where: { id: battleSubmission.id },
+                data: {
+                    status: judgeResult.status,
+                    testCasesPassed: judgeResult.testCasesPassed,
+                    totalTestCases: judgeResult.totalTestCases,
+                    runtime: judgeResult.totalRuntime,
+                    memoryUsage: judgeResult.maxMemoryUsage,
+                    errorMessage: judgeResult.errorMessage,
+                    completedAt: new Date(),
+                },
+            });
+
+            await BattleService.updateParticipantScore(
+                battle.id,
+                userId,
+                judgeResult.testCasesPassed
+            );
+
+            // Broadcast result to battle participants
+            const battleModule = require("../websocket/battleSocket");
+
+            try {
+                const globalAny = global as any;
+                if (globalAny.battleSocket) {
+                    globalAny.battleSocket.broadcastSubmissionResult(
+                        battle.id,
+                        userId,
+                        {
+                            status: judgeResult.status,
+                            testCasesPassed: judgeResult.testCasesPassed,
+                            totalTestCases: judgeResult.totalTestCases,
+                            runtime: judgeResult.totalRuntime,
+                            memoryUsage: judgeResult.maxMemoryUsage,
+                            errorMessage: judgeResult.errorMessage,
+                        }
+                    );
+                }
+            } catch (socketError) {
+                console.error(
+                    "Failed to broadcast battle submission result:",
+                    socketError
+                );
+            }
+
+            if (
+                judgeResult.status === "ACCEPTED" &&
+                judgeResult.testCasesPassed === judgeResult.totalTestCases
+            ) {
+                console.log(
+                    `🏆 User ${userId} achieved AC in battle ${battle.id}`
+                );
+
+                const winnerId = await BattleService.determineWinner(battle.id);
+                const finishedBattle = await BattleService.finishBattle(
+                    battle.id,
+                    winnerId || undefined
+                );
+
+                // Broadcast battle finish
+                try {
+                    const globalAny = global as any;
+                    if (globalAny.battleSocket) {
+                        globalAny.battleSocket.broadcastBattleFinish(
+                            battle.id,
+                            winnerId,
+                            "accepted"
+                        );
+                    }
+                } catch (socketError) {
+                    console.error(
+                        "Failed to broadcast battle finish:",
+                        socketError
+                    );
+                }
+
+                console.log(
+                    `⚔️ Battle ${battle.id} finished. Winner: ${
+                        winnerId || "Draw"
+                    }`
+                );
+            }
+        }
+    } catch (error) {
+        console.error("Error handling battle submission:", error);
+    }
 }

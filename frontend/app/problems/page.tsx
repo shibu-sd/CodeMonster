@@ -26,6 +26,7 @@ import {
     formatSubmissionCount,
 } from "@/lib/api";
 import { Skeleton } from "@/components/ui/skeleton";
+import { DotPattern } from "@/components/ui/dot-pattern";
 
 function ProblemsPageContent() {
     const api = useApiWithAuth();
@@ -179,9 +180,12 @@ function ProblemsPageContent() {
 
     if (showSkeleton) {
         return (
-            <div className="min-h-screen bg-background">
+            <div className="min-h-screen bg-background relative">
+                {/* Dot Pattern Background */}
+                <DotPattern className="opacity-30" />
+
                 <HeroHeader />
-                <div className="container mx-auto px-4 pt-32 pb-16">
+                <div className="container mx-auto px-4 pt-32 pb-16 relative z-10">
                     <div className="mb-8 text-center">
                         <Skeleton className="h-12 w-48 mb-4 mx-auto" />
                         <Skeleton className="h-6 w-96 mb-6 mx-auto" />
@@ -282,9 +286,12 @@ function ProblemsPageContent() {
 
     if (error) {
         return (
-            <div className="min-h-screen bg-background">
+            <div className="min-h-screen bg-background relative">
+                {/* Dot Pattern Background */}
+                <DotPattern className="opacity-30" />
+
                 <HeroHeader />
-                <div className="container mx-auto px-4 pt-32 pb-16">
+                <div className="container mx-auto px-4 pt-32 pb-16 relative z-10">
                     <div className="flex items-center justify-center min-h-[400px]">
                         <div className="text-center">
                             <div className="text-red-500 mb-4">❌</div>
@@ -304,10 +311,13 @@ function ProblemsPageContent() {
     }
 
     return (
-        <div className="min-h-screen bg-background">
+        <div className="min-h-screen bg-background relative">
+            {/* Dot Pattern Background */}
+            <DotPattern className="opacity-30" />
+
             <HeroHeader />
 
-            <main className="container mx-auto px-4 pt-32 pb-16">
+            <main className="container mx-auto px-4 pt-32 pb-16 relative z-10">
                 {/* Header Section */}
                 <div className="mb-8 text-center">
                     <h1 className="text-4xl font-bold mb-4">Problem Set</h1>

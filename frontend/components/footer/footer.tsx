@@ -42,7 +42,7 @@ export default function FooterSection() {
                     className="mt-12 flex flex-wrap items-end justify-between gap-6 border-t py-6"
                 >
                     <span className="text-muted-foreground order-last block text-center text-sm md:order-first">
-                        © {currentYear} CodeMonster, All rights reserved
+                        Built with 🧡 by Shibu
                     </span>
                     <div className="order-first md:order-last">
                         <SocialLinks />

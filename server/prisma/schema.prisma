@@ -22,12 +22,15 @@ model User {
   // User statistics
   problemsSolved  Int      @default(0)
   contestsJoined  Int      @default(0)
+  battlesWon      Int      @default(0)
   totalSubmissions Int     @default(0)
   acceptedSubmissions Int  @default(0)
   
   // Relations
   submissions     Submission[]
   userProblems    UserProblem[] // Track user progress on problems
+  battleSubmissions BattleSubmission[] @relation("BattleSubmissions") // Battle submissions
+  battleParticipants BattleParticipant[] @relation("BattleParticipants") // Battle participation
   
   @@map("users")
 }
@@ -89,6 +92,7 @@ model Problem {
   submissions   Submission[]
   userProblems  UserProblem[]
   starterCode   StarterCode[]
+  battles       Battle[] // Battles that use this problem
   
   @@map("problems")
 }
@@ -144,8 +148,96 @@ model Submission {
   // Relations
   user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   problem       Problem         @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  battleSubmissions BattleSubmission[] // Battle submissions that reference this
   
   @@map("submissions")
+}
+
+// Battle status enum
+enum BattleStatus {
+  WAITING   // Waiting for players to join
+  ACTIVE    // Battle is in progress
+  COMPLETED // Battle finished
+  CANCELLED // Battle was cancelled
+}
+
+// Battle participant status enum
+enum ParticipantStatus {
+  JOINED      // Player joined the battle
+  DISCONNECTED // Player disconnected during battle
+  FINISHED    // Player finished battle (submitted or time expired)
+}
+
+// Battle model
+model Battle {
+  id              String       @id @default(cuid())
+  status          BattleStatus @default(WAITING)
+  startTime       DateTime?    // Battle start time
+  endTime         DateTime?    // Battle end time
+  timeLimit       Int          @default(1800) // 30 minutes in seconds
+  problemId       String       // The problem being solved
+  winnerId        String?      // Reference to winner participant
+  isPublic        Boolean      @default(true)
+  maxParticipants Int          @default(2)
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  // Relations
+  problem        Problem              @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  participants   BattleParticipant[]
+  submissions    BattleSubmission[]
+
+  @@map("battles")
+}
+
+// Battle participants
+model BattleParticipant {
+  id         String             @id @default(cuid())
+  battleId   String
+  userId     String
+  status     ParticipantStatus  @default(JOINED)
+  score      Int                @default(0) // Number of test cases passed
+  finishedAt DateTime?
+
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+
+  // Relations
+  battle     Battle             @relation(fields: [battleId], references: [id], onDelete: Cascade)
+  user       User               @relation("BattleParticipants", fields: [userId], references: [id], onDelete: Cascade)
+  submissions BattleSubmission[]
+
+  @@unique([battleId, userId])
+  @@map("battle_participants")
+}
+
+// Battle submissions
+model BattleSubmission {
+  id             String           @id @default(cuid())
+  battleId       String
+  participantId  String
+  userId         String           // Direct reference to user
+  submissionId   String?          // Reference to actual submission
+  language       Language
+  code           String           @db.Text
+  status         SubmissionStatus @default(PENDING)
+  testCasesPassed Int            @default(0)
+  totalTestCases  Int            @default(0)
+  runtime        Int?             // in milliseconds
+  memoryUsage    Int?             // in MB
+  errorMessage   String?          @db.Text
+
+  createdAt      DateTime         @default(now())
+  completedAt    DateTime?
+
+  // Relations
+  battle         Battle           @relation(fields: [battleId], references: [id], onDelete: Cascade)
+  participant    BattleParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  user           User             @relation("BattleSubmissions", fields: [userId], references: [id], onDelete: Cascade)
+  submission     Submission?      @relation(fields: [submissionId], references: [id], onDelete: SetNull)
+
+  @@map("battle_submissions")
 }
 
 // Track user progress on individual problems
@@ -153,26 +245,26 @@ model UserProblem {
   id         String   @id @default(cuid())
   userId     String
   problemId  String
-  
+
   // Progress tracking
   isSolved   Boolean  @default(false)
   attempts   Int      @default(0)
   bestSubmissionId String? // Reference to best submission
-  
+
   // Accepted solution storage
   acceptedSolution String?  @db.Text // Store the accepted code
   acceptedLanguage Language? // Language of accepted solution
   acceptedRuntime  Int?      // Runtime of accepted solution (ms)
   acceptedMemory   Int?      // Memory of accepted solution (MB)
-  
+
   firstAttemptAt DateTime?
   solvedAt       DateTime?
   lastAttemptAt  DateTime @default(now())
-  
+
   // Relations
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   problem    Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
-  
+
   @@unique([userId, problemId])
   @@map("user_problems")
 }

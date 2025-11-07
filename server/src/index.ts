@@ -3,6 +3,7 @@ import cors from "cors";
 import helmet from "helmet";
 import compression from "compression";
 import { Clerk } from "@clerk/clerk-sdk-node";
+import { createServer } from "http";
 import { config, validateConfig } from "./config";
 import { connectDatabase } from "./utils/database";
 import { apiRoutes } from "./routes";
@@ -11,6 +12,7 @@ import { sanitizeInput } from "./middleware/validation";
 import { rateLimitMiddleware } from "./middleware/rateLimiter";
 import { requestLogger, logger } from "./utils/logger";
 import { redisConnection } from "./queues/submissionQueue";
+import { BattleSocket } from "./websocket/battleSocket";
 
 // Validate configuration
 validateConfig();
@@ -19,7 +21,16 @@ validateConfig();
 process.env.CLERK_SECRET_KEY = config.auth.clerkSecretKey;
 
 const app = express();
+const server = createServer(app);
 const PORT = config.server.port;
+
+// Initialize Battle Socket if battles are enabled
+let battleSocket: BattleSocket | null = null;
+if (config.battle.enabled) {
+    battleSocket = new BattleSocket(server);
+    // Make battle socket globally accessible for judge integration
+    (global as any).battleSocket = battleSocket;
+}
 
 // Middlewares
 app.use(helmet());
@@ -89,12 +100,14 @@ const gracefulShutdown = (signal: string) => {
 };
 
 // Start server
-const server = app.listen(PORT, async () => {
+server.listen(PORT, async () => {
     logger.info(`🚀 Server running on port ${PORT}`, {
         port: PORT,
         environment: config.server.nodeEnv,
         healthCheck: `http://localhost:${PORT}/health`,
         apiPrefix: config.server.apiPrefix,
+        battlesEnabled: config.battle.enabled,
+        battleSocketConnected: battleSocket ? "✅" : "❌",
     });
 
     try {

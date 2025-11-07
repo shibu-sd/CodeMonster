@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ClerkThemeProvider } from "@/components/theme-toggle/clerk-theme-provider";
 import { ThemeProvider } from "@/components/theme-toggle/theme-provider";
+import { BattleProvider } from "@/contexts/BattleContext";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -59,7 +60,9 @@ export default function RootLayout({
                     enableSystem={false}
                     disableTransitionOnChange
                 >
-                    <ClerkThemeProvider>{children}</ClerkThemeProvider>
+                    <ClerkThemeProvider>
+                        <BattleProvider>{children}</BattleProvider>
+                    </ClerkThemeProvider>
                 </ThemeProvider>
             </body>
         </html>
