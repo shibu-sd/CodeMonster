@@ -87,8 +87,26 @@ export function DotPattern({
         };
 
         updateDimensions();
+
+        // Listen to window resize
         window.addEventListener("resize", updateDimensions);
-        return () => window.removeEventListener("resize", updateDimensions);
+
+        // Use ResizeObserver to watch for container size changes
+        let resizeObserver: ResizeObserver | null = null;
+
+        if (containerRef.current) {
+            resizeObserver = new ResizeObserver(() => {
+                updateDimensions();
+            });
+            resizeObserver.observe(containerRef.current);
+        }
+
+        return () => {
+            window.removeEventListener("resize", updateDimensions);
+            if (resizeObserver) {
+                resizeObserver.disconnect();
+            }
+        };
     }, []);
 
     const dots = Array.from(
