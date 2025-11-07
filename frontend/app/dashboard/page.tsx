@@ -219,7 +219,7 @@ function DashboardPageContent() {
                         {[...Array(4)].map((_, i) => (
                             <div
                                 key={i}
-                                className="bg-muted/20 rounded-xl p-6 border shadow-lg"
+                                className="bg-muted/20 rounded-xl p-6 border shadow-lg text-center"
                             >
                                 <div className="flex items-center justify-between mb-3">
                                     <Skeleton className="h-4 w-32" />
@@ -230,83 +230,63 @@ function DashboardPageContent() {
                         ))}
                     </div>
 
-                    {/* Main Content Grid Skeleton */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        {/* Left Column Skeleton */}
-                        <div className="space-y-6">
-                            <Card className="p-6">
-                                <div className="flex items-center mb-4">
-                                    <Skeleton className="h-5 w-5 mr-2" />
-                                    <Skeleton className="h-6 w-40" />
+                    <div className="space-y-6">
+                        <div className="bg-card rounded-xl border shadow-lg p-6">
+                            <div className="flex items-center justify-between mb-6">
+                                <div className="flex items-center">
+                                    <Skeleton className="h-9 w-9 rounded-lg mr-3" />
+                                    <Skeleton className="h-6 w-48" />
                                 </div>
-                                <div className="space-y-4">
-                                    {[...Array(3)].map((_, i) => (
-                                        <div key={i}>
-                                            <div className="flex items-center justify-between mb-2">
-                                                <Skeleton className="h-4 w-16" />
-                                                <Skeleton className="h-4 w-8" />
-                                            </div>
-                                            <Skeleton className="h-2 w-full" />
-                                        </div>
-                                    ))}
+                                <div className="flex gap-2">
+                                    <Skeleton className="h-10 w-20 rounded-lg" />
+                                    <Skeleton className="h-10 w-20 rounded-lg" />
                                 </div>
-                            </Card>
-
-                            <Card className="p-6">
-                                <div className="flex items-center mb-4">
-                                    <Skeleton className="h-5 w-5 mr-2" />
-                                    <Skeleton className="h-6 w-24" />
-                                </div>
-                                <div className="space-y-2">
-                                    {[...Array(6)].map((_, i) => (
-                                        <div
-                                            key={i}
-                                            className="flex items-center justify-between p-2 rounded-lg bg-secondary/50"
-                                        >
-                                            <Skeleton className="h-4 w-20" />
-                                            <Skeleton className="h-5 w-8 rounded-full" />
-                                        </div>
-                                    ))}
-                                </div>
-                            </Card>
+                            </div>
+                            <div className="space-y-4">
+                                <Skeleton className="h-40 w-full rounded-lg" />
+                            </div>
                         </div>
 
-                        {/* Right Column Skeleton */}
-                        <div className="lg:col-span-2 space-y-6">
-                            <Card className="p-6">
-                                <div className="flex items-center justify-between mb-4">
-                                    <div className="flex items-center">
-                                        <Skeleton className="h-5 w-5 mr-2" />
-                                        <Skeleton className="h-6 w-48" />
-                                    </div>
+                        {/* Difficulty Breakdown and Recent Submissions - Two Columns */}
+                        <div className="grid grid-cols-1 lg:grid-cols-[3fr_7fr] gap-6">
+                            {/* Difficulty Breakdown Skeleton */}
+                            <div className="bg-card rounded-xl border shadow-lg p-6 flex flex-col">
+                                <div className="flex items-center mb-8">
+                                    <Skeleton className="h-9 w-9 rounded-lg mr-3" />
+                                    <Skeleton className="h-6 w-48" />
                                 </div>
-                                <div className="space-y-4">
-                                    <Skeleton className="h-32 w-full" />
-                                    <Skeleton className="h-64 w-full" />
+                                <div className="space-y-10 flex-1 flex flex-col justify-center">
+                                    {[...Array(3)].map((_, i) => (
+                                        <div key={i}>
+                                            <div className="flex items-center justify-between mb-3">
+                                                <Skeleton className="h-5 w-16" />
+                                                <Skeleton className="h-6 w-8" />
+                                            </div>
+                                            <Skeleton className="h-4 w-full rounded-full" />
+                                        </div>
+                                    ))}
                                 </div>
-                            </Card>
+                            </div>
 
-                            <Card className="p-6">
-                                <div className="flex items-center justify-between mb-4">
-                                    <div className="flex items-center">
-                                        <Skeleton className="h-5 w-5 mr-2" />
-                                        <Skeleton className="h-6 w-40" />
-                                    </div>
+                            <div className="bg-card rounded-xl border shadow-lg p-6 flex flex-col">
+                                <div className="flex items-center mb-6">
+                                    <Skeleton className="h-9 w-9 rounded-lg mr-3" />
+                                    <Skeleton className="h-6 w-40" />
                                 </div>
-                                <div className="space-y-2 max-h-96 overflow-y-auto pr-2">
+                                <div className="space-y-2 flex-1 overflow-y-auto pr-2">
                                     {[...Array(5)].map((_, i) => (
                                         <div
                                             key={i}
-                                            className="p-3 rounded-lg border"
+                                            className="p-4 rounded-lg border bg-muted/20"
                                         >
                                             <div className="flex items-center justify-between">
                                                 <div className="flex-1">
-                                                    <div className="flex items-center gap-2 mb-1">
+                                                    <div className="flex items-center gap-2 mb-2">
                                                         <Skeleton className="h-5 w-48" />
-                                                        <Skeleton className="h-4 w-12 rounded-full" />
-                                                        <Skeleton className="h-4 w-16 rounded-full" />
+                                                        <Skeleton className="h-5 w-14 rounded-full" />
+                                                        <Skeleton className="h-5 w-20 rounded-full" />
                                                     </div>
-                                                    <div className="flex items-center gap-3">
+                                                    <div className="flex items-center gap-4">
                                                         <Skeleton className="h-3 w-16" />
                                                         <Skeleton className="h-3 w-12" />
                                                         <Skeleton className="h-3 w-20" />
@@ -317,7 +297,7 @@ function DashboardPageContent() {
                                         </div>
                                     ))}
                                 </div>
-                            </Card>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -466,26 +446,86 @@ function DashboardPageContent() {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div className="space-y-6">
-                        <Card className="p-6">
-                            <h2 className="text-xl font-bold mb-4 flex items-center">
-                                <BarChart3 className="h-5 w-5 mr-2" />
+                <div className="space-y-6">
+                    <div className="bg-card rounded-xl border shadow-lg p-6">
+                        <h2 className="text-xl font-bold mb-6 flex items-center">
+                            <div className="p-2 bg-primary/10 rounded-lg mr-3">
+                                <Calendar className="h-5 w-5 text-primary" />
+                            </div>
+                            Contribution Activity
+                        </h2>
+                        <div className="space-y-4">
+                            {loadingContribution ? (
+                                <div className="flex items-center justify-center py-12">
+                                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                                </div>
+                            ) : (
+                                <>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-sm text-muted-foreground">
+                                            {contributionYear}
+                                        </span>
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={() =>
+                                                    loadContributionData(
+                                                        contributionYear - 1
+                                                    )
+                                                }
+                                                className="text-sm px-4 py-2 rounded-lg bg-secondary hover:bg-secondary/80 transition-all duration-200 font-medium"
+                                            >
+                                                ← {contributionYear - 1}
+                                            </button>
+                                            {contributionYear !==
+                                                new Date().getFullYear() && (
+                                                <button
+                                                    onClick={() =>
+                                                        loadContributionData(
+                                                            new Date().getFullYear()
+                                                        )
+                                                    }
+                                                    className="text-sm px-4 py-2 rounded-lg bg-secondary hover:bg-secondary/80 transition-all duration-200 font-medium"
+                                                >
+                                                    Current
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className="bg-background rounded-lg border p-4">
+                                        <ContributionGraph
+                                            data={contributionData}
+                                            year={contributionYear}
+                                            showLegend={true}
+                                            showTooltips={true}
+                                            className="w-full"
+                                        />
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-[3fr_7fr] gap-6">
+                        <div className="bg-card rounded-xl border shadow-lg p-6 flex flex-col">
+                            <h2 className="text-xl font-bold mb-8 flex items-center">
+                                <div className="p-2 bg-primary/10 rounded-lg mr-3">
+                                    <BarChart3 className="h-5 w-5 text-primary" />
+                                </div>
                                 Difficulty Breakdown
                             </h2>
-                            <div className="space-y-4">
+                            <div className="space-y-10 flex-1 flex flex-col justify-center">
                                 <div>
-                                    <div className="flex items-center justify-between mb-2">
-                                        <span className="text-green-600 dark:text-green-400 font-medium">
+                                    <div className="flex items-center justify-between mb-3">
+                                        <span className="text-green-600 dark:text-green-400 font-semibold text-lg">
                                             Easy
                                         </span>
-                                        <span className="font-bold">
+                                        <span className="font-bold text-xl">
                                             {difficultyBreakdown.easy}
                                         </span>
                                     </div>
-                                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                    <div className="w-full bg-muted/50 rounded-full h-4 overflow-hidden">
                                         <div
-                                            className="bg-green-500 h-2 rounded-full"
+                                            className="bg-gradient-to-r from-green-500 to-green-600 h-4 rounded-full transition-all duration-500"
                                             style={{
                                                 width: `${
                                                     (difficultyBreakdown.easy /
@@ -497,17 +537,17 @@ function DashboardPageContent() {
                                     </div>
                                 </div>
                                 <div>
-                                    <div className="flex items-center justify-between mb-2">
-                                        <span className="text-yellow-600 dark:text-yellow-400 font-medium">
+                                    <div className="flex items-center justify-between mb-3">
+                                        <span className="text-yellow-600 dark:text-yellow-400 font-semibold text-lg">
                                             Medium
                                         </span>
-                                        <span className="font-bold">
+                                        <span className="font-bold text-xl">
                                             {difficultyBreakdown.medium}
                                         </span>
                                     </div>
-                                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                    <div className="w-full bg-muted/50 rounded-full h-4 overflow-hidden">
                                         <div
-                                            className="bg-yellow-500 h-2 rounded-full"
+                                            className="bg-gradient-to-r from-yellow-500 to-yellow-600 h-4 rounded-full transition-all duration-500"
                                             style={{
                                                 width: `${
                                                     (difficultyBreakdown.medium /
@@ -519,17 +559,17 @@ function DashboardPageContent() {
                                     </div>
                                 </div>
                                 <div>
-                                    <div className="flex items-center justify-between mb-2">
-                                        <span className="text-red-600 dark:text-red-400 font-medium">
+                                    <div className="flex items-center justify-between mb-3">
+                                        <span className="text-red-600 dark:text-red-400 font-semibold text-lg">
                                             Hard
                                         </span>
-                                        <span className="font-bold">
+                                        <span className="font-bold text-xl">
                                             {difficultyBreakdown.hard}
                                         </span>
                                     </div>
-                                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                    <div className="w-full bg-muted/50 rounded-full h-4 overflow-hidden">
                                         <div
-                                            className="bg-red-500 h-2 rounded-full"
+                                            className="bg-gradient-to-r from-red-500 to-red-600 h-4 rounded-full transition-all duration-500"
                                             style={{
                                                 width: `${
                                                     (difficultyBreakdown.hard /
@@ -541,96 +581,18 @@ function DashboardPageContent() {
                                     </div>
                                 </div>
                             </div>
-                        </Card>
+                        </div>
 
-                        <Card className="p-6">
-                            <h2 className="text-xl font-bold mb-4 flex items-center">
-                                <Tag className="h-5 w-5 mr-2" />
-                                Top Tags
-                            </h2>
-                            <div className="space-y-2">
-                                {topTags.slice(0, 8).map((tagItem) => (
-                                    <div
-                                        key={tagItem.tag}
-                                        className="flex items-center justify-between p-2 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors"
-                                    >
-                                        <span className="text-sm font-medium">
-                                            {tagItem.tag}
-                                        </span>
-                                        <span className="text-xs bg-primary text-primary-foreground px-2 py-1 rounded-full">
-                                            {tagItem.count}
-                                        </span>
-                                    </div>
-                                ))}
-                            </div>
-                        </Card>
-                    </div>
-
-                    <div className="lg:col-span-2 space-y-6">
-                        <Card className="p-6">
-                            <h2 className="text-xl font-bold mb-4 flex items-center">
-                                <Calendar className="h-5 w-5 mr-2" />
-                                Contribution Activity
-                            </h2>
-                            <div className="space-y-4">
-                                {loadingContribution ? (
-                                    <div className="flex items-center justify-center py-12">
-                                        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                                    </div>
-                                ) : (
-                                    <>
-                                        <div className="flex items-center justify-between">
-                                            <span className="text-sm text-muted-foreground">
-                                                {contributionYear}
-                                            </span>
-                                            <div className="flex gap-2">
-                                                <button
-                                                    onClick={() =>
-                                                        loadContributionData(
-                                                            contributionYear - 1
-                                                        )
-                                                    }
-                                                    className="text-xs px-2 py-1 rounded bg-secondary hover:bg-secondary/80 transition-colors"
-                                                >
-                                                    ← {contributionYear - 1}
-                                                </button>
-                                                {contributionYear !==
-                                                    new Date().getFullYear() && (
-                                                    <button
-                                                        onClick={() =>
-                                                            loadContributionData(
-                                                                new Date().getFullYear()
-                                                            )
-                                                        }
-                                                        className="text-xs px-2 py-1 rounded bg-secondary hover:bg-secondary/80 transition-colors"
-                                                    >
-                                                        Current
-                                                    </button>
-                                                )}
-                                            </div>
-                                        </div>
-                                        <div className="bg-background max-w-4xl rounded-lg border p-2 mx-auto">
-                                            <ContributionGraph
-                                                data={contributionData}
-                                                year={contributionYear}
-                                                showLegend={true}
-                                                showTooltips={true}
-                                                className="w-full"
-                                            />
-                                        </div>
-                                    </>
-                                )}
-                            </div>
-                        </Card>
-
-                        <Card className="p-6">
-                            <div className="flex items-center justify-between mb-4">
+                        <div className="bg-card rounded-xl border shadow-lg p-6 flex flex-col">
+                            <div className="flex items-center justify-between mb-6">
                                 <h2 className="text-xl font-bold flex items-center">
-                                    <Code className="h-5 w-5 mr-2" />
+                                    <div className="p-2 bg-primary/10 rounded-lg mr-3">
+                                        <Code className="h-5 w-5 text-primary" />
+                                    </div>
                                     Recent Submissions
                                 </h2>
                             </div>
-                            <div className="space-y-2 max-h-96 overflow-y-auto pr-2 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#424242] [&::-webkit-scrollbar-thumb]:rounded dark:[&::-webkit-scrollbar-thumb:hover]:bg-[#4f4f4f] [&::-webkit-scrollbar-thumb:hover]:bg-[#525252]">
+                            <div className="space-y-2 overflow-y-auto pr-2 flex-1 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#424242] [&::-webkit-scrollbar-thumb]:rounded dark:[&::-webkit-scrollbar-thumb:hover]:bg-[#4f4f4f] [&::-webkit-scrollbar-thumb:hover]:bg-[#525252]">
                                 {recentSubmissions.length === 0 ? (
                                     <p className="text-muted-foreground text-center py-8">
                                         No submissions yet
@@ -640,18 +602,18 @@ function DashboardPageContent() {
                                         <Link
                                             key={submission.id}
                                             href={`/problems/${submission.problemSlug}`}
-                                            className="block p-3 rounded-lg border hover:border-primary transition-all group"
+                                            className="block p-4 rounded-lg border border-border hover:border-primary transition-all duration-200 group hover:shadow-md bg-muted/20 hover:bg-muted/40"
                                         >
                                             <div className="flex items-center justify-between">
                                                 <div className="flex-1">
-                                                    <div className="flex items-center gap-2 mb-1">
-                                                        <h3 className="font-medium group-hover:text-primary transition-colors">
+                                                    <div className="flex items-center gap-2 mb-2">
+                                                        <h3 className="font-semibold text-base group-hover:text-primary transition-colors">
                                                             {
                                                                 submission.problemTitle
                                                             }
                                                         </h3>
                                                         <span
-                                                            className={`text-xs px-2 py-0.5 rounded-full ${getDifficultyBadgeColor(
+                                                            className={`text-xs font-bold px-2.5 py-1 rounded-full ${getDifficultyBadgeColor(
                                                                 submission.difficulty
                                                             )}`}
                                                         >
@@ -660,7 +622,7 @@ function DashboardPageContent() {
                                                             }
                                                         </span>
                                                         <span
-                                                            className={`text-xs px-2 py-0.5 rounded-full ${
+                                                            className={`text-xs font-bold px-2.5 py-1 rounded-full shadow-sm ${
                                                                 submission.status ===
                                                                 "ACCEPTED"
                                                                     ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
@@ -670,37 +632,37 @@ function DashboardPageContent() {
                                                             {submission.status}
                                                         </span>
                                                     </div>
-                                                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                                                        <span className="flex items-center gap-1">
-                                                            <Code className="h-3 w-3" />
+                                                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                                                        <span className="flex items-center gap-1.5 font-medium">
+                                                            <Code className="h-3.5 w-3.5" />
                                                             {
                                                                 submission.language
                                                             }
                                                         </span>
                                                         {submission.runtime && (
-                                                            <span className="flex items-center gap-1">
-                                                                <Clock className="h-3 w-3" />
+                                                            <span className="flex items-center gap-1.5 font-medium">
+                                                                <Clock className="h-3.5 w-3.5" />
                                                                 {
                                                                     submission.runtime
                                                                 }
                                                                 ms
                                                             </span>
                                                         )}
-                                                        <span className="flex items-center gap-1">
-                                                            <Calendar className="h-3 w-3" />
+                                                        <span className="flex items-center gap-1.5 font-medium">
+                                                            <Calendar className="h-3.5 w-3.5" />
                                                             {new Date(
                                                                 submission.submittedAt
                                                             ).toLocaleDateString()}
                                                         </span>
                                                     </div>
                                                 </div>
-                                                <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                                                <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all duration-200" />
                                             </div>
                                         </Link>
                                     ))
                                 )}
                             </div>
-                        </Card>
+                        </div>
                     </div>
                 </div>
             </div>
