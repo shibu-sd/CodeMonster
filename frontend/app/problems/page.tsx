@@ -393,42 +393,78 @@ function ProblemsPageContent() {
                         </form>
 
                         <div className="flex gap-2">
-                            <Button
-                                variant={
-                                    selectedDifficulty === "EASY"
-                                        ? "default"
-                                        : "outline"
-                                }
-                                size="sm"
-                                onClick={() => handleDifficultyFilter("EASY")}
-                                className="text-green-600"
-                            >
-                                Easy
-                            </Button>
-                            <Button
-                                variant={
-                                    selectedDifficulty === "MEDIUM"
-                                        ? "default"
-                                        : "outline"
-                                }
-                                size="sm"
-                                onClick={() => handleDifficultyFilter("MEDIUM")}
-                                className="text-yellow-600"
-                            >
-                                Medium
-                            </Button>
-                            <Button
-                                variant={
-                                    selectedDifficulty === "HARD"
-                                        ? "default"
-                                        : "outline"
-                                }
-                                size="sm"
-                                onClick={() => handleDifficultyFilter("HARD")}
-                                className="text-red-600"
-                            >
-                                Hard
-                            </Button>
+                            {selectedDifficulty === "EASY" ? (
+                                <button
+                                    onClick={() =>
+                                        handleDifficultyFilter("EASY")
+                                    }
+                                    className="p-[3px] relative h-10 rounded-lg transform hover:scale-105 transition-all duration-200"
+                                >
+                                    <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-green-600 rounded-lg" />
+                                    <div className="px-6 h-full flex items-center justify-center rounded-[6px] relative transition duration-200 text-base font-medium bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300">
+                                        Easy
+                                    </div>
+                                </button>
+                            ) : (
+                                <Button
+                                    variant="outline"
+                                    size="default"
+                                    onClick={() =>
+                                        handleDifficultyFilter("EASY")
+                                    }
+                                    className="text-green-600 hover:text-green-400 transform hover:scale-105 transition-all duration-200 h-10 px-6 text-base"
+                                >
+                                    Easy
+                                </Button>
+                            )}
+                            {selectedDifficulty === "MEDIUM" ? (
+                                <button
+                                    onClick={() =>
+                                        handleDifficultyFilter("MEDIUM")
+                                    }
+                                    className="p-[3px] relative h-10 rounded-lg transform hover:scale-105 transition-all duration-200"
+                                >
+                                    <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-lg" />
+                                    <div className="px-6 h-full flex items-center justify-center rounded-[6px] relative transition duration-200 text-base font-medium bg-yellow-100 dark:bg-yellow-950 text-yellow-700 dark:text-yellow-300">
+                                        Medium
+                                    </div>
+                                </button>
+                            ) : (
+                                <Button
+                                    variant="outline"
+                                    size="default"
+                                    onClick={() =>
+                                        handleDifficultyFilter("MEDIUM")
+                                    }
+                                    className="text-yellow-600 hover:text-yellow-400 transform hover:scale-105 transition-all duration-200 h-10 px-6 text-base"
+                                >
+                                    Medium
+                                </Button>
+                            )}
+                            {selectedDifficulty === "HARD" ? (
+                                <button
+                                    onClick={() =>
+                                        handleDifficultyFilter("HARD")
+                                    }
+                                    className="p-[3px] relative h-10 rounded-lg transform hover:scale-105 transition-all duration-200"
+                                >
+                                    <div className="absolute inset-0 bg-gradient-to-r from-red-400 to-red-600 rounded-lg" />
+                                    <div className="px-6 h-full flex items-center justify-center rounded-[6px] relative transition duration-200 text-base font-medium bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300">
+                                        Hard
+                                    </div>
+                                </button>
+                            ) : (
+                                <Button
+                                    variant="outline"
+                                    size="default"
+                                    onClick={() =>
+                                        handleDifficultyFilter("HARD")
+                                    }
+                                    className="text-red-600 hover:text-red-400 transform hover:scale-105 transition-all duration-200 h-10 px-6 text-base"
+                                >
+                                    Hard
+                                </Button>
+                            )}
                         </div>
                     </div>
                 </div>
