@@ -144,7 +144,7 @@ export function BattleQueue({ battleSocket }: BattleQueueProps) {
             <CardHeader className="text-center pb-4">
                 <Swords className="w-16 h-16 mx-auto text-primary mb-4" />
                 <CardTitle className="text-3xl font-bold">
-                    Ready to Battle?
+                    Ready to Dominate?
                 </CardTitle>
                 <CardDescription className="text-lg mt-2">
                     Jump into the matchmaking queue and challenge opponents in
@@ -192,7 +192,7 @@ export function BattleQueue({ battleSocket }: BattleQueueProps) {
                         </Badge>
                     </div>
                 ) : (
-                    <div className="text-center bg-muted/20 rounded-lg p-4 border">
+                    <div className="text-center">
                         <p className="text-muted-foreground font-medium">
                             No one in queue right now. Be the first to join!
                         </p>
@@ -200,15 +200,13 @@ export function BattleQueue({ battleSocket }: BattleQueueProps) {
                 )}
 
                 {/* Join Queue Button */}
-                <Button
+                <button
                     onClick={joinQueue}
-                    size="lg"
-                    className="w-full text-base py-6 shadow-md hover:shadow-lg transition-shadow"
+                    className="w-full px-6 py-4 rounded-full bg-primary font-bold text-primary-foreground tracking-widest uppercase transform hover:scale-105 hover:bg-primary/90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                     disabled={!connected}
                 >
-                    <Swords className="w-5 h-5 mr-2" />
                     Join Battle Queue
-                </Button>
+                </button>
             </CardContent>
         </Card>
     );
