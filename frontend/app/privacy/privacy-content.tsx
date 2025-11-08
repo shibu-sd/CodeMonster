@@ -31,29 +31,13 @@ export default function PrivacyContent() {
                     </p>
                 </motion.div>
 
-                <motion.div
-                    initial="hidden"
-                    animate="visible"
-                    variants={{
-                        hidden: { opacity: 0 },
-                        visible: {
-                            opacity: 1,
-                            transition: {
-                                staggerChildren: 0.1,
-                                delayChildren: 0.2,
-                            },
-                        },
-                    }}
-                    className="max-w-4xl mx-auto space-y-8"
-                >
+                <div className="max-w-4xl mx-auto space-y-8">
                     {/* Introduction */}
                     <motion.div
-                        variants={{
-                            hidden: { opacity: 0, y: 30 },
-                            visible: { opacity: 1, y: 0 },
-                        }}
-                        transition={{ duration: 0.6, ease: "easeOut" }}
-                        whileHover={{ y: -2 }}
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: "-50px" }}
+                        transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
                     >
                         <Card>
                             <CardHeader>
@@ -81,12 +65,10 @@ export default function PrivacyContent() {
 
                     {/* Information We Collect */}
                     <motion.div
-                        variants={{
-                            hidden: { opacity: 0, y: 30 },
-                            visible: { opacity: 1, y: 0 },
-                        }}
-                        transition={{ duration: 0.6, ease: "easeOut" }}
-                        whileHover={{ y: -2 }}
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: "-50px" }}
+                        transition={{ duration: 0.6, delay: 0.15, ease: "easeOut" }}
                     >
                         <Card>
                             <CardHeader>
@@ -140,12 +122,10 @@ export default function PrivacyContent() {
 
                     {/* How We Use Your Information */}
                     <motion.div
-                        variants={{
-                            hidden: { opacity: 0, y: 30 },
-                            visible: { opacity: 1, y: 0 },
-                        }}
-                        transition={{ duration: 0.6, ease: "easeOut" }}
-                        whileHover={{ y: -2 }}
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: "-50px" }}
+                        transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
                     >
                         <Card>
                             <CardHeader>
@@ -186,12 +166,10 @@ export default function PrivacyContent() {
 
                     {/* Information Sharing */}
                     <motion.div
-                        variants={{
-                            hidden: { opacity: 0, y: 30 },
-                            visible: { opacity: 1, y: 0 },
-                        }}
-                        transition={{ duration: 0.6, ease: "easeOut" }}
-                        whileHover={{ y: -2 }}
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: "-50px" }}
+                        transition={{ duration: 0.6, delay: 0.25, ease: "easeOut" }}
                     >
                         <Card>
                             <CardHeader>
@@ -247,12 +225,10 @@ export default function PrivacyContent() {
 
                     {/* Data Security */}
                     <motion.div
-                        variants={{
-                            hidden: { opacity: 0, y: 30 },
-                            visible: { opacity: 1, y: 0 },
-                        }}
-                        transition={{ duration: 0.6, ease: "easeOut" }}
-                        whileHover={{ y: -2 }}
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: "-50px" }}
+                        transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
                     >
                         <Card>
                             <CardHeader>
@@ -280,12 +256,10 @@ export default function PrivacyContent() {
 
                     {/* Cookies and Tracking */}
                     <motion.div
-                        variants={{
-                            hidden: { opacity: 0, y: 30 },
-                            visible: { opacity: 1, y: 0 },
-                        }}
-                        transition={{ duration: 0.6, ease: "easeOut" }}
-                        whileHover={{ y: -2 }}
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: "-50px" }}
+                        transition={{ duration: 0.6, delay: 0.35, ease: "easeOut" }}
                     >
                         <Card>
                             <CardHeader>
@@ -313,12 +287,10 @@ export default function PrivacyContent() {
 
                     {/* Your Rights */}
                     <motion.div
-                        variants={{
-                            hidden: { opacity: 0, y: 30 },
-                            visible: { opacity: 1, y: 0 },
-                        }}
-                        transition={{ duration: 0.6, ease: "easeOut" }}
-                        whileHover={{ y: -2 }}
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: "-50px" }}
+                        transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
                     >
                         <Card>
                             <CardHeader>
@@ -350,12 +322,10 @@ export default function PrivacyContent() {
 
                     {/* Children's Privacy */}
                     <motion.div
-                        variants={{
-                            hidden: { opacity: 0, y: 30 },
-                            visible: { opacity: 1, y: 0 },
-                        }}
-                        transition={{ duration: 0.6, ease: "easeOut" }}
-                        whileHover={{ y: -2 }}
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: "-50px" }}
+                        transition={{ duration: 0.6, delay: 0.45, ease: "easeOut" }}
                     >
                         <Card>
                             <CardHeader>
@@ -376,12 +346,10 @@ export default function PrivacyContent() {
 
                     {/* Changes to This Policy */}
                     <motion.div
-                        variants={{
-                            hidden: { opacity: 0, y: 30 },
-                            visible: { opacity: 1, y: 0 },
-                        }}
-                        transition={{ duration: 0.6, ease: "easeOut" }}
-                        whileHover={{ y: -2 }}
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: "-50px" }}
+                        transition={{ duration: 0.6, delay: 0.5, ease: "easeOut" }}
                     >
                         <Card>
                             <CardHeader>
@@ -397,7 +365,7 @@ export default function PrivacyContent() {
                             </CardContent>
                         </Card>
                     </motion.div>
-                </motion.div>
+                </div>
             </div>
             <FooterSection />
         </div>
