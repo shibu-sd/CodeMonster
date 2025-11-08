@@ -15,9 +15,8 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Swords, Users, Clock, Trophy, Target } from "lucide-react";
+import { Target } from "lucide-react";
 import FooterSection from "@/components/footer/footer";
 import { DotPattern } from "@/components/ui/dot-pattern";
 
@@ -124,44 +123,23 @@ function BattlePage() {
             <HeroHeader />
 
             <main className="container mx-auto px-4 pt-32 pb-16 relative z-10">
-                <div className="space-y-8">
-                    {/* Header */}
-                    <div className="text-center space-y-4">
-                        <div className="flex justify-center items-center space-x-3">
-                            <h1 className="text-4xl font-bold text-foreground">
-                                Code Battles
-                            </h1>
-                        </div>
-                        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                            Face fierce monsters in live 1v1 coding duels
-                        </p>
-                        <div className="flex justify-center items-center space-x-2 text-sm text-muted-foreground">
-                            <Target className="w-4 h-4" />
-                            <span>
-                                First to solve wins, or highest score wins
-                            </span>
-                        </div>
+                <div className="mb-8 text-center">
+                    <h1 className="text-4xl font-bold mb-4">Code Battles</h1>
+                    <p className="text-xl text-muted-foreground mb-6 max-w-2xl mx-auto">
+                        Face fierce monsters in live 1v1 coding duels
+                    </p>
 
-                        {/* Connection Status */}
-                        <div className="flex justify-center items-center gap-2 mt-4">
-                            <Badge
-                                variant={connected ? "default" : "destructive"}
-                            >
-                                {connected ? "Connected" : "Disconnected"}
-                            </Badge>
-                            {battleState.usersInQueue > 0 && (
-                                <Badge variant="secondary">
-                                    <Users className="w-3 h-3 mr-1" />
-                                    {battleState.usersInQueue} in queue
-                                </Badge>
-                            )}
-                        </div>
+                    {/* Connection Status */}
+                    <div className="flex justify-center items-center gap-2 mb-6">
+                        <Badge variant={connected ? "default" : "destructive"}>
+                            {connected ? "Connected" : "Disconnected"}
+                        </Badge>
                     </div>
+                </div>
 
-                    {/* Main Content */}
-                    <div className="max-w-4xl mx-auto">
-                        <BattleQueue battleSocket={battleSocket} />
-                    </div>
+                {/* Main Content */}
+                <div className="max-w-4xl mx-auto">
+                    <BattleQueue battleSocket={battleSocket} />
                 </div>
             </main>
 
