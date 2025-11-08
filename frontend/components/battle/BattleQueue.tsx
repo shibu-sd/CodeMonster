@@ -65,17 +65,21 @@ export function BattleQueue({ battleSocket }: BattleQueueProps) {
 
     if (!connected) {
         return (
-            <Card className="max-w-2xl mx-auto border shadow-lg">
-                <CardHeader className="text-center">
-                    <AlertCircle className="w-16 h-16 mx-auto text-destructive mb-4" />
-                    <CardTitle className="text-2xl">
+            <div className="bg-gradient-to-br from-secondary/5 via-secondary/10 to-secondary/5 border-2 border-secondary/20 rounded-xl p-8 shadow-lg">
+                <div className="text-center space-y-4">
+                    <div className="flex items-center justify-center gap-3 mb-3">
+                        <div className="p-3 bg-secondary/10 rounded-lg">
+                            <AlertCircle className="w-8 h-8 text-secondary" />
+                        </div>
+                    </div>
+                    <h3 className="text-2xl font-bold text-foreground">
                         Connection Required
-                    </CardTitle>
-                    <CardDescription className="text-base">
+                    </h3>
+                    <p className="text-base text-muted-foreground font-medium">
                         Please wait while we connect to the battle server...
-                    </CardDescription>
-                </CardHeader>
-            </Card>
+                    </p>
+                </div>
+            </div>
         );
     }
 
