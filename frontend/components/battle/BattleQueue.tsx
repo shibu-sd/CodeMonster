@@ -10,8 +10,8 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Swords, Users, Shield, AlertCircle } from "lucide-react";
+import { Users, Shield, AlertCircle, Swords } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 
 interface BattleQueueProps {
     battleSocket: ReturnType<
@@ -22,6 +22,18 @@ interface BattleQueueProps {
 export function BattleQueue({ battleSocket }: BattleQueueProps) {
     const { battleState, connected, joinQueue, leaveQueue } = battleSocket;
     const [searchingTime, setSearchingTime] = useState(0);
+    const [currentTipIndex, setCurrentTipIndex] = useState(0);
+
+    const battleTips = [
+        "Ctrl + Z won’t undo that WA",
+        "When in doubt, blame the test cases",
+        "TLEs exist to humble brute force",
+        "Keyboard clacks = confidence. Type loud",
+        "Real monsters don’t Google mid-battle (well, maybe once)",
+        "Brute force isn’t dumb if it works",
+        "Clean code wins ugly battles",
+        "Runtime Errors are just loud edge cases",
+    ];
 
     // Update search time when in queue
     useEffect(() => {
@@ -32,6 +44,16 @@ export function BattleQueue({ battleSocket }: BattleQueueProps) {
             return () => clearInterval(interval);
         } else {
             setSearchingTime(0);
+        }
+    }, [battleState.isInQueue]);
+
+    // Rotate battle tips
+    useEffect(() => {
+        if (battleState.isInQueue) {
+            const interval = setInterval(() => {
+                setCurrentTipIndex((prev) => (prev + 1) % battleTips.length);
+            }, 5000);
+            return () => clearInterval(interval);
         }
     }, [battleState.isInQueue]);
 
@@ -59,155 +81,122 @@ export function BattleQueue({ battleSocket }: BattleQueueProps) {
 
     if (battleState.isInQueue) {
         return (
-            <Card className="max-w-2xl mx-auto border-primary shadow-lg">
-                <CardHeader className="text-center pb-4">
-                    <div className="w-16 h-16 mx-auto mb-4 relative">
-                        <Swords className="w-16 h-16 text-primary animate-pulse" />
-                        <div className="absolute inset-0 animate-ping">
-                            <Swords className="w-16 h-16 text-primary opacity-20" />
+            <div className="max-w-2xl mx-auto space-y-6">
+                {/* Main Card with Queueing Chaos */}
+                <div className="bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5 border-2 border-primary/20 rounded-xl p-8 shadow-lg">
+                    <div className="text-center space-y-4">
+                        <div className="w-16 h-16 mx-auto relative">
+                            <Swords className="w-16 h-16 text-primary animate-pulse" />
+                            <div className="absolute inset-0 animate-ping">
+                                <Swords className="w-16 h-16 text-primary opacity-20" />
+                            </div>
                         </div>
-                    </div>
-                    <CardTitle className="text-3xl font-bold">
-                        Queueing Chaos...
-                    </CardTitle>
-                    <CardDescription className="text-lg mt-2">
-                        Summoning a monster to battle
-                    </CardDescription>
+                        <h3 className="text-3xl font-bold">
+                            Queueing Chaos...
+                        </h3>
+                        <p className="text-lg text-muted-foreground">
+                            Summoning a monster to battle
+                        </p>
 
-                    <div className="mt-6 space-y-3">
-                        <div className="text-base font-medium text-foreground">
-                            Search time: {formatTime(searchingTime)}
-                        </div>
-                        <Progress
-                            value={Math.min(searchingTime / 2, 100)}
-                            className="w-full h-2"
-                        />
-                    </div>
-                </CardHeader>
-
-                <CardContent className="text-center space-y-6 pt-2">
-                    {/* Battle Tips */}
-                    <div className="bg-muted/30 border rounded-lg p-5 text-left">
-                        <h4 className="font-bold mb-3 text-center text-lg flex items-center justify-center gap-2">
-                            <Shield className="w-5 h-5" />
-                            Battle Tips
-                        </h4>
-                        <ul className="text-sm space-y-2">
-                            <li className="flex items-start gap-2">
-                                <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5"></div>
-                                <span>
-                                    Problems are randomly selected from our
-                                    database
-                                </span>
-                            </li>
-                            <li className="flex items-start gap-2">
-                                <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5"></div>
-                                <span>
-                                    First to get Accepted (AC) wins instantly
-                                </span>
-                            </li>
-                            <li className="flex items-start gap-2">
-                                <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5"></div>
-                                <span>If time expires, highest score wins</span>
-                            </li>
-                            <li className="flex items-start gap-2">
-                                <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5"></div>
-                                <span>
-                                    You have 30 minutes to solve the problem
-                                </span>
-                            </li>
-                            <li className="flex items-start gap-2">
-                                <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5"></div>
-                                <span>
-                                    Run and submit events are visible to your
-                                    opponent
-                                </span>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <Button
-                        onClick={leaveQueue}
-                        variant="outline"
-                        size="lg"
-                        className="w-full text-base py-6"
-                    >
-                        Leave Queue
-                    </Button>
-                </CardContent>
-            </Card>
-        );
-    }
-
-    return (
-        <Card className="max-w-2xl mx-auto shadow-lg border">
-            <CardHeader className="text-center pb-4">
-                <Swords className="w-16 h-16 mx-auto text-primary mb-4" />
-                <CardTitle className="text-3xl font-bold">
-                    Ready to Dominate?
-                </CardTitle>
-                <CardDescription className="text-lg mt-2">
-                    Jump into the matchmaking queue and challenge opponents in
-                    real-time coding duels
-                </CardDescription>
-            </CardHeader>
-
-            <CardContent className="space-y-6 pt-2">
-                {/* Battle Rules */}
-                <div className="bg-muted/30 border rounded-lg p-5">
-                    <h4 className="font-bold mb-3 text-lg flex items-center gap-2">
-                        <Shield className="w-5 h-5" />
-                        Battle Rules
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                        <div className="flex items-start gap-2">
-                            <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5"></div>
-                            <span>Random problem selection</span>
-                        </div>
-                        <div className="flex items-start gap-2">
-                            <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5"></div>
-                            <span>30-minute time limit</span>
-                        </div>
-                        <div className="flex items-start gap-2">
-                            <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5"></div>
-                            <span>First AC wins</span>
-                        </div>
-                        <div className="flex items-start gap-2">
-                            <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5"></div>
-                            <span>Real-time opponent tracking</span>
+                        {/* Rotating Battle Tips */}
+                        <div className="mt-6 min-h-[60px] flex items-center justify-center overflow-hidden">
+                            <AnimatePresence mode="wait">
+                                <motion.div
+                                    key={currentTipIndex}
+                                    initial={{ opacity: 0, y: -20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: 20 }}
+                                    transition={{
+                                        duration: 0.25,
+                                        ease: "easeOut",
+                                    }}
+                                    className="text-base font-medium text-foreground"
+                                >
+                                    <span className="font-semibold">
+                                        💡 Battle Tip:
+                                    </span>{" "}
+                                    {battleTips[currentTipIndex]}
+                                </motion.div>
+                            </AnimatePresence>
                         </div>
                     </div>
                 </div>
 
-                {/* Queue Status */}
-                {battleState.usersInQueue > 0 ? (
-                    <div className="text-center">
-                        <Badge
-                            variant="secondary"
-                            className="text-base px-4 py-2"
-                        >
-                            <Users className="w-4 h-4 mr-2" />
-                            {battleState.usersInQueue} player
-                            {battleState.usersInQueue !== 1 ? "s" : ""} waiting
-                        </Badge>
-                    </div>
-                ) : (
-                    <div className="text-center">
-                        <p className="text-muted-foreground font-medium">
-                            No one in queue right now. Be the first to join!
-                        </p>
-                    </div>
-                )}
-
-                {/* Join Queue Button */}
                 <button
-                    onClick={joinQueue}
-                    className="w-full px-6 py-4 rounded-full bg-primary font-bold text-primary-foreground tracking-widest uppercase transform hover:scale-105 hover:bg-primary/90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-                    disabled={!connected}
+                    onClick={leaveQueue}
+                    className="w-full px-6 py-4 rounded-full bg-red-800 font-bold text-white tracking-widest uppercase transform hover:scale-105 hover:bg-red-900 transition-all duration-200"
                 >
-                    Join Battle Queue
+                    Leave Queue
                 </button>
-            </CardContent>
-        </Card>
+            </div>
+        );
+    }
+
+    return (
+        <div className="max-w-2xl mx-auto space-y-6">
+            {/* Battle Rules */}
+            <div className="bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5 border-2 border-primary/20 rounded-xl p-6 shadow-lg">
+                <div className="flex items-center justify-center gap-2 mb-5">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                        <Shield className="w-6 h-6 text-primary" />
+                    </div>
+                    <h4 className="font-bold text-xl text-foreground">
+                        Battle Rules
+                    </h4>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex items-start gap-3 bg-background/50 rounded-lg p-3 border border-border/50">
+                        <div className="w-2 h-2 rounded-full bg-primary mt-1.5 flex-shrink-0"></div>
+                        <span className="text-sm font-medium">
+                            Random problem selection
+                        </span>
+                    </div>
+                    <div className="flex items-start gap-3 bg-background/50 rounded-lg p-3 border border-border/50">
+                        <div className="w-2 h-2 rounded-full bg-primary mt-1.5 flex-shrink-0"></div>
+                        <span className="text-sm font-medium">
+                            30-minute time limit
+                        </span>
+                    </div>
+                    <div className="flex items-start gap-3 bg-background/50 rounded-lg p-3 border border-border/50">
+                        <div className="w-2 h-2 rounded-full bg-primary mt-1.5 flex-shrink-0"></div>
+                        <span className="text-sm font-medium">
+                            First AC wins
+                        </span>
+                    </div>
+                    <div className="flex items-start gap-3 bg-background/50 rounded-lg p-3 border border-border/50">
+                        <div className="w-2 h-2 rounded-full bg-primary mt-1.5 flex-shrink-0"></div>
+                        <span className="text-sm font-medium">
+                            Real-time opponent tracking
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            {/* Queue Status */}
+            {battleState.usersInQueue > 0 ? (
+                <div className="text-center">
+                    <Badge variant="secondary" className="text-base px-4 py-2">
+                        <Users className="w-4 h-4 mr-2" />
+                        {battleState.usersInQueue} player
+                        {battleState.usersInQueue !== 1 ? "s" : ""} waiting
+                    </Badge>
+                </div>
+            ) : (
+                <div className="text-center">
+                    <p className="text-muted-foreground font-medium">
+                        No one in queue right now. Be the first to join!
+                    </p>
+                </div>
+            )}
+
+            {/* Join Queue Button */}
+            <button
+                onClick={joinQueue}
+                className="w-full px-6 py-4 rounded-full bg-primary font-bold text-primary-foreground tracking-widest uppercase transform hover:scale-105 hover:bg-primary/90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                disabled={!connected}
+            >
+                Join Battle Queue
+            </button>
+        </div>
     );
 }
