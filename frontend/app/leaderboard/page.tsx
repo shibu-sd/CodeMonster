@@ -7,7 +7,7 @@ import {
     type LeaderboardStats,
 } from "@/lib/api";
 import { useAuth } from "@clerk/nextjs";
-import { Trophy, Users, Target, TrendingUp } from "lucide-react";
+import { Trophy, Users, TrendingUp } from "lucide-react";
 import { HeroHeader } from "@/components/header/header";
 import FooterSection from "@/components/footer/footer";
 import { ProtectedPage } from "@/components/auth/protected-page";
@@ -211,10 +211,6 @@ function LeaderboardPageContent() {
                                     <Skeleton className="h-10 w-48" />
                                 </div>
                                 <Skeleton className="h-6 w-96 mx-auto" />
-                                <div className="flex justify-center items-center space-x-2">
-                                    <Skeleton className="h-4 w-4" />
-                                    <Skeleton className="h-4 w-48" />
-                                </div>
                             </div>
                         </div>
 
@@ -348,10 +344,6 @@ function LeaderboardPageContent() {
                                 Competition never sleeps and neither do the
                                 monsters
                             </p>
-                            <div className="flex justify-center items-center space-x-2 text-sm text-muted-foreground">
-                                <Target className="w-4 h-4" />
-                                <span>Ranked by total problems solved</span>
-                            </div>
                         </div>
                     </div>
 
