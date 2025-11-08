@@ -25,6 +25,7 @@ import {
     ChevronRight,
     Loader2,
 } from "lucide-react";
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from "recharts";
 import Link from "next/link";
 import { getDifficultyBadgeColor } from "@/lib/api";
 import {
@@ -250,49 +251,58 @@ function DashboardPageContent() {
                         {/* Difficulty Breakdown and Recent Submissions - Two Columns */}
                         <div className="grid grid-cols-1 lg:grid-cols-[3fr_7fr] gap-6">
                             {/* Difficulty Breakdown Skeleton */}
-                            <div className="bg-card rounded-xl border shadow-lg p-6 flex flex-col">
-                                <div className="flex items-center mb-8">
+                            <div className="bg-card rounded-xl border shadow-lg p-6 flex flex-col h-[500px]">
+                                <div className="flex items-center mb-4">
                                     <Skeleton className="h-9 w-9 rounded-lg mr-3" />
                                     <Skeleton className="h-6 w-48" />
                                 </div>
-                                <div className="space-y-10 flex-1 flex flex-col justify-center">
-                                    {[...Array(3)].map((_, i) => (
-                                        <div key={i}>
-                                            <div className="flex items-center justify-between mb-3">
-                                                <Skeleton className="h-5 w-16" />
-                                                <Skeleton className="h-6 w-8" />
-                                            </div>
-                                            <Skeleton className="h-4 w-full rounded-full" />
+                                <div className="flex-1 flex flex-col items-center justify-center relative">
+                                    <div className="relative mb-4">
+                                        <Skeleton className="h-[220px] w-[220px] rounded-full" />
+                                        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+                                            <Skeleton className="h-10 w-16 mx-auto mb-2" />
+                                            <Skeleton className="h-4 w-20" />
                                         </div>
-                                    ))}
+                                    </div>
+                                    <div className="flex gap-6">
+                                        {[...Array(3)].map((_, i) => (
+                                            <div
+                                                key={i}
+                                                className="flex items-center gap-2"
+                                            >
+                                                <Skeleton className="h-3 w-3 rounded-full" />
+                                                <Skeleton className="h-4 w-16" />
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
 
-                            <div className="bg-card rounded-xl border shadow-lg p-6 flex flex-col">
+                            <div className="bg-card rounded-xl border shadow-lg p-6 flex flex-col h-[500px]">
                                 <div className="flex items-center mb-6">
                                     <Skeleton className="h-9 w-9 rounded-lg mr-3" />
                                     <Skeleton className="h-6 w-40" />
                                 </div>
-                                <div className="space-y-2 flex-1 overflow-y-auto pr-2">
+                                <div className="space-y-2 flex-1 min-h-0 overflow-y-auto pr-2">
                                     {[...Array(5)].map((_, i) => (
                                         <div
                                             key={i}
-                                            className="p-4 rounded-lg border bg-muted/20"
+                                            className="p-3 rounded-lg border bg-muted/20"
                                         >
                                             <div className="flex items-center justify-between">
                                                 <div className="flex-1">
-                                                    <div className="flex items-center gap-2 mb-2">
-                                                        <Skeleton className="h-5 w-48" />
-                                                        <Skeleton className="h-5 w-14 rounded-full" />
-                                                        <Skeleton className="h-5 w-20 rounded-full" />
+                                                    <div className="flex items-center gap-1.5 mb-1.5">
+                                                        <Skeleton className="h-4 w-48" />
+                                                        <Skeleton className="h-4 w-12 rounded-full" />
+                                                        <Skeleton className="h-4 w-16 rounded-full" />
                                                     </div>
-                                                    <div className="flex items-center gap-4">
+                                                    <div className="flex items-center gap-3">
                                                         <Skeleton className="h-3 w-16" />
                                                         <Skeleton className="h-3 w-12" />
                                                         <Skeleton className="h-3 w-20" />
                                                     </div>
                                                 </div>
-                                                <Skeleton className="h-5 w-5" />
+                                                <Skeleton className="h-4 w-4" />
                                             </div>
                                         </div>
                                     ))}
@@ -506,84 +516,105 @@ function DashboardPageContent() {
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-[3fr_7fr] gap-6">
-                        <div className="bg-card rounded-xl border shadow-lg p-6 flex flex-col">
-                            <h2 className="text-xl font-bold mb-8 flex items-center">
+                        <div className="bg-card rounded-xl border shadow-lg p-6 flex flex-col h-[500px]">
+                            <h2 className="text-xl font-bold mb-4 flex items-center">
                                 <div className="p-2 bg-primary/10 rounded-lg mr-3">
                                     <BarChart3 className="h-5 w-5 text-primary" />
                                 </div>
                                 Difficulty Breakdown
                             </h2>
-                            <div className="space-y-10 flex-1 flex flex-col justify-center">
-                                <div>
-                                    <div className="flex items-center justify-between mb-3">
-                                        <span className="text-green-600 dark:text-green-400 font-semibold text-lg">
-                                            Easy
-                                        </span>
-                                        <span className="font-bold text-xl">
-                                            {difficultyBreakdown.easy}
-                                        </span>
+                            <div className="flex-1 flex flex-col items-center justify-center relative">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie
+                                            data={[
+                                                {
+                                                    name: "Easy",
+                                                    value: difficultyBreakdown.easy,
+                                                    color: "#22c55e",
+                                                },
+                                                {
+                                                    name: "Medium",
+                                                    value: difficultyBreakdown.medium,
+                                                    color: "#eab308",
+                                                },
+                                                {
+                                                    name: "Hard",
+                                                    value: difficultyBreakdown.hard,
+                                                    color: "#ef4444",
+                                                },
+                                            ].filter((item) => item.value > 0)}
+                                            cx="50%"
+                                            cy="45%"
+                                            innerRadius={70}
+                                            outerRadius={110}
+                                            paddingAngle={2}
+                                            dataKey="value"
+                                            label={false}
+                                        >
+                                            {[
+                                                {
+                                                    name: "Easy",
+                                                    value: difficultyBreakdown.easy,
+                                                    color: "#22c55e",
+                                                },
+                                                {
+                                                    name: "Medium",
+                                                    value: difficultyBreakdown.medium,
+                                                    color: "#eab308",
+                                                },
+                                                {
+                                                    name: "Hard",
+                                                    value: difficultyBreakdown.hard,
+                                                    color: "#ef4444",
+                                                },
+                                            ]
+                                                .filter(
+                                                    (item) => item.value > 0
+                                                )
+                                                .map((entry, index) => (
+                                                    <Cell
+                                                        key={`cell-${index}`}
+                                                        fill={entry.color}
+                                                        stroke="hsl(var(--card))"
+                                                        strokeWidth={2}
+                                                    />
+                                                ))}
+                                        </Pie>
+                                    </PieChart>
+                                </ResponsiveContainer>
+                                <div className="absolute top-[40%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+                                    <div className="text-4xl font-bold text-foreground">
+                                        {user.problemsSolved}
                                     </div>
-                                    <div className="w-full bg-muted/50 rounded-full h-4 overflow-hidden">
-                                        <div
-                                            className="bg-gradient-to-r from-green-500 to-green-600 h-4 rounded-full transition-all duration-500"
-                                            style={{
-                                                width: `${
-                                                    (difficultyBreakdown.easy /
-                                                        user.problemsSolved) *
-                                                        100 || 0
-                                                }%`,
-                                            }}
-                                        />
+                                    <div className="text-sm text-muted-foreground font-medium mt-1">
+                                        Total Solved
                                     </div>
                                 </div>
-                                <div>
-                                    <div className="flex items-center justify-between mb-3">
-                                        <span className="text-yellow-600 dark:text-yellow-400 font-semibold text-lg">
-                                            Medium
-                                        </span>
-                                        <span className="font-bold text-xl">
-                                            {difficultyBreakdown.medium}
+                                <div className="flex gap-6 mt-4">
+                                    <div className="flex items-center gap-2">
+                                        <div className="h-3 w-3 rounded-full bg-[#22c55e]"></div>
+                                        <span className="text-sm font-medium text-foreground">
+                                            Easy: {difficultyBreakdown.easy}
                                         </span>
                                     </div>
-                                    <div className="w-full bg-muted/50 rounded-full h-4 overflow-hidden">
-                                        <div
-                                            className="bg-gradient-to-r from-yellow-500 to-yellow-600 h-4 rounded-full transition-all duration-500"
-                                            style={{
-                                                width: `${
-                                                    (difficultyBreakdown.medium /
-                                                        user.problemsSolved) *
-                                                        100 || 0
-                                                }%`,
-                                            }}
-                                        />
-                                    </div>
-                                </div>
-                                <div>
-                                    <div className="flex items-center justify-between mb-3">
-                                        <span className="text-red-600 dark:text-red-400 font-semibold text-lg">
-                                            Hard
-                                        </span>
-                                        <span className="font-bold text-xl">
-                                            {difficultyBreakdown.hard}
+                                    <div className="flex items-center gap-2">
+                                        <div className="h-3 w-3 rounded-full bg-[#eab308]"></div>
+                                        <span className="text-sm font-medium text-foreground">
+                                            Medium: {difficultyBreakdown.medium}
                                         </span>
                                     </div>
-                                    <div className="w-full bg-muted/50 rounded-full h-4 overflow-hidden">
-                                        <div
-                                            className="bg-gradient-to-r from-red-500 to-red-600 h-4 rounded-full transition-all duration-500"
-                                            style={{
-                                                width: `${
-                                                    (difficultyBreakdown.hard /
-                                                        user.problemsSolved) *
-                                                        100 || 0
-                                                }%`,
-                                            }}
-                                        />
+                                    <div className="flex items-center gap-2">
+                                        <div className="h-3 w-3 rounded-full bg-[#ef4444]"></div>
+                                        <span className="text-sm font-medium text-foreground">
+                                            Hard: {difficultyBreakdown.hard}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="bg-card rounded-xl border shadow-lg p-6 flex flex-col">
+                        <div className="bg-card rounded-xl border shadow-lg p-6 flex flex-col h-[500px]">
                             <div className="flex items-center justify-between mb-6">
                                 <h2 className="text-xl font-bold flex items-center">
                                     <div className="p-2 bg-primary/10 rounded-lg mr-3">
@@ -592,7 +623,7 @@ function DashboardPageContent() {
                                     Recent Submissions
                                 </h2>
                             </div>
-                            <div className="space-y-2 overflow-y-auto pr-2 flex-1 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#424242] [&::-webkit-scrollbar-thumb]:rounded dark:[&::-webkit-scrollbar-thumb:hover]:bg-[#4f4f4f] [&::-webkit-scrollbar-thumb:hover]:bg-[#525252]">
+                            <div className="space-y-2 overflow-y-auto pr-2 flex-1 min-h-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#424242] [&::-webkit-scrollbar-thumb]:rounded dark:[&::-webkit-scrollbar-thumb:hover]:bg-[#4f4f4f] [&::-webkit-scrollbar-thumb:hover]:bg-[#525252]">
                                 {recentSubmissions.length === 0 ? (
                                     <p className="text-muted-foreground text-center py-8">
                                         No submissions yet
@@ -602,18 +633,18 @@ function DashboardPageContent() {
                                         <Link
                                             key={submission.id}
                                             href={`/problems/${submission.problemSlug}`}
-                                            className="block p-4 rounded-lg border border-border hover:border-primary transition-all duration-200 group hover:shadow-md bg-muted/20 hover:bg-muted/40"
+                                            className="block p-3 rounded-lg border border-border hover:border-primary transition-all duration-200 group hover:shadow-md bg-muted/20 hover:bg-muted/40"
                                         >
                                             <div className="flex items-center justify-between">
                                                 <div className="flex-1">
-                                                    <div className="flex items-center gap-2 mb-2">
-                                                        <h3 className="font-semibold text-base group-hover:text-primary transition-colors">
+                                                    <div className="flex items-center gap-1.5 mb-1.5">
+                                                        <h3 className="font-semibold text-sm group-hover:text-primary transition-colors">
                                                             {
                                                                 submission.problemTitle
                                                             }
                                                         </h3>
                                                         <span
-                                                            className={`text-xs font-bold px-2.5 py-1 rounded-full ${getDifficultyBadgeColor(
+                                                            className={`text-xs font-bold px-2 py-0.5 rounded-full ${getDifficultyBadgeColor(
                                                                 submission.difficulty
                                                             )}`}
                                                         >
@@ -622,7 +653,7 @@ function DashboardPageContent() {
                                                             }
                                                         </span>
                                                         <span
-                                                            className={`text-xs font-bold px-2.5 py-1 rounded-full shadow-sm ${
+                                                            className={`text-xs font-bold px-2 py-0.5 rounded-full shadow-sm ${
                                                                 submission.status ===
                                                                 "ACCEPTED"
                                                                     ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
@@ -632,31 +663,31 @@ function DashboardPageContent() {
                                                             {submission.status}
                                                         </span>
                                                     </div>
-                                                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                                                        <span className="flex items-center gap-1.5 font-medium">
-                                                            <Code className="h-3.5 w-3.5" />
+                                                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                                                        <span className="flex items-center gap-1 font-medium">
+                                                            <Code className="h-3 w-3" />
                                                             {
                                                                 submission.language
                                                             }
                                                         </span>
                                                         {submission.runtime && (
-                                                            <span className="flex items-center gap-1.5 font-medium">
-                                                                <Clock className="h-3.5 w-3.5" />
+                                                            <span className="flex items-center gap-1 font-medium">
+                                                                <Clock className="h-3 w-3" />
                                                                 {
                                                                     submission.runtime
                                                                 }
                                                                 ms
                                                             </span>
                                                         )}
-                                                        <span className="flex items-center gap-1.5 font-medium">
-                                                            <Calendar className="h-3.5 w-3.5" />
+                                                        <span className="flex items-center gap-1 font-medium">
+                                                            <Calendar className="h-3 w-3" />
                                                             {new Date(
                                                                 submission.submittedAt
                                                             ).toLocaleDateString()}
                                                         </span>
                                                     </div>
                                                 </div>
-                                                <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all duration-200" />
+                                                <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all duration-200" />
                                             </div>
                                         </Link>
                                     ))
