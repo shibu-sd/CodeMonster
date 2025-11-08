@@ -72,21 +72,21 @@ export function BattleEndDialog({
 
     const getTitle = () => {
         if (isDraw) return "Battle Draw!";
-        return isWinner ? "Insane Victory!" : "Defeat";
+        return isWinner ? "Victory" : "Defeat";
     };
 
     const getMessage = () => {
         if (isDraw) {
-            return "Neither warrior could claim victory this time. A worthy challenge!";
+            return "Neither warrior could claim victory this time. A worthy challenge.";
         }
         if (isWinner) {
-            return `You've crushed ${
-                opponentName || "your opponent"
-            }! Your coding skills reign supreme!`;
+            return `${
+                opponentName || "Your opponent"
+            } faced pure monster energy.`;
         }
-        return `${
-            opponentName || "Your opponent"
-        } claimed victory this time. Better luck next time, warrior!`;
+        return `The arena sides with ${
+            opponentName || "your opponent"
+        } today. Tomorrow, it's yours.`;
     };
 
     const getIcon = () => {
@@ -100,7 +100,11 @@ export function BattleEndDialog({
                 <Trophy className="w-24 h-24 text-yellow-500 mx-auto animate-bounce" />
             );
         }
-        return <Skull className="w-24 h-24 text-red-500 mx-auto" />;
+        return (
+            <div className="relative">
+                <Skull className="w-24 h-24 text-red-500 mx-auto animate-bounce" />
+            </div>
+        );
     };
 
     const getBackgroundColor = () => {
