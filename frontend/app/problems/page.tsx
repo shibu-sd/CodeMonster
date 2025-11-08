@@ -15,7 +15,6 @@ import {
 import { HeroHeader } from "@/components/header/header";
 import FooterSection from "@/components/footer/footer";
 import { Button } from "@/components/ui/button";
-import { ProtectedPage } from "@/components/auth/protected-page";
 import { useAuth } from "@clerk/nextjs";
 import {
     useApiWithAuth,
@@ -647,12 +646,5 @@ function ProblemsPageContent() {
 }
 
 export default function ProblemsPage() {
-    return (
-        <ProtectedPage
-            fallbackTitle="Authentication Required"
-            fallbackMessage="You need to sign in to access the problems."
-        >
-            <ProblemsPageContent />
-        </ProtectedPage>
-    );
+    return <ProblemsPageContent />;
 }

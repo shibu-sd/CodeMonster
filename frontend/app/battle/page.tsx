@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { ProtectedPage } from "@/components/auth/protected-page";
 import { HeroHeader } from "@/components/header/header";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { useBattle } from "@/contexts/BattleContext";
@@ -75,30 +74,6 @@ function BattlePage() {
         return () => window.removeEventListener("keydown", handleEscape);
     }, [clearBattleState]);
 
-    if (!isSignedIn) {
-        return (
-            <div className="min-h-screen bg-background relative">
-                <DotPattern className="opacity-30" />
-                <HeroHeader />
-
-                <main className="container mx-auto px-4 pt-32 pb-16 relative z-10">
-                    <Card className="max-w-2xl mx-auto">
-                        <CardHeader className="text-center">
-                            <CardTitle className="text-3xl font-bold">
-                                Code Battles
-                            </CardTitle>
-                            <CardDescription>
-                                Sign in to start 1v1 realtime coding battles
-                            </CardDescription>
-                        </CardHeader>
-                    </Card>
-                </main>
-
-                <FooterSection />
-            </div>
-        );
-    }
-
     if (isRedirecting) {
         return (
             <BattleStartingAnimation
@@ -149,12 +124,5 @@ function BattlePage() {
 }
 
 export default function ProtectedBattlePage() {
-    return (
-        <ProtectedPage
-            fallbackTitle="Authentication Required"
-            fallbackMessage="You need to sign in to access Code Battles."
-        >
-            <BattlePage />
-        </ProtectedPage>
-    );
+    return <BattlePage />;
 }

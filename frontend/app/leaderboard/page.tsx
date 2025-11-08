@@ -10,7 +10,6 @@ import { useAuth } from "@clerk/nextjs";
 import { Trophy, Users, TrendingUp } from "lucide-react";
 import { HeroHeader } from "@/components/header/header";
 import FooterSection from "@/components/footer/footer";
-import { ProtectedPage } from "@/components/auth/protected-page";
 import { LeaderboardTable } from "@/components/leaderboard/LeaderboardTable";
 import { LeaderboardStats as LeaderboardStatsComponent } from "@/components/leaderboard/LeaderboardStats";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -411,12 +410,5 @@ function LeaderboardPageContent() {
 }
 
 export default function LeaderboardPage() {
-    return (
-        <ProtectedPage
-            fallbackTitle="Authentication Required"
-            fallbackMessage="You need to sign in to access the leaderboard."
-        >
-            <LeaderboardPageContent />
-        </ProtectedPage>
-    );
+    return <LeaderboardPageContent />;
 }

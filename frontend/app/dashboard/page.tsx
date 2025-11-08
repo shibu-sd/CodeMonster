@@ -7,7 +7,6 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@clerk/nextjs";
-import { ProtectedPage } from "@/components/auth/protected-page";
 import { HeroHeader } from "@/components/header/header";
 import FooterSection from "@/components/footer/footer";
 import {
@@ -703,9 +702,5 @@ function DashboardPageContent() {
 }
 
 export default function DashboardPage() {
-    return (
-        <ProtectedPage>
-            <DashboardPageContent />
-        </ProtectedPage>
-    );
+    return <DashboardPageContent />;
 }
