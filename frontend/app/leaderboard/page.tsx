@@ -57,6 +57,11 @@ function LeaderboardPageContent() {
     const [showSkeleton, setShowSkeleton] = useState(true);
     const skeletonStartTime = useRef<number>(Date.now());
 
+    // Set page title
+    useEffect(() => {
+        document.title = "Leaderboard - CodeMonster";
+    }, []);
+
     // Initialize authentication
     useEffect(() => {
         const initAuth = async () => {

@@ -97,6 +97,15 @@ function ProblemDetailPageContent() {
         solvedAt: string;
     } | null>(null);
 
+    // Set page title when problem loads
+    useEffect(() => {
+        if (problem?.title) {
+            document.title = `${problem.title} - CodeMonster`;
+        } else {
+            document.title = "Problem - CodeMonster";
+        }
+    }, [problem?.title]);
+
     // Pop-up window states
     const [showRunPanel, setShowRunPanel] = useState(false);
     const [showSubmitPanel, setShowSubmitPanel] = useState(false);

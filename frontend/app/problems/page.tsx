@@ -46,6 +46,11 @@ function ProblemsPageContent() {
         new Set()
     );
 
+    // Set page title
+    useEffect(() => {
+        document.title = "Problems - CodeMonster";
+    }, []);
+
     useEffect(() => {
         const initAuth = async () => {
             if (isLoaded && isSignedIn) {

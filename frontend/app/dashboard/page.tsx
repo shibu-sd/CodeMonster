@@ -106,6 +106,11 @@ function DashboardPageContent() {
     );
     const [loadingContribution, setLoadingContribution] = useState(false);
 
+    // Set page title
+    useEffect(() => {
+        document.title = "Dashboard - CodeMonster";
+    }, []);
+
     useEffect(() => {
         const initDashboard = async () => {
             if (isLoaded && isSignedIn) {

@@ -31,6 +31,15 @@ export default function BlogPostPage() {
     const [featuredPosts, setFeaturedPosts] = useState<any[]>([]);
     const [allTags, setAllTags] = useState<string[]>([]);
 
+    // Set page title when blog post loads
+    useEffect(() => {
+        if (blogPost?.title) {
+            document.title = `${blogPost.title} - CodeMonster`;
+        } else {
+            document.title = "Blog - CodeMonster";
+        }
+    }, [blogPost?.title]);
+
     // Handle minimum skeleton display time
     useEffect(() => {
         if (!loading && showSkeleton) {

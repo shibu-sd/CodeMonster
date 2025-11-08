@@ -1,6 +1,12 @@
+import { Metadata } from "next";
 import { SignIn } from "@clerk/nextjs";
 import { HeroHeader } from "@/components/header/header";
 import FooterSection from "@/components/footer/footer";
+
+export const metadata: Metadata = {
+    title: "Sign In - CodeMonster",
+    description: "Sign in to your CodeMonster account to continue coding.",
+};
 
 export default function Page() {
     return (

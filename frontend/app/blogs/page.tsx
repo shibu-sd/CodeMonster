@@ -28,6 +28,11 @@ export default function BlogsPage() {
     const featuredPosts = useMemo(() => getFeaturedBlogPosts(), []);
     const allTags = useMemo(() => getAllTags(), []);
 
+    // Set page title
+    useEffect(() => {
+        document.title = "Blogs - CodeMonster";
+    }, []);
+
     // Update selectedTag when URL changes
     useEffect(() => {
         setSelectedTag(tagFromUrl);

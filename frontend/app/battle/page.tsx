@@ -30,6 +30,11 @@ function BattlePage() {
     const [showSkeleton, setShowSkeleton] = useState(true);
     const [isRedirecting, setIsRedirecting] = useState(false);
 
+    // Set page title
+    useEffect(() => {
+        document.title = "Battle - CodeMonster";
+    }, []);
+
     useEffect(() => {
         if (isSignedIn && !connected) {
             connect();
