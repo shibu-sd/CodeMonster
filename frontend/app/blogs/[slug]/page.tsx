@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ProtectedPage } from "@/components/auth/protected-page";
 import { BlogHeader } from "@/components/blog/blog-header";
 import { MarkdownRenderer } from "@/components/blog/markdown-renderer";
 import { BlogSidebar } from "@/components/blog/blog-sidebar";
@@ -31,6 +30,15 @@ export default function BlogPostPage() {
     const [allPosts, setAllPosts] = useState<any[]>([]);
     const [featuredPosts, setFeaturedPosts] = useState<any[]>([]);
     const [allTags, setAllTags] = useState<string[]>([]);
+
+    // Set page title when blog post loads
+    useEffect(() => {
+        if (blogPost?.title) {
+            document.title = `${blogPost.title} - CodeMonster`;
+        } else {
+            document.title = "Blog - CodeMonster";
+        }
+    }, [blogPost?.title]);
 
     // Handle minimum skeleton display time
     useEffect(() => {
@@ -150,173 +158,169 @@ export default function BlogPostPage() {
 
     if (showSkeleton) {
         return (
-            <ProtectedPage>
-                <div className="min-h-screen bg-background relative">
-                    <DotPattern className="opacity-30" />
-                    <HeroHeader />
-                    <ScrollProgress />
-                    <main className="container mx-auto px-4 pt-32 pb-16 relative z-10">
-                        {/* Back Button Skeleton */}
-                        <div className="mb-6">
-                            <Skeleton className="h-10 w-24" />
-                        </div>
+            <div className="min-h-screen bg-background relative">
+                <DotPattern className="opacity-30" />
+                <HeroHeader />
+                <ScrollProgress />
+                <main className="container mx-auto px-4 pt-32 pb-16 relative z-10">
+                    {/* Back Button Skeleton */}
+                    <div className="mb-6">
+                        <Skeleton className="h-10 w-24" />
+                    </div>
 
-                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                            {/* Main Content Skeleton */}
-                            <div className="lg:col-span-3">
-                                {/* Blog Header Skeleton */}
-                                <div className="space-y-4 mb-8 pb-8 border-b">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <Skeleton className="h-6 w-24 rounded-full" />
-                                    </div>
-                                    <Skeleton className="h-12 w-3/4 mb-4" />
-                                    <Skeleton className="h-6 w-full mb-4" />
-                                    <div className="flex flex-wrap gap-2">
-                                        <Skeleton className="h-5 w-20 rounded-full" />
-                                        <Skeleton className="h-5 w-24 rounded-full" />
-                                        <Skeleton className="h-5 w-28 rounded-full" />
-                                        <Skeleton className="h-5 w-16 rounded-full" />
-                                    </div>
+                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                        {/* Main Content Skeleton */}
+                        <div className="lg:col-span-3">
+                            {/* Blog Header Skeleton */}
+                            <div className="space-y-4 mb-8 pb-8 border-b">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <Skeleton className="h-6 w-24 rounded-full" />
                                 </div>
-
-                                {/* Blog Content Skeleton */}
-                                <div className="space-y-4">
-                                    <Skeleton className="h-4 w-full" />
-                                    <Skeleton className="h-4 w-11/12" />
-                                    <Skeleton className="h-4 w-full" />
-                                    <Skeleton className="h-4 w-5/6" />
-                                    <Skeleton className="h-4 w-full" />
-                                    <Skeleton className="h-4 w-4/5" />
-                                    <Skeleton className="h-4 w-full" />
-                                    <Skeleton className="h-4 w-3/4" />
-                                </div>
-
-                                {/* Navigation Skeleton */}
-                                <div className="mt-12 pt-8 border-t">
-                                    <div className="flex justify-between items-center">
-                                        <Skeleton className="h-10 w-32" />
-                                        <Skeleton className="h-10 w-32" />
-                                    </div>
-                                </div>
-
-                                {/* Related Posts Skeleton */}
-                                <div className="mt-16 pt-8 border-t">
-                                    <Skeleton className="h-6 w-40 mb-6" />
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                        {[...Array(3)].map((_, i) => (
-                                            <div
-                                                key={i}
-                                                className="p-4 border rounded-lg space-y-2"
-                                            >
-                                                <Skeleton className="h-4 w-32" />
-                                                <div className="flex items-center gap-3">
-                                                    <div className="flex items-center gap-1">
-                                                        <Skeleton className="h-3 w-3" />
-                                                        <Skeleton className="h-3 w-16" />
-                                                    </div>
-                                                    <div className="flex items-center gap-1">
-                                                        <Skeleton className="h-3 w-3" />
-                                                        <Skeleton className="h-3 w-12" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
+                                <Skeleton className="h-12 w-3/4 mb-4" />
+                                <Skeleton className="h-6 w-full mb-4" />
+                                <div className="flex flex-wrap gap-2">
+                                    <Skeleton className="h-5 w-20 rounded-full" />
+                                    <Skeleton className="h-5 w-24 rounded-full" />
+                                    <Skeleton className="h-5 w-28 rounded-full" />
+                                    <Skeleton className="h-5 w-16 rounded-full" />
                                 </div>
                             </div>
 
-                            {/* Sidebar Skeleton */}
-                            <div className="lg:col-span-1">
-                                <div className="space-y-6">
-                                    {/* Featured Posts Sidebar */}
-                                    <div className="bg-card rounded-lg border p-4 space-y-4">
-                                        <div className="flex items-center gap-2">
-                                            <Skeleton className="h-5 w-5" />
-                                            <Skeleton className="h-5 w-32" />
-                                        </div>
-                                        {[...Array(3)].map((_, i) => (
-                                            <div key={i} className="space-y-2">
-                                                <Skeleton className="h-4 w-36" />
-                                                <div className="flex items-center gap-2">
-                                                    <div className="flex items-center gap-1">
-                                                        <Skeleton className="h-3 w-3" />
-                                                        <Skeleton className="h-3 w-20" />
-                                                    </div>
-                                                    <div className="flex items-center gap-1">
-                                                        <Skeleton className="h-3 w-3" />
-                                                        <Skeleton className="h-3 w-16" />
-                                                    </div>
+                            {/* Blog Content Skeleton */}
+                            <div className="space-y-4">
+                                <Skeleton className="h-4 w-full" />
+                                <Skeleton className="h-4 w-11/12" />
+                                <Skeleton className="h-4 w-full" />
+                                <Skeleton className="h-4 w-5/6" />
+                                <Skeleton className="h-4 w-full" />
+                                <Skeleton className="h-4 w-4/5" />
+                                <Skeleton className="h-4 w-full" />
+                                <Skeleton className="h-4 w-3/4" />
+                            </div>
+
+                            {/* Navigation Skeleton */}
+                            <div className="mt-12 pt-8 border-t">
+                                <div className="flex justify-between items-center">
+                                    <Skeleton className="h-10 w-32" />
+                                    <Skeleton className="h-10 w-32" />
+                                </div>
+                            </div>
+
+                            {/* Related Posts Skeleton */}
+                            <div className="mt-16 pt-8 border-t">
+                                <Skeleton className="h-6 w-40 mb-6" />
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    {[...Array(3)].map((_, i) => (
+                                        <div
+                                            key={i}
+                                            className="p-4 border rounded-lg space-y-2"
+                                        >
+                                            <Skeleton className="h-4 w-32" />
+                                            <div className="flex items-center gap-3">
+                                                <div className="flex items-center gap-1">
+                                                    <Skeleton className="h-3 w-3" />
+                                                    <Skeleton className="h-3 w-16" />
+                                                </div>
+                                                <div className="flex items-center gap-1">
+                                                    <Skeleton className="h-3 w-3" />
+                                                    <Skeleton className="h-3 w-12" />
                                                 </div>
                                             </div>
-                                        ))}
-                                    </div>
-
-                                    {/* Recent Posts Sidebar */}
-                                    <div className="bg-card rounded-lg border p-4 space-y-4">
-                                        <div className="flex items-center gap-2">
-                                            <Skeleton className="h-5 w-5" />
-                                            <Skeleton className="h-5 w-28" />
                                         </div>
-                                        {[...Array(5)].map((_, i) => (
-                                            <div key={i} className="space-y-2">
-                                                <Skeleton className="h-4 w-32" />
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Sidebar Skeleton */}
+                        <div className="lg:col-span-1">
+                            <div className="space-y-6">
+                                {/* Featured Posts Sidebar */}
+                                <div className="bg-card rounded-lg border p-4 space-y-4">
+                                    <div className="flex items-center gap-2">
+                                        <Skeleton className="h-5 w-5" />
+                                        <Skeleton className="h-5 w-32" />
+                                    </div>
+                                    {[...Array(3)].map((_, i) => (
+                                        <div key={i} className="space-y-2">
+                                            <Skeleton className="h-4 w-36" />
+                                            <div className="flex items-center gap-2">
                                                 <div className="flex items-center gap-1">
                                                     <Skeleton className="h-3 w-3" />
                                                     <Skeleton className="h-3 w-20" />
                                                 </div>
+                                                <div className="flex items-center gap-1">
+                                                    <Skeleton className="h-3 w-3" />
+                                                    <Skeleton className="h-3 w-16" />
+                                                </div>
                                             </div>
-                                        ))}
-                                    </div>
-
-                                    {/* Popular Tags Sidebar */}
-                                    <div className="bg-card rounded-lg border p-4 space-y-4">
-                                        <Skeleton className="h-5 w-32 mb-4" />
-                                        <div className="flex flex-wrap gap-2">
-                                            {[...Array(8)].map((_, i) => (
-                                                <Skeleton
-                                                    key={i}
-                                                    className="h-5 w-20 rounded-full"
-                                                />
-                                            ))}
                                         </div>
+                                    ))}
+                                </div>
+
+                                {/* Recent Posts Sidebar */}
+                                <div className="bg-card rounded-lg border p-4 space-y-4">
+                                    <div className="flex items-center gap-2">
+                                        <Skeleton className="h-5 w-5" />
+                                        <Skeleton className="h-5 w-28" />
+                                    </div>
+                                    {[...Array(5)].map((_, i) => (
+                                        <div key={i} className="space-y-2">
+                                            <Skeleton className="h-4 w-32" />
+                                            <div className="flex items-center gap-1">
+                                                <Skeleton className="h-3 w-3" />
+                                                <Skeleton className="h-3 w-20" />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Popular Tags Sidebar */}
+                                <div className="bg-card rounded-lg border p-4 space-y-4">
+                                    <Skeleton className="h-5 w-32 mb-4" />
+                                    <div className="flex flex-wrap gap-2">
+                                        {[...Array(8)].map((_, i) => (
+                                            <Skeleton
+                                                key={i}
+                                                className="h-5 w-20 rounded-full"
+                                            />
+                                        ))}
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </main>
-                    <FooterSection />
-                </div>
-            </ProtectedPage>
+                    </div>
+                </main>
+                <FooterSection />
+            </div>
         );
     }
 
     if (error || !blogPost) {
         return (
-            <ProtectedPage>
-                <div className="min-h-screen bg-background relative">
-                    <DotPattern className="opacity-30" />
-                    <HeroHeader />
-                    <ScrollProgress />
-                    <main className="container mx-auto px-4 pt-32 pb-16 relative z-10">
-                        <div className="text-center py-12">
-                            <h1 className="text-2xl font-bold mb-4">
-                                Blog Post Not Found
-                            </h1>
-                            <p className="text-muted-foreground mb-6">
-                                The blog post you're looking for doesn't exist
-                                or has been moved.
-                            </p>
-                            <Button asChild>
-                                <Link href="/blogs">
-                                    <ArrowLeft className="h-4 w-4 mr-2" />
-                                    Back to Blogs
-                                </Link>
-                            </Button>
-                        </div>
-                    </main>
-                    <FooterSection />
-                </div>
-            </ProtectedPage>
+            <div className="min-h-screen bg-background relative">
+                <DotPattern className="opacity-30" />
+                <HeroHeader />
+                <ScrollProgress />
+                <main className="container mx-auto px-4 pt-32 pb-16 relative z-10">
+                    <div className="text-center py-12">
+                        <h1 className="text-2xl font-bold mb-4">
+                            Blog Post Not Found
+                        </h1>
+                        <p className="text-muted-foreground mb-6">
+                            The blog post you're looking for doesn't exist or
+                            has been moved.
+                        </p>
+                        <Button asChild>
+                            <Link href="/blogs">
+                                <ArrowLeft className="h-4 w-4 mr-2" />
+                                Back to Blogs
+                            </Link>
+                        </Button>
+                    </div>
+                </main>
+                <FooterSection />
+            </div>
         );
     }
 
@@ -325,118 +329,116 @@ export default function BlogPostPage() {
     const relatedPosts = getRelatedPosts();
 
     return (
-        <ProtectedPage>
-            <div className="min-h-screen bg-background relative">
-                <DotPattern className="opacity-30" />
-                <HeroHeader />
-                <ScrollProgress />
-                <main className="container mx-auto px-4 pt-32 pb-16 relative z-10">
-                    {/* Back Button */}
-                    <div className="mb-6">
-                        <Button variant="ghost" asChild>
-                            <Link href="/blogs">
-                                <ArrowLeft className="h-4 w-4 mr-2" />
-                                Back to Blogs
-                            </Link>
-                        </Button>
-                    </div>
+        <div className="min-h-screen bg-background relative">
+            <DotPattern className="opacity-30" />
+            <HeroHeader />
+            <ScrollProgress />
+            <main className="container mx-auto px-4 pt-32 pb-16 relative z-10">
+                {/* Back Button */}
+                <div className="mb-6">
+                    <Button variant="ghost" asChild>
+                        <Link href="/blogs">
+                            <ArrowLeft className="h-4 w-4 mr-2" />
+                            Back to Blogs
+                        </Link>
+                    </Button>
+                </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                        {/* Main Content */}
-                        <div className="lg:col-span-3">
-                            {/* Blog Header */}
-                            <BlogHeader {...blogPost} />
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                    {/* Main Content */}
+                    <div className="lg:col-span-3">
+                        {/* Blog Header */}
+                        <BlogHeader {...blogPost} />
 
-                            {/* Blog Content */}
-                            <article className="prose prose-slate max-w-none">
-                                <MarkdownRenderer content={blogPost.content} />
-                            </article>
+                        {/* Blog Content */}
+                        <article className="prose prose-slate max-w-none">
+                            <MarkdownRenderer content={blogPost.content} />
+                        </article>
 
-                            {/* Post Navigation */}
-                            <div className="mt-12 pt-8 border-t">
-                                <div className="flex justify-between items-center">
-                                    <div>
-                                        {previousPost && (
-                                            <Button variant="outline" asChild>
-                                                <Link
-                                                    href={`/blogs/${previousPost.slug}`}
-                                                >
-                                                    <ArrowLeft className="h-4 w-4 mr-2" />
-                                                    {previousPost.title}
-                                                </Link>
-                                            </Button>
-                                        )}
-                                    </div>
-                                    <div>
-                                        {nextPost && (
-                                            <Button variant="outline" asChild>
-                                                <Link
-                                                    href={`/blogs/${nextPost.slug}`}
-                                                >
-                                                    {nextPost.title}
-                                                    <ArrowRight className="h-4 w-4 ml-2" />
-                                                </Link>
-                                            </Button>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Related Posts */}
-                            {relatedPosts.length > 0 && (
-                                <div className="mt-16 pt-8 border-t">
-                                    <h3 className="text-xl font-semibold mb-6">
-                                        Related Posts
-                                    </h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                        {relatedPosts.map((post) => (
-                                            <div
-                                                key={post.slug}
-                                                className="p-4 border rounded-lg hover:shadow-md transition-shadow"
+                        {/* Post Navigation */}
+                        <div className="mt-12 pt-8 border-t">
+                            <div className="flex justify-between items-center">
+                                <div>
+                                    {previousPost && (
+                                        <Button variant="outline" asChild>
+                                            <Link
+                                                href={`/blogs/${previousPost.slug}`}
                                             >
-                                                <Link
-                                                    href={`/blogs/${post.slug}`}
-                                                    className="block"
-                                                >
-                                                    <h4 className="font-medium mb-2 line-clamp-2 hover:text-primary transition-colors">
-                                                        {post.title}
-                                                    </h4>
-                                                    <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                                                        <div className="flex items-center gap-1">
-                                                            <User className="h-3 w-3" />
-                                                            <span>
-                                                                {post.author}
-                                                            </span>
-                                                        </div>
-                                                        <div className="flex items-center gap-1">
-                                                            <Clock className="h-3 w-3" />
-                                                            <span>
-                                                                {post.readTime}
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </Link>
-                                            </div>
-                                        ))}
-                                    </div>
+                                                <ArrowLeft className="h-4 w-4 mr-2" />
+                                                {previousPost.title}
+                                            </Link>
+                                        </Button>
+                                    )}
                                 </div>
-                            )}
-                        </div>
-
-                        {/* Sidebar */}
-                        <div className="lg:col-span-1">
-                            <div className="sticky top-8">
-                                <BlogSidebar
-                                    recentPosts={allPosts}
-                                    allTags={allTags}
-                                    featuredPosts={featuredPosts}
-                                />
+                                <div>
+                                    {nextPost && (
+                                        <Button variant="outline" asChild>
+                                            <Link
+                                                href={`/blogs/${nextPost.slug}`}
+                                            >
+                                                {nextPost.title}
+                                                <ArrowRight className="h-4 w-4 ml-2" />
+                                            </Link>
+                                        </Button>
+                                    )}
+                                </div>
                             </div>
                         </div>
+
+                        {/* Related Posts */}
+                        {relatedPosts.length > 0 && (
+                            <div className="mt-16 pt-8 border-t">
+                                <h3 className="text-xl font-semibold mb-6">
+                                    Related Posts
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    {relatedPosts.map((post) => (
+                                        <div
+                                            key={post.slug}
+                                            className="p-4 border rounded-lg hover:shadow-md transition-shadow"
+                                        >
+                                            <Link
+                                                href={`/blogs/${post.slug}`}
+                                                className="block"
+                                            >
+                                                <h4 className="font-medium mb-2 line-clamp-2 hover:text-primary transition-colors">
+                                                    {post.title}
+                                                </h4>
+                                                <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                                                    <div className="flex items-center gap-1">
+                                                        <User className="h-3 w-3" />
+                                                        <span>
+                                                            {post.author}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-1">
+                                                        <Clock className="h-3 w-3" />
+                                                        <span>
+                                                            {post.readTime}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </Link>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
-                </main>
-                <FooterSection />
-            </div>
-        </ProtectedPage>
+
+                    {/* Sidebar */}
+                    <div className="lg:col-span-1">
+                        <div className="sticky top-8">
+                            <BlogSidebar
+                                recentPosts={allPosts}
+                                allTags={allTags}
+                                featuredPosts={featuredPosts}
+                            />
+                        </div>
+                    </div>
+                </div>
+            </main>
+            <FooterSection />
+        </div>
     );
 }

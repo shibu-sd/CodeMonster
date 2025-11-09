@@ -77,14 +77,14 @@ export const HeroHeader: React.FC = () => {
                                         {item.requireAuth && !isSignedIn ? (
                                             <Link
                                                 href="/auth/sign-in"
-                                                className="text-muted-foreground hover:text-accent-foreground block duration-150"
+                                                className="text-muted-foreground hover:text-accent-foreground hover:bg-accent block duration-150 px-2 py-1 rounded-full"
                                             >
                                                 <span>{item.name}</span>
                                             </Link>
                                         ) : (
                                             <Link
                                                 href={item.href}
-                                                className="text-muted-foreground hover:text-accent-foreground block duration-150"
+                                                className="text-muted-foreground hover:text-accent-foreground hover:bg-accent block duration-150 px-2 py-1 rounded-full"
                                             >
                                                 <span>{item.name}</span>
                                             </Link>
@@ -176,14 +176,14 @@ export const HeroHeader: React.FC = () => {
                                             {item.requireAuth && !isSignedIn ? (
                                                 <Link
                                                     href="/auth/sign-in"
-                                                    className="text-muted-foreground hover:text-accent-foreground block duration-150"
+                                                    className="text-muted-foreground hover:text-accent-foreground hover:bg-accent block duration-150 px-2 py-1 rounded-full"
                                                 >
                                                     <span>{item.name}</span>
                                                 </Link>
                                             ) : (
                                                 <Link
                                                     href={item.href}
-                                                    className="text-muted-foreground hover:text-accent-foreground block duration-150"
+                                                    className="text-muted-foreground hover:text-accent-foreground hover:bg-accent block duration-150 px-2 py-1 rounded-full"
                                                 >
                                                     <span>{item.name}</span>
                                                 </Link>

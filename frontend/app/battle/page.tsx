@@ -1,23 +1,14 @@
 "use client";
 
-import { useState, useEffect, useTransition } from "react";
+import { useState, useEffect, useTransition, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { ProtectedPage } from "@/components/auth/protected-page";
 import { HeroHeader } from "@/components/header/header";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { useBattle } from "@/contexts/BattleContext";
 import { BattleQueue } from "@/components/battle/BattleQueue";
 import { BattleStartingAnimation } from "@/components/battle/BattleStartingAnimation";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Swords, Users, Clock, Trophy, Target } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import FooterSection from "@/components/footer/footer";
 import { DotPattern } from "@/components/ui/dot-pattern";
 
@@ -36,13 +27,28 @@ function BattlePage() {
         clearBattleState,
     } = battleSocket;
 
+    const [showSkeleton, setShowSkeleton] = useState(true);
+    const [isRedirecting, setIsRedirecting] = useState(false);
+
+    // Set page title
+    useEffect(() => {
+        document.title = "Battle - CodeMonster";
+    }, []);
+
     useEffect(() => {
         if (isSignedIn && !connected) {
             connect();
         }
     }, [isSignedIn, connected, connect]);
 
-    const [isRedirecting, setIsRedirecting] = useState(false);
+    // Handle minimum skeleton display time
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setShowSkeleton(false);
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, []);
 
     useEffect(() => {
         if (
@@ -76,30 +82,6 @@ function BattlePage() {
         return () => window.removeEventListener("keydown", handleEscape);
     }, [clearBattleState]);
 
-    if (!isSignedIn) {
-        return (
-            <div className="min-h-screen bg-background relative">
-                <DotPattern className="opacity-30" />
-                <HeroHeader />
-
-                <main className="container mx-auto px-4 pt-32 pb-16 relative z-10">
-                    <Card className="max-w-2xl mx-auto">
-                        <CardHeader className="text-center">
-                            <CardTitle className="text-3xl font-bold">
-                                Code Battles
-                            </CardTitle>
-                            <CardDescription>
-                                Sign in to start 1v1 realtime coding battles
-                            </CardDescription>
-                        </CardHeader>
-                    </Card>
-                </main>
-
-                <FooterSection />
-            </div>
-        );
-    }
-
     if (isRedirecting) {
         return (
             <BattleStartingAnimation
@@ -118,50 +100,61 @@ function BattlePage() {
         );
     }
 
+    if (showSkeleton) {
+        return (
+            <div className="min-h-screen bg-background relative">
+                <DotPattern className="opacity-30" />
+                <HeroHeader />
+
+                <main className="container mx-auto px-4 pt-32 pb-16 relative z-10">
+                    {/* Header Skeleton */}
+                    <div className="mb-8 text-center">
+                        <Skeleton className="h-12 w-64 mb-4 mx-auto" />
+                        <Skeleton className="h-6 w-96 mb-6 mx-auto" />
+
+                        {/* Connection Status Skeleton */}
+                        <div className="flex justify-center items-center gap-2 mb-6">
+                            <Skeleton className="h-6 w-24 rounded-full" />
+                        </div>
+                    </div>
+
+                    {/* Main Content Skeleton */}
+                    <div className="max-w-4xl mx-auto">
+                        <div className="bg-card rounded-xl border shadow-lg p-8">
+                            <Skeleton className="h-64 w-full rounded-lg" />
+                        </div>
+                    </div>
+                </main>
+
+                <FooterSection />
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-screen bg-background relative">
             <DotPattern className="opacity-30" />
             <HeroHeader />
 
             <main className="container mx-auto px-4 pt-32 pb-16 relative z-10">
-                <div className="space-y-8">
-                    {/* Header */}
-                    <div className="text-center space-y-4">
-                        <div className="flex justify-center items-center space-x-3">
-                            <h1 className="text-4xl font-bold text-foreground">
-                                Code Battles
-                            </h1>
-                        </div>
-                        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                            Face fierce monsters in live 1v1 coding duels
-                        </p>
-                        <div className="flex justify-center items-center space-x-2 text-sm text-muted-foreground">
-                            <Target className="w-4 h-4" />
-                            <span>
-                                First to solve wins, or highest score wins
-                            </span>
-                        </div>
+                {/* Header Section */}
+                <div className="mb-8 text-center">
+                    <h1 className="text-4xl font-bold mb-4">Code Battles</h1>
+                    <p className="text-xl text-muted-foreground mb-6 max-w-2xl mx-auto">
+                        Face fierce monsters in live 1v1 coding duels
+                    </p>
 
-                        {/* Connection Status */}
-                        <div className="flex justify-center items-center gap-2 mt-4">
-                            <Badge
-                                variant={connected ? "default" : "destructive"}
-                            >
-                                {connected ? "Connected" : "Disconnected"}
-                            </Badge>
-                            {battleState.usersInQueue > 0 && (
-                                <Badge variant="secondary">
-                                    <Users className="w-3 h-3 mr-1" />
-                                    {battleState.usersInQueue} in queue
-                                </Badge>
-                            )}
-                        </div>
+                    {/* Connection Status */}
+                    <div className="flex justify-center items-center gap-2 mb-6">
+                        <Badge variant={connected ? "default" : "destructive"}>
+                            {connected ? "Connected" : "Disconnected"}
+                        </Badge>
                     </div>
+                </div>
 
-                    {/* Main Content */}
-                    <div className="max-w-4xl mx-auto">
-                        <BattleQueue battleSocket={battleSocket} />
-                    </div>
+                {/* Main Content */}
+                <div className="max-w-4xl mx-auto">
+                    <BattleQueue battleSocket={battleSocket} />
                 </div>
             </main>
 
@@ -171,12 +164,5 @@ function BattlePage() {
 }
 
 export default function ProtectedBattlePage() {
-    return (
-        <ProtectedPage
-            fallbackTitle="Authentication Required"
-            fallbackMessage="You need to sign in to access Code Battles."
-        >
-            <BattlePage />
-        </ProtectedPage>
-    );
+    return <BattlePage />;
 }

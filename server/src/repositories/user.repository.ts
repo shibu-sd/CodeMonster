@@ -535,9 +535,44 @@ export class UserRepository extends BaseRepository<User, string> {
                     totalSubmissions: true,
                     acceptedSubmissions: true,
                 },
-                orderBy: {
-                    problemsSolved: "desc",
-                },
+            });
+
+            users.sort((a, b) => {
+                const problemsSolvedA = Number(a.problemsSolved) || 0;
+                const problemsSolvedB = Number(b.problemsSolved) || 0;
+                const battlesWonA = Number(a.battlesWon) || 0;
+                const battlesWonB = Number(b.battlesWon) || 0;
+                const totalSubmissionsA = Number(a.totalSubmissions) || 0;
+                const totalSubmissionsB = Number(b.totalSubmissions) || 0;
+                const acceptedSubmissionsA = Number(a.acceptedSubmissions) || 0;
+                const acceptedSubmissionsB = Number(b.acceptedSubmissions) || 0;
+
+                const acceptanceRateA =
+                    totalSubmissionsA > 0
+                        ? (acceptedSubmissionsA / totalSubmissionsA) * 100
+                        : 0;
+                const acceptanceRateB =
+                    totalSubmissionsB > 0
+                        ? (acceptedSubmissionsB / totalSubmissionsB) * 100
+                        : 0;
+
+                // Primary sort: Problems solved
+                if (problemsSolvedB !== problemsSolvedA) {
+                    return problemsSolvedB - problemsSolvedA;
+                }
+
+                // Secondary sort: Battles won
+                if (battlesWonB !== battlesWonA) {
+                    return battlesWonB - battlesWonA;
+                }
+
+                // Tertiary sort: Acceptance rate
+                if (Math.abs(acceptanceRateB - acceptanceRateA) > 0.01) {
+                    return acceptanceRateB - acceptanceRateA;
+                }
+
+                // Quaternary sort: Fewer submissions (efficiency)
+                return totalSubmissionsA - totalSubmissionsB;
             });
 
             const usersWithStats = users.map((user, index) => {

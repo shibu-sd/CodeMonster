@@ -10,11 +10,11 @@ import {
     Clock,
     Users,
     CheckCircle,
+    Star,
 } from "lucide-react";
 import { HeroHeader } from "@/components/header/header";
 import FooterSection from "@/components/footer/footer";
 import { Button } from "@/components/ui/button";
-import { ProtectedPage } from "@/components/auth/protected-page";
 import { useAuth } from "@clerk/nextjs";
 import {
     useApiWithAuth,
@@ -45,6 +45,11 @@ function ProblemsPageContent() {
     const [solvedProblemIds, setSolvedProblemIds] = useState<Set<string>>(
         new Set()
     );
+
+    // Set page title
+    useEffect(() => {
+        document.title = "Problems - CodeMonster";
+    }, []);
 
     useEffect(() => {
         const initAuth = async () => {
@@ -190,77 +195,81 @@ function ProblemsPageContent() {
                         <Skeleton className="h-12 w-48 mb-4 mx-auto" />
                         <Skeleton className="h-6 w-96 mb-6 mx-auto" />
 
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                        {/* Stats Cards Skeleton */}
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
                             {[...Array(4)].map((_, i) => (
                                 <div
                                     key={i}
-                                    className="bg-card rounded-lg p-4 border"
+                                    className="bg-muted/20 rounded-xl p-6 border shadow-lg"
                                 >
-                                    <div className="flex items-center space-x-2 mb-2">
-                                        <Skeleton className="h-5 w-5" />
-                                        <Skeleton className="h-4 w-12" />
+                                    <div className="flex items-center justify-between mb-3">
+                                        <Skeleton className="h-4 w-16" />
+                                        <Skeleton className="h-9 w-9 rounded-lg" />
                                     </div>
-                                    <Skeleton className="h-8 w-16" />
+                                    <Skeleton className="h-9 w-16 mx-auto" />
                                 </div>
                             ))}
                         </div>
 
+                        {/* Search and Filter Skeleton */}
                         <div className="flex flex-col md:flex-row gap-4 mb-6">
                             <div className="flex-1">
-                                <div className="relative">
-                                    <Skeleton className="h-10 w-full rounded-md" />
-                                </div>
+                                <Skeleton className="h-10 w-full rounded-md" />
                             </div>
                             <div className="flex gap-2">
-                                {[...Array(3)].map((_, i) => (
-                                    <Skeleton key={i} className="h-10 w-16" />
-                                ))}
+                                <Skeleton className="h-10 w-20 rounded-full" />
+                                <Skeleton className="h-10 w-24 rounded-full" />
+                                <Skeleton className="h-10 w-20 rounded-full" />
                             </div>
                         </div>
                     </div>
 
-                    <div className="bg-card rounded-lg border overflow-hidden">
+                    {/* Problems Table Skeleton */}
+                    <div className="bg-card rounded-xl border shadow-lg overflow-hidden">
                         <div className="overflow-x-auto">
                             <table className="w-full">
-                                <thead className="bg-muted/50">
+                                <thead className="bg-gradient-to-r from-muted/80 to-muted/60">
                                     <tr>
-                                        <th className="text-left py-3 px-4 font-medium">
-                                            <Skeleton className="h-5 w-20" />
+                                        <th className="text-left py-4 px-6">
+                                            <Skeleton className="h-4 w-20" />
                                         </th>
-                                        <th className="text-center py-3 px-4 font-medium">
-                                            <Skeleton className="h-5 w-20 mx-auto" />
+                                        <th className="text-center py-4 px-6">
+                                            <Skeleton className="h-4 w-20 mx-auto" />
                                         </th>
-                                        <th className="text-center py-3 px-4 font-medium">
-                                            <Skeleton className="h-5 w-20 mx-auto" />
+                                        <th className="text-center py-4 px-6">
+                                            <Skeleton className="h-4 w-24 mx-auto" />
                                         </th>
-                                        <th className="text-center py-3 px-4 font-medium">
-                                            <Skeleton className="h-5 w-20 mx-auto" />
+                                        <th className="text-center py-4 px-6">
+                                            <Skeleton className="h-4 w-24 mx-auto" />
                                         </th>
-                                        <th className="text-center py-3 px-4 font-medium">
-                                            <Skeleton className="h-5 w-16 mx-auto" />
+                                        <th className="text-center py-4 px-6">
+                                            <Skeleton className="h-4 w-16 mx-auto" />
                                         </th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {[...Array(10)].map((_, index) => (
-                                        <tr key={index} className="border-t">
-                                            <td className="py-4 px-4">
-                                                <div className="flex items-center space-x-2">
-                                                    <Skeleton className="h-4 w-6" />
-                                                    <Skeleton className="h-5 w-48" />
+                                        <tr
+                                            key={index}
+                                            className="border-t border-border/50"
+                                        >
+                                            <td className="py-5 px-6">
+                                                <div className="flex items-center space-x-3">
+                                                    <Skeleton className="h-4 w-8" />
+                                                    <Skeleton className="h-5 w-64" />
                                                 </div>
                                             </td>
-                                            <td className="py-4 px-4 text-center">
+                                            <td className="py-5 px-6 text-center">
                                                 <Skeleton className="h-6 w-16 mx-auto rounded-full" />
                                             </td>
-                                            <td className="py-4 px-4 text-center">
+                                            <td className="py-5 px-6 text-center">
                                                 <Skeleton className="h-4 w-12 mx-auto" />
                                             </td>
-                                            <td className="py-4 px-4 text-center">
+                                            <td className="py-5 px-6 text-center">
                                                 <Skeleton className="h-4 w-16 mx-auto" />
                                             </td>
-                                            <td className="py-4 px-4 text-center">
-                                                <Skeleton className="h-5 w-5 mx-auto" />
+                                            <td className="py-5 px-6 text-center">
+                                                <Skeleton className="h-5 w-5 mx-auto rounded-full" />
                                             </td>
                                         </tr>
                                     ))}
@@ -327,48 +336,66 @@ function ProblemsPageContent() {
 
                     {/* Stats Cards */}
                     {stats && (
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                            <div className="bg-card rounded-lg p-4 border text-left">
-                                <div className="flex items-center space-x-2 mb-2">
-                                    <BarChart3 className="h-5 w-5 text-primary" />
-                                    <span className="text-sm font-medium">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+                            {/* Total Card */}
+                            <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/30 dark:to-blue-900/20 rounded-xl p-6 border border-blue-200 dark:border-blue-800 shadow-lg">
+                                <div className="flex items-center justify-between mb-3">
+                                    <span className="text-sm font-semibold text-blue-700 dark:text-blue-400 uppercase tracking-wide">
                                         Total
                                     </span>
+                                    <div className="p-2 bg-blue-200 dark:bg-blue-800/50 rounded-lg">
+                                        <BarChart3 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                                    </div>
                                 </div>
-                                <p className="text-2xl font-bold">
+                                <p className="text-3xl font-bold text-blue-700 dark:text-blue-300">
                                     {stats.total}
                                 </p>
                             </div>
-                            <div className="bg-card rounded-lg p-4 border text-left">
-                                <div className="flex items-center space-x-2 mb-2">
-                                    <Trophy className="h-5 w-5 text-green-500" />
-                                    <span className="text-sm font-medium">
+
+                            {/* Easy Card */}
+                            <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950/30 dark:to-green-900/20 rounded-xl p-6 border border-green-200 dark:border-green-800 shadow-lg">
+                                <div className="flex items-center justify-between mb-3">
+                                    <span className="text-sm font-semibold text-green-700 dark:text-green-400 uppercase tracking-wide">
                                         Easy
                                     </span>
+                                    <div className="p-2 bg-green-200 dark:bg-green-800/50 rounded-lg">
+                                        <Star className="h-5 w-5 text-green-600 dark:text-green-400 fill-green-600 dark:fill-green-400" />
+                                    </div>
                                 </div>
-                                <p className="text-2xl font-bold text-green-600">
+                                <p className="text-3xl font-bold text-green-700 dark:text-green-300">
                                     {stats.easy}
                                 </p>
                             </div>
-                            <div className="bg-card rounded-lg p-4 border text-left">
-                                <div className="flex items-center space-x-2 mb-2">
-                                    <Clock className="h-5 w-5 text-yellow-500" />
-                                    <span className="text-sm font-medium">
+
+                            {/* Medium Card */}
+                            <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-950/30 dark:to-yellow-900/20 rounded-xl p-6 border border-yellow-200 dark:border-yellow-800 shadow-lg">
+                                <div className="flex items-center justify-between mb-3">
+                                    <span className="text-sm font-semibold text-yellow-700 dark:text-yellow-400 uppercase tracking-wide">
                                         Medium
                                     </span>
+                                    <div className="p-2 bg-yellow-200 dark:bg-yellow-800/50 rounded-lg flex items-center">
+                                        <Star className="h-4 w-4 text-yellow-600 dark:text-yellow-400 fill-yellow-600 dark:fill-yellow-400" />
+                                        <Star className="h-4 w-4 text-yellow-600 dark:text-yellow-400 fill-yellow-600 dark:fill-yellow-400 -ml-1" />
+                                    </div>
                                 </div>
-                                <p className="text-2xl font-bold text-yellow-600">
+                                <p className="text-3xl font-bold text-yellow-700 dark:text-yellow-300">
                                     {stats.medium}
                                 </p>
                             </div>
-                            <div className="bg-card rounded-lg p-4 border text-left">
-                                <div className="flex items-center space-x-2 mb-2">
-                                    <Users className="h-5 w-5 text-red-500" />
-                                    <span className="text-sm font-medium">
+
+                            {/* Hard Card */}
+                            <div className="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-950/30 dark:to-red-900/20 rounded-xl p-6 border border-red-200 dark:border-red-800 shadow-lg">
+                                <div className="flex items-center justify-between mb-3">
+                                    <span className="text-sm font-semibold text-red-700 dark:text-red-400 uppercase tracking-wide">
                                         Hard
                                     </span>
+                                    <div className="p-2 bg-red-200 dark:bg-red-800/50 rounded-lg flex items-center">
+                                        <Star className="h-4 w-4 text-red-600 dark:text-red-400 fill-red-600 dark:fill-red-400" />
+                                        <Star className="h-4 w-4 text-red-600 dark:text-red-400 fill-red-600 dark:fill-red-400 -ml-1" />
+                                        <Star className="h-4 w-4 text-red-600 dark:text-red-400 fill-red-600 dark:fill-red-400 -ml-1" />
+                                    </div>
                                 </div>
-                                <p className="text-2xl font-bold text-red-600">
+                                <p className="text-3xl font-bold text-red-700 dark:text-red-300">
                                     {stats.hard}
                                 </p>
                             </div>
@@ -393,65 +420,101 @@ function ProblemsPageContent() {
                         </form>
 
                         <div className="flex gap-2">
-                            <Button
-                                variant={
-                                    selectedDifficulty === "EASY"
-                                        ? "default"
-                                        : "outline"
-                                }
-                                size="sm"
-                                onClick={() => handleDifficultyFilter("EASY")}
-                                className="text-green-600"
-                            >
-                                Easy
-                            </Button>
-                            <Button
-                                variant={
-                                    selectedDifficulty === "MEDIUM"
-                                        ? "default"
-                                        : "outline"
-                                }
-                                size="sm"
-                                onClick={() => handleDifficultyFilter("MEDIUM")}
-                                className="text-yellow-600"
-                            >
-                                Medium
-                            </Button>
-                            <Button
-                                variant={
-                                    selectedDifficulty === "HARD"
-                                        ? "default"
-                                        : "outline"
-                                }
-                                size="sm"
-                                onClick={() => handleDifficultyFilter("HARD")}
-                                className="text-red-600"
-                            >
-                                Hard
-                            </Button>
+                            {selectedDifficulty === "EASY" ? (
+                                <button
+                                    onClick={() =>
+                                        handleDifficultyFilter("EASY")
+                                    }
+                                    className="p-[3px] relative h-10 rounded-lg transform hover:scale-105 transition-all duration-200"
+                                >
+                                    <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-green-600 rounded-lg" />
+                                    <div className="px-6 h-full flex items-center justify-center rounded-[6px] relative transition duration-200 text-base font-medium bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300">
+                                        Easy
+                                    </div>
+                                </button>
+                            ) : (
+                                <Button
+                                    variant="outline"
+                                    size="default"
+                                    onClick={() =>
+                                        handleDifficultyFilter("EASY")
+                                    }
+                                    className="text-green-600 hover:text-green-400 transform hover:scale-105 transition-all duration-200 h-10 px-6 text-base"
+                                >
+                                    Easy
+                                </Button>
+                            )}
+                            {selectedDifficulty === "MEDIUM" ? (
+                                <button
+                                    onClick={() =>
+                                        handleDifficultyFilter("MEDIUM")
+                                    }
+                                    className="p-[3px] relative h-10 rounded-lg transform hover:scale-105 transition-all duration-200"
+                                >
+                                    <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-lg" />
+                                    <div className="px-6 h-full flex items-center justify-center rounded-[6px] relative transition duration-200 text-base font-medium bg-yellow-100 dark:bg-yellow-950 text-yellow-700 dark:text-yellow-300">
+                                        Medium
+                                    </div>
+                                </button>
+                            ) : (
+                                <Button
+                                    variant="outline"
+                                    size="default"
+                                    onClick={() =>
+                                        handleDifficultyFilter("MEDIUM")
+                                    }
+                                    className="text-yellow-600 hover:text-yellow-400 transform hover:scale-105 transition-all duration-200 h-10 px-6 text-base"
+                                >
+                                    Medium
+                                </Button>
+                            )}
+                            {selectedDifficulty === "HARD" ? (
+                                <button
+                                    onClick={() =>
+                                        handleDifficultyFilter("HARD")
+                                    }
+                                    className="p-[3px] relative h-10 rounded-lg transform hover:scale-105 transition-all duration-200"
+                                >
+                                    <div className="absolute inset-0 bg-gradient-to-r from-red-400 to-red-600 rounded-lg" />
+                                    <div className="px-6 h-full flex items-center justify-center rounded-[6px] relative transition duration-200 text-base font-medium bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300">
+                                        Hard
+                                    </div>
+                                </button>
+                            ) : (
+                                <Button
+                                    variant="outline"
+                                    size="default"
+                                    onClick={() =>
+                                        handleDifficultyFilter("HARD")
+                                    }
+                                    className="text-red-600 hover:text-red-400 transform hover:scale-105 transition-all duration-200 h-10 px-6 text-base"
+                                >
+                                    Hard
+                                </Button>
+                            )}
                         </div>
                     </div>
                 </div>
 
                 {/* Problems Table */}
-                <div className="bg-card rounded-lg border overflow-hidden">
+                <div className="bg-card rounded-xl border shadow-lg overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full">
-                            <thead className="bg-muted/50">
+                            <thead className="bg-gradient-to-r from-muted/80 to-muted/60">
                                 <tr>
-                                    <th className="text-left py-3 px-4 font-medium">
+                                    <th className="text-left py-4 px-6 font-semibold text-sm uppercase tracking-wide">
                                         Problem
                                     </th>
-                                    <th className="text-center py-3 px-4 font-medium">
+                                    <th className="text-center py-4 px-6 font-semibold text-sm uppercase tracking-wide">
                                         Difficulty
                                     </th>
-                                    <th className="text-center py-3 px-4 font-medium">
+                                    <th className="text-center py-4 px-6 font-semibold text-sm uppercase tracking-wide">
                                         Acceptance
                                     </th>
-                                    <th className="text-center py-3 px-4 font-medium">
+                                    <th className="text-center py-4 px-6 font-semibold text-sm uppercase tracking-wide">
                                         Submissions
                                     </th>
-                                    <th className="text-center py-3 px-4 font-medium">
+                                    <th className="text-center py-4 px-6 font-semibold text-sm uppercase tracking-wide">
                                         Status
                                     </th>
                                 </tr>
@@ -460,33 +523,33 @@ function ProblemsPageContent() {
                                 {problems?.map((problem, index) => (
                                     <tr
                                         key={problem?.id || index}
-                                        className="border-t hover:bg-muted/30 transition-colors"
+                                        className="border-t border-border/50 hover:bg-muted/20 transition-all duration-200 group"
                                     >
-                                        <td className="py-4 px-4">
+                                        <td className="py-5 px-6">
                                             <Link
                                                 href={`/problems/${
                                                     problem?.slug || "unknown"
                                                 }`}
                                                 className="hover:text-primary transition-colors"
                                             >
-                                                <div className="flex items-center space-x-2">
-                                                    <span className="text-sm text-muted-foreground">
+                                                <div className="flex items-center space-x-3">
+                                                    <span className="text-sm font-medium text-muted-foreground min-w-[2rem]">
                                                         {(currentPage - 1) *
                                                             10 +
                                                             index +
                                                             1}
                                                         .
                                                     </span>
-                                                    <span className="font-medium">
+                                                    <span className="font-semibold text-base group-hover:underline">
                                                         {problem?.title ||
                                                             "Unknown Problem"}
                                                     </span>
                                                 </div>
                                             </Link>
                                         </td>
-                                        <td className="py-4 px-4 text-center">
+                                        <td className="py-5 px-6 text-center">
                                             <span
-                                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getDifficultyBadgeColor(
+                                                className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide shadow-sm ${getDifficultyBadgeColor(
                                                     problem?.difficulty ||
                                                         "EASY"
                                                 )}`}
@@ -494,25 +557,29 @@ function ProblemsPageContent() {
                                                 {problem?.difficulty || "EASY"}
                                             </span>
                                         </td>
-                                        <td className="py-4 px-4 text-center">
-                                            <span className="text-sm">
+                                        <td className="py-5 px-6 text-center">
+                                            <span className="text-sm font-medium">
                                                 {formatAcceptanceRate(
                                                     problem?.acceptanceRate
                                                 )}
                                             </span>
                                         </td>
-                                        <td className="py-4 px-4 text-center">
-                                            <span className="text-sm">
+                                        <td className="py-5 px-6 text-center">
+                                            <span className="text-sm font-medium text-muted-foreground">
                                                 {formatSubmissionCount(
                                                     problem?.totalSubmissions
                                                 )}
                                             </span>
                                         </td>
-                                        <td className="py-4 px-4 text-center">
+                                        <td className="py-5 px-6 text-center">
                                             {solvedProblemIds.has(
                                                 problem?.id || ""
                                             ) && (
-                                                <CheckCircle className="h-5 w-5 text-green-500 inline-block" />
+                                                <div className="flex justify-center">
+                                                    <div className="p-1.5 bg-green-100 dark:bg-green-900/30 rounded-full">
+                                                        <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+                                                    </div>
+                                                </div>
                                             )}
                                         </td>
                                     </tr>
@@ -584,12 +651,5 @@ function ProblemsPageContent() {
 }
 
 export default function ProblemsPage() {
-    return (
-        <ProtectedPage
-            fallbackTitle="Authentication Required"
-            fallbackMessage="You need to sign in to access the problems."
-        >
-            <ProblemsPageContent />
-        </ProtectedPage>
-    );
+    return <ProblemsPageContent />;
 }

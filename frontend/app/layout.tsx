@@ -16,9 +16,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-    title: "CodeMonster - Interactive Coding Practice Platform",
+    title: "CodeMonster - The Ultimate Coding Arena",
     description:
-        "Master algorithms and data structures with CodeMonster. Solve problems, compete in contests, and improve your programming skills with instant feedback from our online judge.",
+        "Solve algorithmic challenges, compete on leaderboards, and master DSA through real-time battles. Train your logic, track your progress, and evolve into an unstoppable coding monster.",
     icons: {
         icon: [
             {

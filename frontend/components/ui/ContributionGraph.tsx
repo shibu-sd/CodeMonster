@@ -206,20 +206,20 @@ export function ContributionGraph({
 
     return (
         <div className={`contribution-graph ${className}`}>
-            <div className="overflow-x-auto">
-                <table className="border-separate border-spacing-1 text-xs">
+            <div>
+                <table className="border-separate border-spacing-1 text-sm w-full">
                     <caption className="sr-only">
                         Contribution Graph for {year}
                     </caption>
 
                     {/* Month Headers */}
                     <thead>
-                        <tr className="h-3">
-                            <td className="w-7 min-w-7"></td>
+                        <tr className="h-4">
+                            <td className="w-9 min-w-9"></td>
                             {monthHeaders.map((header, index) => (
                                 <td
                                     key={index}
-                                    className="text-foreground relative text-left"
+                                    className="text-foreground relative text-left text-xs"
                                     colSpan={header.colspan}
                                 >
                                     <span className="absolute top-0 left-1">
@@ -233,9 +233,9 @@ export function ContributionGraph({
                     {/* Day Grid */}
                     <tbody>
                         {Array.from({ length: 7 }, (_, dayIndex) => (
-                            <tr key={dayIndex} className="h-2.5">
+                            <tr key={dayIndex} className="h-3.5">
                                 {/* Day Labels */}
-                                <td className="text-foreground relative w-7 min-w-7">
+                                <td className="text-foreground relative w-9 min-w-9">
                                     {dayIndex % 2 === 0 && (
                                         <span className="absolute -bottom-0.5 left-0 text-xs">
                                             {DAYS[dayIndex]}
@@ -251,9 +251,9 @@ export function ContributionGraph({
                                         return (
                                             <td
                                                 key={weekIndex}
-                                                className="h-2.5 w-2.5 p-0"
+                                                className="h-3.5 w-3.5 p-0"
                                             >
-                                                <div className="h-2.5 w-2.5"></div>
+                                                <div className="h-3.5 w-3.5"></div>
                                             </td>
                                         );
                                     }
@@ -261,7 +261,7 @@ export function ContributionGraph({
                                     return (
                                         <td
                                             key={weekIndex}
-                                            className="h-2.5 w-2.5 cursor-pointer p-0"
+                                            className="h-3.5 w-3.5 cursor-pointer p-0"
                                             onMouseEnter={(e) =>
                                                 handleDayHover(dayData, e)
                                             }
@@ -277,7 +277,7 @@ export function ContributionGraph({
                                             }
                                         >
                                             <div
-                                                className={`h-2.5 w-2.5 rounded-sm ${
+                                                className={`h-3.5 w-3.5 rounded-sm ${
                                                     CONTRIBUTION_COLORS[
                                                         dayData.level
                                                     ]
@@ -319,7 +319,7 @@ export function ContributionGraph({
                         {CONTRIBUTION_LEVELS.map((level) => (
                             <div
                                 key={level}
-                                className={`h-3 w-3 rounded-sm ${CONTRIBUTION_COLORS[level]}`}
+                                className={`h-3.5 w-3.5 rounded-sm ${CONTRIBUTION_COLORS[level]}`}
                             />
                         ))}
                     </div>

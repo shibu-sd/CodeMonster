@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { HeroHeader } from "@/components/header/header";
-import { ProtectedPage } from "@/components/auth/protected-page";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { ResizablePanelGroup, ResizablePanel } from "@/components/ui/resizable";
 import { useApiWithAuth, Problem } from "@/lib/api";
@@ -97,6 +96,15 @@ function ProblemDetailPageContent() {
         memory: number;
         solvedAt: string;
     } | null>(null);
+
+    // Set page title when problem loads
+    useEffect(() => {
+        if (problem?.title) {
+            document.title = `${problem.title} - CodeMonster`;
+        } else {
+            document.title = "Problem - CodeMonster";
+        }
+    }, [problem?.title]);
 
     // Pop-up window states
     const [showRunPanel, setShowRunPanel] = useState(false);
@@ -869,12 +877,5 @@ function ProblemDetailPageContent() {
 }
 
 export default function ProblemDetailPage() {
-    return (
-        <ProtectedPage
-            fallbackTitle="Authentication Required"
-            fallbackMessage="You need to sign in to access this problem."
-        >
-            <ProblemDetailPageContent />
-        </ProtectedPage>
-    );
+    return <ProblemDetailPageContent />;
 }
