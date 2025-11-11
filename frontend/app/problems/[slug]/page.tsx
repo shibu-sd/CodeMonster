@@ -13,8 +13,8 @@ import { CodeEditorPanel } from "./components/CodeEditorPanel";
 import { ResultsPanel } from "./components/ResultsPanel";
 import { ProblemErrorState } from "./components/ProblemErrorState";
 import { useBattle } from "@/contexts/BattleContext";
-import { BattleEndDialog } from "@/components/battle/BattleEndDialog";
-import { BattleChatBox } from "@/components/battle/BattleChatBox";
+import { BattleEndDialog } from "@/components/battle/battle-end-dialog";
+import { BattleChatBox } from "@/components/battle/battle-chat-box";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DotPattern } from "@/components/ui/dot-pattern";
 

@@ -9,7 +9,7 @@ import {
     formatAcceptanceRate,
     formatSubmissionCount,
 } from "@/lib/api";
-import { BattleTimer } from "@/components/battle/BattleTimer";
+import { BattleTimer } from "@/components/battle/battle-timer";
 import {
     Dialog,
     DialogContent,
