@@ -29,3 +29,4 @@ export type {
 } from "./leaderboard.types";
 export type { MascotProps } from "./hero.types";
 export type { FooterLinksProps } from "./footer.types";
+export type { FaqItem, FaqsAccordionProps } from "./faqs.types";
