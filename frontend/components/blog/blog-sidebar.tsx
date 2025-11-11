@@ -1,16 +1,8 @@
-"use client";
-
 import Link from "next/link";
 import { Calendar, Clock, TrendingUp, Archive } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { BlogPost } from "@/lib/blog";
-
-interface BlogSidebarProps {
-    recentPosts: BlogPost[];
-    allTags: string[];
-    featuredPosts: BlogPost[];
-}
+import type { BlogSidebarProps } from "@/types";
 
 export function BlogSidebar({
     recentPosts,
@@ -21,7 +13,6 @@ export function BlogSidebar({
 
     return (
         <div className="space-y-6">
-            {/* Featured Posts */}
             {featuredPosts.length > 0 && (
                 <Card>
                     <CardHeader className="pb-3">
@@ -55,7 +46,6 @@ export function BlogSidebar({
                 </Card>
             )}
 
-            {/* Recent Posts */}
             <Card>
                 <CardHeader className="pb-3">
                     <CardTitle className="text-lg flex items-center gap-2">
@@ -83,7 +73,6 @@ export function BlogSidebar({
                 </CardContent>
             </Card>
 
-            {/* Popular Tags */}
             <Card>
                 <CardHeader className="pb-3">
                     <CardTitle className="text-lg">Popular Tags</CardTitle>
