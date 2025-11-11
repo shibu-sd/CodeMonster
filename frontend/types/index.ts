@@ -14,3 +14,10 @@ export type {
     ProblemsResponse,
 } from "./api.types";
 export type { BlogPost } from "./blog.types";
+export type {
+    BattleUser,
+    BattleProblem,
+    BattleEvents,
+    BattleState,
+    BattleSocketState,
+} from "./battle.types";
