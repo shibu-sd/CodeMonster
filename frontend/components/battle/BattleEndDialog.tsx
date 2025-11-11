@@ -12,14 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Trophy, Skull, Swords } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
-
-interface BattleEndDialogProps {
-    open: boolean;
-    isWinner: boolean;
-    isDraw: boolean;
-    opponentName?: string;
-    onClose?: () => void;
-}
+import type { BattleEndDialogProps } from "@/types";
 
 export function BattleEndDialog({
     open,
@@ -33,11 +26,7 @@ export function BattleEndDialog({
     const [countdown, setCountdown] = useState(15);
 
     const redirectToBattle = useCallback(() => {
-        // 1. Clear battle state FIRST (while still on problem page)
         onClose?.();
-
-        // 2. Then navigate using replace (removes history entry)
-        // Wrapped in startTransition for smoother navigation
         startTransition(() => {
             router.replace("/battle");
         });
@@ -56,7 +45,6 @@ export function BattleEndDialog({
         return () => clearInterval(interval);
     }, [open]);
 
-    // Separate effect to handle redirect when countdown reaches 0
     useEffect(() => {
         if (open && countdown <= 0) {
             redirectToBattle();
@@ -64,7 +52,6 @@ export function BattleEndDialog({
     }, [countdown, open, redirectToBattle]);
 
     const handleOpenChange = (newOpen: boolean) => {
-        // If user tries to close dialog, redirect to battle page
         if (!newOpen) {
             redirectToBattle();
         }
@@ -139,7 +126,6 @@ export function BattleEndDialog({
                 </DialogHeader>
 
                 <div className="space-y-4 py-4">
-                    {/* Countdown Timer */}
                     <div className="space-y-2">
                         <div className="text-sm text-center text-muted-foreground">
                             Redirecting to battle lobby in {countdown}s
@@ -150,7 +136,6 @@ export function BattleEndDialog({
                         />
                     </div>
 
-                    {/* Action Button */}
                     <Button
                         onClick={redirectToBattle}
                         size="lg"

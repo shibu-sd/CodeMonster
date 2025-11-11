@@ -1,15 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Clock, AlertTriangle } from "lucide-react";
-
-interface BattleTimerProps {
-    startTime?: Date | null;
-    timeLimit: number; // in seconds
-    onTimeUp?: () => void;
-}
+import type { BattleTimerProps } from "@/types";
 
 export function BattleTimer({
     startTime,
@@ -20,7 +13,12 @@ export function BattleTimer({
     const [isRunning, setIsRunning] = useState(false);
 
     useEffect(() => {
-        console.log("⏰ BattleTimer - startTime:", startTime, "timeLimit:", timeLimit);
+        console.log(
+            "⏰ BattleTimer - startTime:",
+            startTime,
+            "timeLimit:",
+            timeLimit
+        );
 
         if (!startTime) {
             console.log("⚠️ No startTime, timer not running");
@@ -37,7 +35,9 @@ export function BattleTimer({
             const elapsed = Math.floor((now - start) / 1000);
             const remaining = Math.max(0, timeLimit - elapsed);
 
-            console.log(`⏱️ Timer tick: ${remaining}s remaining (elapsed: ${elapsed}s)`);
+            console.log(
+                `⏱️ Timer tick: ${remaining}s remaining (elapsed: ${elapsed}s)`
+            );
             setTimeRemaining(remaining);
 
             if (remaining === 0) {
@@ -72,14 +72,6 @@ export function BattleTimer({
         if (timeRemaining <= 300) return "text-orange-500"; // Last 5 minutes
         return "text-foreground";
     };
-
-    const getUrgencyVariant = () => {
-        if (timeRemaining <= 60) return "destructive";
-        if (timeRemaining <= 300) return "secondary";
-        return "default";
-    };
-
-    const progress = ((timeLimit - timeRemaining) / timeLimit) * 100;
 
     return (
         <div className="flex items-center gap-2">

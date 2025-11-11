@@ -1,41 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Users, Shield, AlertCircle, Swords } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-
-interface BattleQueueProps {
-    battleSocket: ReturnType<
-        typeof import("@/hooks/useBattleSocket").useBattleSocket
-    >;
-}
+import type { BattleQueueProps } from "@/types";
+import { BATTLE_TIPS } from "./battle-config";
 
 export function BattleQueue({ battleSocket }: BattleQueueProps) {
     const { battleState, connected, joinQueue, leaveQueue } = battleSocket;
     const [searchingTime, setSearchingTime] = useState(0);
     const [currentTipIndex, setCurrentTipIndex] = useState(0);
 
-    const battleTips = [
-        "Ctrl + Z won’t undo that WA",
-        "When in doubt, blame the test cases",
-        "TLEs exist to humble brute force",
-        "Keyboard clacks = confidence. Type loud",
-        "Real monsters don’t Google mid-battle (well, maybe once)",
-        "Brute force isn’t dumb if it works",
-        "Clean code wins ugly battles",
-        "Runtime Errors are just loud edge cases",
-    ];
-
-    // Update search time when in queue
     useEffect(() => {
         if (battleState.isInQueue) {
             const interval = setInterval(() => {
@@ -51,7 +27,7 @@ export function BattleQueue({ battleSocket }: BattleQueueProps) {
     useEffect(() => {
         if (battleState.isInQueue) {
             const interval = setInterval(() => {
-                setCurrentTipIndex((prev) => (prev + 1) % battleTips.length);
+                setCurrentTipIndex((prev) => (prev + 1) % BATTLE_TIPS.length);
             }, 5000);
             return () => clearInterval(interval);
         }
@@ -86,7 +62,6 @@ export function BattleQueue({ battleSocket }: BattleQueueProps) {
     if (battleState.isInQueue) {
         return (
             <div className="max-w-2xl mx-auto space-y-6">
-                {/* Main Card with Queueing Chaos */}
                 <div className="bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5 border-2 border-primary/20 rounded-xl p-8 shadow-lg">
                     <div className="text-center space-y-4">
                         <div className="w-16 h-16 mx-auto relative">
@@ -102,7 +77,6 @@ export function BattleQueue({ battleSocket }: BattleQueueProps) {
                             Summoning a monster to battle
                         </p>
 
-                        {/* Rotating Battle Tips */}
                         <div className="mt-6 min-h-[60px] flex items-center justify-center overflow-hidden">
                             <AnimatePresence mode="wait">
                                 <motion.div
@@ -119,7 +93,7 @@ export function BattleQueue({ battleSocket }: BattleQueueProps) {
                                     <span className="font-semibold">
                                         💡 Battle Tip:
                                     </span>{" "}
-                                    {battleTips[currentTipIndex]}
+                                    {BATTLE_TIPS[currentTipIndex]}
                                 </motion.div>
                             </AnimatePresence>
                         </div>
@@ -138,7 +112,6 @@ export function BattleQueue({ battleSocket }: BattleQueueProps) {
 
     return (
         <div className="max-w-2xl mx-auto space-y-6">
-            {/* Battle Rules */}
             <div className="bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5 border-2 border-primary/20 rounded-xl p-6 shadow-lg">
                 <div className="flex items-center justify-center gap-2 mb-5">
                     <div className="p-2 bg-primary/10 rounded-lg">
@@ -176,7 +149,6 @@ export function BattleQueue({ battleSocket }: BattleQueueProps) {
                 </div>
             </div>
 
-            {/* Queue Status */}
             {battleState.usersInQueue > 0 ? (
                 <div className="text-center">
                     <Badge variant="secondary" className="text-base px-4 py-2">
@@ -193,7 +165,6 @@ export function BattleQueue({ battleSocket }: BattleQueueProps) {
                 </div>
             )}
 
-            {/* Join Queue Button */}
             <button
                 onClick={joinQueue}
                 className="w-full px-6 py-4 rounded-full bg-primary font-bold text-primary-foreground tracking-widest uppercase transform hover:scale-105 hover:bg-primary/90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"

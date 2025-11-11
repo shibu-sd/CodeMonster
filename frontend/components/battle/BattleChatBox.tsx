@@ -6,27 +6,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import type { BattleChatBoxProps } from "@/types";
+import { CHAT_CONFIG } from "./battle-config";
 
-interface BattleChatBoxProps {
-    battleId: string;
-    currentUserId: string;
-    opponentUsername?: string;
-    onSendMessage: (message: string) => void;
-}
-
-export function BattleChatBox({
-    battleId,
-    currentUserId,
-    opponentUsername,
-    onSendMessage,
-}: BattleChatBoxProps) {
+export function BattleChatBox({ battleId, onSendMessage }: BattleChatBoxProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [message, setMessage] = useState("");
     const [cooldownRemaining, setCooldownRemaining] = useState(0);
     const [lastMessageTime, setLastMessageTime] = useState<number | null>(null);
 
-    const MAX_MESSAGE_LENGTH = 100;
-    const COOLDOWN_SECONDS = 60;
+    const { MAX_MESSAGE_LENGTH, COOLDOWN_SECONDS } = CHAT_CONFIG;
 
     useEffect(() => {
         const storageKey = `battle-message-cooldown-${battleId}`;

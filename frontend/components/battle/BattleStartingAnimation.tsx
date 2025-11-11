@@ -5,6 +5,7 @@ import { Swords } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AnimatedBeam } from "@/components/ui/animated-beam";
 import { cn } from "@/lib/utils";
+import type { BattleStartingAnimationProps } from "@/types";
 
 const Circle = forwardRef<
     HTMLDivElement,
@@ -25,17 +26,6 @@ const Circle = forwardRef<
 
 Circle.displayName = "Circle";
 
-interface BattleStartingAnimationProps {
-    currentUser: {
-        username?: string;
-        profileImageUrl?: string;
-    };
-    opponent: {
-        username?: string;
-        profileImageUrl?: string;
-    };
-}
-
 export function BattleStartingAnimation({
     currentUser,
     opponent,
@@ -48,13 +38,11 @@ export function BattleStartingAnimation({
     return (
         <div className="min-h-screen bg-background flex items-center justify-center">
             <div className="space-y-8 w-full max-w-4xl px-8">
-                {/* Animated Battle Connection */}
                 <div
                     className="relative flex h-[300px] w-full items-center justify-center overflow-hidden"
                     ref={containerRef}
                 >
                     <div className="flex size-full items-center justify-between gap-8">
-                        {/* Current User */}
                         <div className="flex flex-col items-center gap-4">
                             <Circle ref={user1Ref} className="size-24">
                                 <Avatar className="w-full h-full">
@@ -78,7 +66,6 @@ export function BattleStartingAnimation({
                             </div>
                         </div>
 
-                        {/* Battle Icon */}
                         <div className="flex flex-col items-center gap-4">
                             <Circle
                                 ref={battleIconRef}
@@ -93,7 +80,6 @@ export function BattleStartingAnimation({
                             </div>
                         </div>
 
-                        {/* Opponent */}
                         <div className="flex flex-col items-center gap-4">
                             <Circle ref={user2Ref} className="size-24">
                                 <Avatar className="w-full h-full">
@@ -118,7 +104,6 @@ export function BattleStartingAnimation({
                         </div>
                     </div>
 
-                    {/* AnimatedBeams - 3 beams from user1 to battle icon */}
                     <AnimatedBeam
                         containerRef={containerRef}
                         fromRef={user1Ref}
@@ -149,8 +134,6 @@ export function BattleStartingAnimation({
                         gradientStopColor="#7c3aed"
                         curvature={-50}
                     />
-
-                    {/* AnimatedBeams - 3 beams from battle icon to user2 */}
                     <AnimatedBeam
                         containerRef={containerRef}
                         fromRef={battleIconRef}
@@ -183,7 +166,6 @@ export function BattleStartingAnimation({
                     />
                 </div>
 
-                {/* Text */}
                 <div className="text-center space-y-4">
                     <h2 className="text-3xl font-bold text-foreground animate-pulse">
                         Battle Starting!
