@@ -107,25 +107,19 @@ function BattlePage() {
                 <HeroHeader />
 
                 <main className="container mx-auto px-4 pt-32 pb-16 relative z-10">
-                    {/* Header Skeleton */}
                     <div className="mb-8 text-center">
                         <Skeleton className="h-12 w-64 mb-4 mx-auto" />
                         <Skeleton className="h-6 w-96 mb-6 mx-auto" />
-
-                        {/* Connection Status Skeleton */}
                         <div className="flex justify-center items-center gap-2 mb-6">
                             <Skeleton className="h-6 w-24 rounded-full" />
                         </div>
                     </div>
-
-                    {/* Main Content Skeleton */}
                     <div className="max-w-4xl mx-auto">
                         <div className="bg-card rounded-xl border shadow-lg p-8">
                             <Skeleton className="h-64 w-full rounded-lg" />
                         </div>
                     </div>
                 </main>
-
                 <FooterSection />
             </div>
         );
@@ -137,14 +131,12 @@ function BattlePage() {
             <HeroHeader />
 
             <main className="container mx-auto px-4 pt-32 pb-16 relative z-10">
-                {/* Header Section */}
                 <div className="mb-8 text-center">
                     <h1 className="text-4xl font-bold mb-4">Code Battles</h1>
                     <p className="text-xl text-muted-foreground mb-6 max-w-2xl mx-auto">
                         Face fierce monsters in live 1v1 coding duels
                     </p>
 
-                    {/* Connection Status */}
                     <div className="flex justify-center items-center gap-2 mb-6">
                         <Badge variant={connected ? "default" : "destructive"}>
                             {connected ? "Connected" : "Disconnected"}
@@ -152,7 +144,6 @@ function BattlePage() {
                     </div>
                 </div>
 
-                {/* Main Content */}
                 <div className="max-w-4xl mx-auto">
                     <BattleQueue battleSocket={battleSocket} />
                 </div>
