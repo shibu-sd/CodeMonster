@@ -15,7 +15,6 @@ export default function AboutContent() {
             <DotPattern className="opacity-30" />
             <HeroHeader />
             <div className="container mx-auto px-6 pt-32 pb-16 relative z-10">
-                {/* Hero Section */}
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -32,7 +31,6 @@ export default function AboutContent() {
                     </p>
                 </motion.div>
 
-                {/* Mission Section */}
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -57,7 +55,6 @@ export default function AboutContent() {
                     </Card>
                 </motion.div>
 
-                {/* Features Grid */}
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -165,7 +162,6 @@ export default function AboutContent() {
                     </motion.div>
                 </motion.div>
 
-                {/* Story Section */}
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -211,7 +207,6 @@ export default function AboutContent() {
                     </Card>
                 </motion.div>
 
-                {/* Call to Action */}
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
