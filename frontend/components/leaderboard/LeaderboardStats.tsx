@@ -1,14 +1,6 @@
-"use client";
-
 import React from "react";
-import type { LeaderboardStats as LeaderboardStatsType } from "@/lib/api";
-import { Card, CardContent } from "@/components/ui/card";
+import type { LeaderboardStatsProps } from "@/types";
 import { Users, Trophy, Target, TrendingUp } from "lucide-react";
-
-interface LeaderboardStatsProps {
-    stats: LeaderboardStatsType;
-    isLoading?: boolean;
-}
 
 export function LeaderboardStats({ stats, isLoading }: LeaderboardStatsProps) {
     if (isLoading) {

@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import type { LeaderboardEntry } from "@/lib/api";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { LeaderboardTableProps } from "@/types";
+import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,23 +14,6 @@ import {
     ChevronRight,
     User,
 } from "lucide-react";
-
-interface PaginationInfo {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-    hasNext: boolean;
-    hasPrev: boolean;
-}
-
-interface LeaderboardTableProps {
-    users: LeaderboardEntry[];
-    isLoading?: boolean;
-    pagination?: PaginationInfo;
-    onNextPage?: () => void;
-    onPrevPage?: () => void;
-}
 
 export function LeaderboardTable({
     users,
