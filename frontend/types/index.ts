@@ -44,3 +44,4 @@ export type {
     BattleStartingAnimationProps,
     BattleTimerProps,
 } from "./battle-components.types";
+export type { DashboardData } from "./dashboard.types";
