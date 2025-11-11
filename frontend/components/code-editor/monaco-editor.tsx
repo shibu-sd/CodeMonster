@@ -3,17 +3,8 @@
 import { Editor } from "@monaco-editor/react";
 import { useTheme } from "next-themes";
 import React, { useState, useRef } from "react";
-
-interface MonacoEditorProps {
-    value: string;
-    onChange: (value: string) => void;
-    language: string;
-    readOnly?: boolean;
-    height?: string;
-    className?: string;
-    tabSize?: number;
-    fontSize?: number;
-}
+import type { MonacoEditorProps } from "@/types";
+import { getMonacoLanguage, getEditorOptions } from "./editor-config";
 
 export function MonacoEditor({
     value,
@@ -43,45 +34,9 @@ export function MonacoEditor({
         }
     }, [fontSize]);
 
-    const getMonacoLanguage = (lang: string) => {
-        const languageMap: Record<string, string> = {
-            JAVASCRIPT: "javascript",
-            TYPESCRIPT: "typescript",
-            PYTHON: "python",
-            JAVA: "java",
-            CPP: "cpp",
-            C: "c",
-        };
-        return languageMap[lang] || "javascript";
-    };
-
     const handleEditorDidMount = (editor: any) => {
         editorRef.current = editor;
         setIsLoading(false);
-
-        editor.updateOptions({
-            fontSize: fontSize,
-            lineHeight: 1.6,
-            fontFamily: "JetBrains Mono, Fira Code, Monaco, Menlo, monospace",
-            minimap: { enabled: false },
-            scrollBeyondLastLine: false,
-            automaticLayout: true,
-            tabSize: tabSize,
-            insertSpaces: true,
-            wordWrap: "on",
-            lineNumbers: "on",
-            glyphMargin: false,
-            folding: true,
-            lineDecorationsWidth: 0,
-            lineNumbersMinChars: 3,
-            renderLineHighlight: "line",
-            scrollbar: {
-                vertical: "auto",
-                horizontal: "auto",
-                verticalScrollbarSize: 8,
-                horizontalScrollbarSize: 8,
-            },
-        });
     };
 
     const handleEditorChange = (newValue: string | undefined) => {
@@ -99,32 +54,7 @@ export function MonacoEditor({
                 onChange={handleEditorChange}
                 onMount={handleEditorDidMount}
                 theme={editorTheme}
-                options={{
-                    readOnly,
-                    selectOnLineNumbers: true,
-                    roundedSelection: false,
-                    cursorStyle: "line",
-                    automaticLayout: true,
-                    scrollBeyondLastLine: false,
-                    wordWrap: "on",
-                    minimap: { enabled: false },
-                    fontSize: fontSize,
-                    lineHeight: 1.6,
-                    fontFamily:
-                        "JetBrains Mono, Fira Code, Monaco, Menlo, monospace",
-                    lineNumbers: "on",
-                    glyphMargin: false,
-                    folding: true,
-                    lineDecorationsWidth: 0,
-                    lineNumbersMinChars: 3,
-                    renderLineHighlight: "line",
-                    scrollbar: {
-                        vertical: "auto",
-                        horizontal: "auto",
-                        verticalScrollbarSize: 8,
-                        horizontalScrollbarSize: 8,
-                    },
-                }}
+                options={getEditorOptions(readOnly, fontSize, tabSize)}
                 loading={
                     <div className="flex items-center justify-center w-full h-full bg-muted rounded">
                         <div className="text-center">
