@@ -9,8 +9,8 @@ import {
 import { useAuth } from "@clerk/nextjs";
 import { HeroHeader } from "@/components/header/header";
 import FooterSection from "@/components/footer/footer";
-import { LeaderboardTable } from "@/components/leaderboard/LeaderboardTable";
-import { LeaderboardStats as LeaderboardStatsComponent } from "@/components/leaderboard/LeaderboardStats";
+import { LeaderboardTable } from "@/components/leaderboard/leaderboard-table";
+import { LeaderboardStats as LeaderboardStatsComponent } from "@/components/leaderboard/leaderboard-stats";
 import { LeaderboardSkeleton } from "@/components/skeletons/leaderboard/leaderboard-skeleton";
 import { LeaderboardErrorState } from "@/components/leaderboard/leaderboard-error-state";
 import { LeaderboardUserRankCard } from "@/components/leaderboard/leaderboard-user-rank-card";
