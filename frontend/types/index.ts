@@ -22,3 +22,8 @@ export type {
     BattleSocketState,
 } from "./battle.types";
 export type { Testimonial, TestimonialCardProps } from "./testimonial.types";
+export type {
+    PaginationInfo,
+    LeaderboardTableProps,
+    LeaderboardStatsProps,
+} from "./leaderboard.types";
