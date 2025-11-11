@@ -28,3 +28,4 @@ export type {
     LeaderboardStatsProps,
 } from "./leaderboard.types";
 export type { MascotProps } from "./hero.types";
+export type { FooterLinksProps } from "./footer.types";
