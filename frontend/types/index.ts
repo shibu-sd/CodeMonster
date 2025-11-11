@@ -37,3 +37,10 @@ export type {
     BlogSidebarProps,
     MarkdownRendererProps,
 } from "./blog-components.types";
+export type {
+    BattleChatBoxProps,
+    BattleEndDialogProps,
+    BattleQueueProps,
+    BattleStartingAnimationProps,
+    BattleTimerProps,
+} from "./battle-components.types";
