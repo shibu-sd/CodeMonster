@@ -21,3 +21,4 @@ export type {
     BattleState,
     BattleSocketState,
 } from "./battle.types";
+export type { Testimonial, TestimonialCardProps } from "./testimonial.types";
