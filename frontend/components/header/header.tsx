@@ -16,7 +16,6 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -56,7 +55,6 @@ export const HeroHeader: React.FC = () => {
             >
                 <div className="mx-auto max-w-7xl px-6 transition-all duration-300">
                     <div className="grid grid-cols-3 items-center py-3 lg:py-4">
-                        {/* Left: Logo */}
                         <div className="flex justify-start">
                             <Link
                                 href="/"
@@ -67,7 +65,6 @@ export const HeroHeader: React.FC = () => {
                             </Link>
                         </div>
 
-                        {/* Center: Navigation links */}
                         <div className="hidden lg:flex justify-center">
                             <ul className="flex gap-8 text-base">
                                 {HEADER_MENU_ITEMS.filter(
@@ -94,9 +91,7 @@ export const HeroHeader: React.FC = () => {
                             </ul>
                         </div>
 
-                        {/* Right: Buttons and mobile menu */}
                         <div className="flex justify-end items-center gap-3">
-                            {/* Buttons on desktop */}
                             <div className="hidden lg:flex lg:items-center lg:gap-3">
                                 <SignedOut>
                                     <Link href="/auth/sign-in">
@@ -154,7 +149,6 @@ export const HeroHeader: React.FC = () => {
                                 </SignedIn>
                             </div>
 
-                            {/* Mobile menu button */}
                             <button
                                 onClick={toggleMenu}
                                 aria-label={menuState ? "Close Menu" : "Open Menu"}
