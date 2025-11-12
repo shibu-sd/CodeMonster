@@ -2,15 +2,34 @@
 
 import { useState, useEffect, useTransition, useRef } from "react";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import { HeroHeader } from "@/components/header/header";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { useBattle } from "@/contexts/BattleContext";
-import { BattleQueue } from "@/components/battle/battle-queue";
-import { BattleStartingAnimation } from "@/components/battle/battle-starting-animation";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import FooterSection from "@/components/footer/footer";
 import { DotPattern } from "@/components/ui/dot-pattern";
+
+// Lazy load battle components
+const BattleQueue = dynamic(
+    () =>
+        import("@/components/battle/battle-queue").then(
+            (mod) => mod.BattleQueue
+        ),
+    {
+        ssr: false,
+        loading: () => <Skeleton className="w-full h-96" />,
+    }
+);
+
+const BattleStartingAnimation = dynamic(
+    () =>
+        import("@/components/battle/battle-starting-animation").then(
+            (mod) => mod.BattleStartingAnimation
+        ),
+    { ssr: false }
+);
 
 function BattlePage() {
     const { isSignedIn } = useAuth();

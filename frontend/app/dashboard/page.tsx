@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import { useApiWithAuth } from "@/lib/api";
 import { useAuth } from "@clerk/nextjs";
 import { HeroHeader } from "@/components/header/header";
@@ -12,9 +13,29 @@ import { DashboardSkeleton } from "@/components/skeletons/dashboard/dashboard-sk
 import { DashboardStatsCards } from "@/components/dashboard/dashboard-stats-cards";
 import { DashboardErrorState } from "@/components/dashboard/dashboard-error-state";
 import { DashboardContributionSection } from "@/components/dashboard/dashboard-contribution-section";
-import { DashboardDifficultyChart } from "@/components/dashboard/dashboard-difficulty-chart";
 import { DashboardRecentSubmissions } from "@/components/dashboard/dashboard-recent-submissions";
 import type { DashboardData } from "@/types";
+
+// Lazy load Recharts
+const DashboardDifficultyChart = dynamic(
+    () =>
+        import("@/components/dashboard/dashboard-difficulty-chart").then(
+            (mod) => mod.DashboardDifficultyChart
+        ),
+    {
+        ssr: false,
+        loading: () => (
+            <div className="bg-card rounded-xl border shadow-lg p-6 flex items-center justify-center h-[500px]">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mx-auto mb-2"></div>
+                    <p className="text-sm text-muted-foreground">
+                        Loading chart...
+                    </p>
+                </div>
+            </div>
+        ),
+    }
+);
 
 function DashboardPageContent() {
     const router = useRouter();

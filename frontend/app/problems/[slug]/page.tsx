@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import { HeroHeader } from "@/components/header/header";
 import { useUser } from "@clerk/nextjs";
 import { ResizablePanelGroup, ResizablePanel } from "@/components/ui/resizable";
@@ -11,15 +12,37 @@ import { ProblemContentTabs } from "@/components/problems-detail/problem-content
 import { CodeEditorPanel } from "@/components/problems-detail/code-editor-panel";
 import { ResultsPanel } from "@/components/problems-detail/results-panel";
 import { ProblemErrorState } from "@/components/problems-detail/problem-error-state";
-import { BattleNotifications } from "@/components/problems-detail/battle-notifications";
 import { useBattle } from "@/contexts/BattleContext";
-import { BattleEndDialog } from "@/components/battle/battle-end-dialog";
-import { BattleChatBox } from "@/components/battle/battle-chat-box";
 import { DotPattern } from "@/components/ui/dot-pattern";
 import { useProblemData } from "@/hooks/useProblemData";
 import { useCodeExecution } from "@/hooks/useCodeExecution";
 import { useSubmissionPolling } from "@/hooks/useSubmissionPolling";
 import { useBattleNotifications } from "@/hooks/useBattleNotifications";
+
+// Lazy load battle-specific components - only loads when battle is active
+const BattleNotifications = dynamic(
+    () =>
+        import("@/components/problems-detail/battle-notifications").then(
+            (mod) => mod.BattleNotifications
+        ),
+    { ssr: false }
+);
+
+const BattleEndDialog = dynamic(
+    () =>
+        import("@/components/battle/battle-end-dialog").then(
+            (mod) => mod.BattleEndDialog
+        ),
+    { ssr: false }
+);
+
+const BattleChatBox = dynamic(
+    () =>
+        import("@/components/battle/battle-chat-box").then(
+            (mod) => mod.BattleChatBox
+        ),
+    { ssr: false }
+);
 
 function ProblemDetailPageContent() {
     const params = useParams();

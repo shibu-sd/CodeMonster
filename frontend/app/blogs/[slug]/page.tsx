@@ -2,8 +2,8 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useParams } from "next/navigation";
+import dynamic from "next/dynamic";
 import { BlogHeader } from "@/components/blog/blog-header";
-import { MarkdownRenderer } from "@/components/blog/markdown-renderer";
 import { BlogSidebar } from "@/components/blog/blog-sidebar";
 import { getBlogPost, getAllBlogPosts, getAllTags } from "@/lib/blog";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,25 @@ import {
     getRelatedPosts,
 } from "@/utils/blog-navigation.utils";
 import type { BlogPost } from "@/types";
+
+// Lazy load markdown renderer
+const MarkdownRenderer = dynamic(
+    () =>
+        import("@/components/blog/markdown-renderer").then(
+            (mod) => mod.MarkdownRenderer
+        ),
+    {
+        loading: () => (
+            <div className="prose prose-slate dark:prose-invert max-w-none">
+                <div className="animate-pulse space-y-4">
+                    <div className="h-4 bg-muted rounded w-full"></div>
+                    <div className="h-4 bg-muted rounded w-5/6"></div>
+                    <div className="h-4 bg-muted rounded w-4/6"></div>
+                </div>
+            </div>
+        ),
+    }
+);
 
 export default function BlogPostPage() {
     const params = useParams();
