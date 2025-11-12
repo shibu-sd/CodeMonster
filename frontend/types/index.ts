@@ -45,3 +45,10 @@ export type {
     BattleTimerProps,
 } from "./battle-components.types";
 export type { DashboardData } from "./dashboard.types";
+export type {
+    TestCaseResult,
+    RunResult,
+    SubmissionResult,
+    BattleNotification,
+    AcceptedSolution,
+} from "./problem-detail.types";
