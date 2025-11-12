@@ -5,7 +5,6 @@ import {
     CheckCircle,
     Star,
     Settings,
-    FileText,
     Terminal,
     ArrowRightCircle,
     AlertCircle,
@@ -42,7 +41,6 @@ function ProblemDescriptionContent({ description }: { description: string }) {
 
     return (
         <div className="space-y-6">
-            {/* Problem Statement */}
             <section className="space-y-6">
                 <div
                     className="prose prose-gray dark:prose-invert max-w-none
@@ -63,7 +61,6 @@ function ProblemDescriptionContent({ description }: { description: string }) {
                 />
             </section>
 
-            {/* Input Format Section */}
             <section className="space-y-4">
                 <div className="bg-muted/50 rounded-lg border p-6">
                     <div className="flex items-center gap-3 text-base font-semibold text-foreground mb-4">
@@ -85,7 +82,6 @@ function ProblemDescriptionContent({ description }: { description: string }) {
                 </div>
             </section>
 
-            {/* Output Format Section */}
             <section className="space-y-4">
                 <div className="bg-muted/50 rounded-lg border p-6">
                     <div className="flex items-center gap-3 text-base font-semibold text-foreground mb-4">
@@ -107,7 +103,6 @@ function ProblemDescriptionContent({ description }: { description: string }) {
                 </div>
             </section>
 
-            {/* Examples Section */}
             <section className="space-y-4">
                 <div className="bg-muted/50 rounded-lg border p-6">
                     <div className="flex items-center gap-3 text-base font-semibold text-foreground mb-6">
@@ -162,7 +157,6 @@ function ProblemDescriptionContent({ description }: { description: string }) {
                 </div>
             </section>
 
-            {/* Constraints Section */}
             <section className="space-y-4">
                 <div className="bg-muted/50 rounded-lg border p-6">
                     <div className="flex items-center gap-3 text-base font-semibold text-foreground mb-6">
@@ -189,7 +183,6 @@ function ProblemDescriptionContent({ description }: { description: string }) {
     );
 }
 
-// Helper functions to extract and format content
 function removeExamplesFromDescription(description: string): string {
     const lines = description.split("\n");
     const cleanedLines: string[] = [];
@@ -202,7 +195,6 @@ function removeExamplesFromDescription(description: string): string {
             .replace(/<[^>]*>/g, "")
             .trim();
 
-        // Check if we're entering an example section
         if (
             line.includes("example") ||
             line.includes("sample") ||
@@ -213,14 +205,12 @@ function removeExamplesFromDescription(description: string): string {
             continue;
         }
 
-        // Check if we're entering a constraint section
         if (line.includes("constraint") || line.includes("limit")) {
             skipSection = true;
             currentSection = "constraint";
             continue;
         }
 
-        // Check if we're entering other sections to skip
         if (
             line.includes("input format") ||
             line.includes("output format") ||
@@ -232,16 +222,13 @@ function removeExamplesFromDescription(description: string): string {
             continue;
         }
 
-        // If we encounter a new major heading, stop skipping
         if (skipSection && line.length > 0 && line[0] === "#") {
             skipSection = false;
             currentSection = "";
-            // Add the heading back
             cleanedLines.push(lines[i]);
             continue;
         }
 
-        // Add lines that are not in skip sections
         if (!skipSection) {
             cleanedLines.push(lines[i]);
         }
@@ -306,7 +293,6 @@ function extractExamplesFromContent(
             let outputContent = "";
             let explanationContent = "";
 
-            // Find input section
             for (let j = i + 1; j < lines.length; j++) {
                 const currentLine = lines[j]
                     .toLowerCase()
@@ -316,7 +302,6 @@ function extractExamplesFromContent(
                     currentLine.includes("sample input")
                 ) {
                     j++;
-                    // Look for actual input content (code blocks, numbered lines, or direct input)
                     while (
                         j < lines.length &&
                         !lines[j].toLowerCase().includes("output") &&
@@ -340,7 +325,6 @@ function extractExamplesFromContent(
                             !trimmedLine.toLowerCase().includes("should") &&
                             !trimmedLine.toLowerCase().includes("only")
                         ) {
-                            // Check if this looks like actual input data
                             if (isValidInputLine(trimmedLine)) {
                                 inputContent +=
                                     lines[j].replace(/<[^>]*>/g, "") + "\n";
@@ -353,7 +337,6 @@ function extractExamplesFromContent(
                 }
             }
 
-            // Find output section
             for (let j = i + 1; j < lines.length; j++) {
                 const currentLine = lines[j]
                     .toLowerCase()
@@ -363,7 +346,6 @@ function extractExamplesFromContent(
                     currentLine.includes("sample output")
                 ) {
                     j++;
-                    // Look for actual output content
                     while (
                         j < lines.length &&
                         !lines[j].toLowerCase().includes("input") &&
@@ -372,7 +354,6 @@ function extractExamplesFromContent(
                     ) {
                         const trimmedLine = lines[j].trim();
 
-                        // Skip explanatory text and look for actual output data
                         if (
                             trimmedLine &&
                             !lines[j].toLowerCase().includes("explanation") &&
@@ -383,7 +364,6 @@ function extractExamplesFromContent(
                             !trimmedLine.toLowerCase().startsWith("you") &&
                             !trimmedLine.toLowerCase().startsWith("print")
                         ) {
-                            // Check if this looks like actual output data
                             if (isValidOutputLine(trimmedLine)) {
                                 outputContent +=
                                     lines[j].replace(/<[^>]*>/g, "") + "\n";
@@ -408,9 +388,7 @@ function extractExamplesFromContent(
     return examples.length > 0 ? examples : [];
 }
 
-// Helper function to determine if a line looks like input data
 function isValidInputLine(line: string): boolean {
-    // Look for patterns that suggest actual input data
     return (
         // Numbers (common in input)
         /^\d+(\s+\d+)*$/.test(line) ||
@@ -429,9 +407,7 @@ function isValidInputLine(line: string): boolean {
     );
 }
 
-// Helper function to determine if a line looks like output data
 function isValidOutputLine(line: string): boolean {
-    // Similar to input but often simpler
     return (
         // Numbers
         /^\d+(\s+\d+)*$/.test(line) ||
@@ -448,7 +424,6 @@ function isValidOutputLine(line: string): boolean {
     );
 }
 
-// Helper function to check if line contains explanatory words
 function containsExplanatoryWords(line: string): boolean {
     const explanatoryWords = [
         "the",
@@ -583,7 +558,6 @@ export function ProblemContentTabs({
 }: ProblemContentTabsProps) {
     return (
         <div className="flex flex-col h-full">
-            {/* Tabs Header */}
             <div className="flex justify-between items-center border-b mb-3 flex-shrink-0">
                 <div className="flex">
                     <button
@@ -635,7 +609,6 @@ export function ProblemContentTabs({
                 </div>
             </div>
 
-            {/* Tab Content - Scrollable with custom scrollbar */}
             <div className="flex-1 overflow-hidden">
                 <div className="h-full overflow-y-auto pr-2 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#424242] dark:[&::-webkit-scrollbar-thumb:hover]:bg-[#4f4f4f]">
                     {activeTab === "description" && (

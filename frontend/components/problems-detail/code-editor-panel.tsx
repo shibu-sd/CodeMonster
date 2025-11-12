@@ -54,7 +54,6 @@ export function CodeEditorPanel({
 
     return (
         <div className="flex flex-col h-full space-y-3">
-            {/* Editor Header */}
             <div className="flex items-center justify-between bg-card rounded-lg p-3 border flex-shrink-0">
                 <div className="flex items-center gap-10">
                     <div className="flex items-center space-x-2">
@@ -129,7 +128,6 @@ export function CodeEditorPanel({
                 </div>
             </div>
 
-            {/* Monaco Code Editor - Full Height */}
             <div className="bg-card rounded-lg border overflow-hidden flex-1">
                 <MonacoEditor
                     value={code}
@@ -142,7 +140,6 @@ export function CodeEditorPanel({
                 />
             </div>
 
-            {/* Reset Confirmation Dialog */}
             <AlertDialog
                 open={showResetDialog}
                 onOpenChange={setShowResetDialog}

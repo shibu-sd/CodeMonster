@@ -59,7 +59,6 @@ export function ProblemHeader({
 
     return (
         <div className="mb-3 px-2">
-            {/* Regular Navigation */}
             <div className="flex items-center mb-4">
                 <Link href={battleInfo ? "/battle" : "/problems"}>
                     <Button variant="ghost" size="sm">
@@ -71,12 +70,10 @@ export function ProblemHeader({
                 </Link>
             </div>
 
-            {/* Problem Title with Battle Info */}
             <div className="mb-6">
                 <div className="flex items-center justify-between mb-3">
                     <h1 className="text-3xl font-bold">{problem.title}</h1>
 
-                    {/* Battle Mode Info - Inline on Right */}
                     {battleInfo &&
                         (battleInfo.status === "active" ||
                             battleInfo.status === "waiting") && (
@@ -111,7 +108,6 @@ export function ProblemHeader({
                                     </div>
                                 )}
 
-                                {/* Timer */}
                                 <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 dark:bg-green-950 border border-green-300 dark:border-green-700 rounded-lg">
                                     <BattleTimer
                                         startTime={battleInfo.startTime || null}
@@ -120,7 +116,6 @@ export function ProblemHeader({
                                     />
                                 </div>
 
-                                {/* Exit Button */}
                                 {onExitBattle && (
                                     <Button
                                         onClick={handleQuitClick}
@@ -153,7 +148,6 @@ export function ProblemHeader({
                         </span>
                     </div>
 
-                    {/* Tags */}
                     {problem.tags && problem.tags.length > 0 && (
                         <div className="flex items-center space-x-2">
                             {problem.tags.map((tag, index) => (
@@ -169,7 +163,6 @@ export function ProblemHeader({
                 </div>
             </div>
 
-            {/* Quit Battle Confirmation Dialog */}
             <Dialog open={showQuitDialog} onOpenChange={setShowQuitDialog}>
                 <DialogContent>
                     <DialogHeader>
