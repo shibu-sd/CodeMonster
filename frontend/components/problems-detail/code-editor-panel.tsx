@@ -1,7 +1,28 @@
 import { Button } from "@/components/ui/button";
 import { RotateCcw, Play, Send } from "lucide-react";
-import { MonacoEditor } from "@/components/code-editor/monaco-editor";
+import dynamic from "next/dynamic";
 import { useState } from "react";
+
+// Lazy load Monaco Editor
+const MonacoEditor = dynamic(
+    () =>
+        import("@/components/code-editor/monaco-editor").then(
+            (mod) => mod.MonacoEditor
+        ),
+    {
+        loading: () => (
+            <div className="flex items-center justify-center w-full h-full bg-muted/50 rounded">
+                <div className="text-center space-y-3">
+                    <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mx-auto"></div>
+                    <p className="text-sm text-muted-foreground font-medium">
+                        Loading code editor...
+                    </p>
+                </div>
+            </div>
+        ),
+        ssr: false,
+    }
+);
 import {
     AlertDialog,
     AlertDialogAction,
