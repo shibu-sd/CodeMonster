@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { HeroHeader } from "@/components/header/header";
 import FooterSection from "@/components/footer/footer";
 import { useAuth } from "@clerk/nextjs";
@@ -67,7 +67,7 @@ function ProblemsPageContent() {
         }
     }, [currentPage, selectedDifficulty, searchTerm, authReady]);
 
-    const fetchSolvedProblems = async () => {
+    const fetchSolvedProblems = useCallback(async () => {
         if (!isSignedIn) return;
 
         try {
@@ -88,9 +88,9 @@ function ProblemsPageContent() {
         } catch (err) {
             console.log("Could not fetch solved problems:", err);
         }
-    };
+    }, [isSignedIn, getToken, api]);
 
-    const fetchProblems = async () => {
+    const fetchProblems = useCallback(async () => {
         try {
             setLoading(true);
             const response = await api.getProblems({
@@ -113,9 +113,9 @@ function ProblemsPageContent() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [api, currentPage, selectedDifficulty, searchTerm]);
 
-    const fetchStats = async () => {
+    const fetchStats = useCallback(async () => {
         try {
             const response = await api.getProblemStats();
             if (response.success) {
@@ -124,20 +124,19 @@ function ProblemsPageContent() {
         } catch (err) {
             console.error("Failed to fetch stats:", err);
         }
-    };
+    }, [api]);
 
-    const handleSearch = (e: React.FormEvent) => {
+    const handleSearch = useCallback((e: React.FormEvent) => {
         e.preventDefault();
         setCurrentPage(1);
-        fetchProblems();
-    };
+    }, []);
 
-    const handleDifficultyFilter = (difficulty: string) => {
-        setSelectedDifficulty(
-            difficulty === selectedDifficulty ? "" : difficulty
+    const handleDifficultyFilter = useCallback((difficulty: string) => {
+        setSelectedDifficulty((prev) =>
+            difficulty === prev ? "" : difficulty
         );
         setCurrentPage(1);
-    };
+    }, []);
 
     if (loading) {
         return <ProblemsListSkeleton />;
