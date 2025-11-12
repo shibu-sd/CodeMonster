@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { memo, useMemo, useCallback } from "react";
 import type { LeaderboardTableProps } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -15,6 +15,114 @@ import {
     User,
 } from "lucide-react";
 
+const getRankBadge = (rank: number) => {
+    if (rank === 1) {
+        return (
+            <div className="flex items-center justify-center w-8 h-8 bg-yellow-500 rounded-full">
+                <Trophy className="w-5 h-5 text-white" />
+            </div>
+        );
+    } else if (rank === 2) {
+        return (
+            <div className="flex items-center justify-center w-8 h-8 bg-gray-400 rounded-full">
+                <Medal className="w-5 h-5 text-white" />
+            </div>
+        );
+    } else if (rank === 3) {
+        return (
+            <div className="flex items-center justify-center w-8 h-8 bg-amber-600 rounded-full">
+                <Award className="w-5 h-5 text-white" />
+            </div>
+        );
+    } else {
+        return (
+            <div className="flex items-center justify-center w-8 h-8 bg-muted rounded-full">
+                <span className="text-sm font-semibold text-muted-foreground">
+                    {rank}
+                </span>
+            </div>
+        );
+    }
+};
+
+const getAcceptanceRateColor = (rate: number) => {
+    if (rate >= 70) return "text-green-600 dark:text-green-400";
+    if (rate >= 50) return "text-yellow-600 dark:text-yellow-400";
+    return "text-red-600 dark:text-red-400";
+};
+
+const formatAcceptanceRate = (rate: number) => {
+    return `${rate.toFixed(1)}%`;
+};
+
+const LeaderboardRow = memo(({ user }: { user: any }) => {
+    return (
+        <tr
+            className={`border-t border-border/50 hover:bg-muted/20 transition-all duration-200 group ${
+                user.isCurrentUser ? "bg-primary/10" : ""
+            }`}
+        >
+            <td className="py-5 px-6">{getRankBadge(user.rank)}</td>
+            <td className="py-5 px-4">
+                <Avatar className="w-10 h-10 border-2 border-primary/20">
+                    <AvatarImage
+                        src={user.profileImageUrl || undefined}
+                        alt={user.username || user.firstName || "User"}
+                    />
+                    <AvatarFallback className="text-sm font-medium">
+                        {(user.username || user.firstName || "User")
+                            .slice(0, 2)
+                            .toUpperCase()}
+                    </AvatarFallback>
+                </Avatar>
+            </td>
+            <td className="py-5 px-2">
+                <div>
+                    <div className="flex items-center space-x-2">
+                        <span className="font-semibold text-base">
+                            {user.username || user.firstName || "User"}
+                        </span>
+                        {user.isCurrentUser && (
+                            <Badge variant="default" className="text-xs">
+                                You
+                            </Badge>
+                        )}
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-0.5">
+                        Joined {new Date(user.createdAt).toLocaleDateString()}
+                    </div>
+                </div>
+            </td>
+            <td className="py-5 px-6 text-center">
+                <span className="font-bold text-base">
+                    {user.problemsSolved.toLocaleString()}
+                </span>
+            </td>
+            <td className="py-5 px-6 text-center">
+                <span className="font-bold text-base text-primary">
+                    {user.battlesWon.toLocaleString()}
+                </span>
+            </td>
+            <td className="py-5 px-6 text-center">
+                <span className="text-sm font-medium text-muted-foreground">
+                    {user.totalSubmissions.toLocaleString()}
+                </span>
+            </td>
+            <td className="py-5 px-6 text-center">
+                <span
+                    className={`text-sm font-bold ${getAcceptanceRateColor(
+                        user.acceptanceRate
+                    )}`}
+                >
+                    {formatAcceptanceRate(user.acceptanceRate)}
+                </span>
+            </td>
+        </tr>
+    );
+});
+
+LeaderboardRow.displayName = "LeaderboardRow";
+
 export function LeaderboardTable({
     users,
     isLoading,
@@ -22,46 +130,6 @@ export function LeaderboardTable({
     onNextPage,
     onPrevPage,
 }: LeaderboardTableProps) {
-    const getRankBadge = (rank: number) => {
-        if (rank === 1) {
-            return (
-                <div className="flex items-center justify-center w-8 h-8 bg-yellow-500 rounded-full">
-                    <Trophy className="w-5 h-5 text-white" />
-                </div>
-            );
-        } else if (rank === 2) {
-            return (
-                <div className="flex items-center justify-center w-8 h-8 bg-gray-400 rounded-full">
-                    <Medal className="w-5 h-5 text-white" />
-                </div>
-            );
-        } else if (rank === 3) {
-            return (
-                <div className="flex items-center justify-center w-8 h-8 bg-amber-600 rounded-full">
-                    <Award className="w-5 h-5 text-white" />
-                </div>
-            );
-        } else {
-            return (
-                <div className="flex items-center justify-center w-8 h-8 bg-muted rounded-full">
-                    <span className="text-sm font-semibold text-muted-foreground">
-                        {rank}
-                    </span>
-                </div>
-            );
-        }
-    };
-
-    const getAcceptanceRateColor = (rate: number) => {
-        if (rate >= 70) return "text-green-600 dark:text-green-400";
-        if (rate >= 50) return "text-yellow-600 dark:text-yellow-400";
-        return "text-red-600 dark:text-red-400";
-    };
-
-    const formatAcceptanceRate = (rate: number) => {
-        return `${rate.toFixed(1)}%`;
-    };
-
     if (isLoading) {
         return (
             <div className="bg-card rounded-xl border shadow-lg overflow-hidden">
@@ -176,91 +244,7 @@ export function LeaderboardTable({
                     </thead>
                     <tbody>
                         {users.map((user) => (
-                            <tr
-                                key={user.id}
-                                className={`border-t border-border/50 hover:bg-muted/20 transition-all duration-200 group ${
-                                    user.isCurrentUser ? "bg-primary/10" : ""
-                                }`}
-                            >
-                                <td className="py-5 px-6">
-                                    {getRankBadge(user.rank)}
-                                </td>
-                                <td className="py-5 px-4">
-                                    <Avatar className="w-10 h-10 border-2 border-primary/20">
-                                        <AvatarImage
-                                            src={
-                                                user.profileImageUrl ||
-                                                undefined
-                                            }
-                                            alt={
-                                                user.username ||
-                                                user.firstName ||
-                                                "User"
-                                            }
-                                        />
-                                        <AvatarFallback className="text-sm font-medium">
-                                            {(
-                                                user.username ||
-                                                user.firstName ||
-                                                "User"
-                                            )
-                                                .slice(0, 2)
-                                                .toUpperCase()}
-                                        </AvatarFallback>
-                                    </Avatar>
-                                </td>
-                                <td className="py-5 px-2">
-                                    <div>
-                                        <div className="flex items-center space-x-2">
-                                            <span className="font-semibold text-base">
-                                                {user.username ||
-                                                    user.firstName ||
-                                                    "User"}
-                                            </span>
-                                            {user.isCurrentUser && (
-                                                <Badge
-                                                    variant="default"
-                                                    className="text-xs"
-                                                >
-                                                    You
-                                                </Badge>
-                                            )}
-                                        </div>
-                                        <div className="text-xs text-muted-foreground mt-0.5">
-                                            Joined{" "}
-                                            {new Date(
-                                                user.createdAt
-                                            ).toLocaleDateString()}
-                                        </div>
-                                    </div>
-                                </td>
-                                <td className="py-5 px-6 text-center">
-                                    <span className="font-bold text-base">
-                                        {user.problemsSolved.toLocaleString()}
-                                    </span>
-                                </td>
-                                <td className="py-5 px-6 text-center">
-                                    <span className="font-bold text-base text-primary">
-                                        {user.battlesWon.toLocaleString()}
-                                    </span>
-                                </td>
-                                <td className="py-5 px-6 text-center">
-                                    <span className="text-sm font-medium text-muted-foreground">
-                                        {user.totalSubmissions.toLocaleString()}
-                                    </span>
-                                </td>
-                                <td className="py-5 px-6 text-center">
-                                    <span
-                                        className={`text-sm font-bold ${getAcceptanceRateColor(
-                                            user.acceptanceRate
-                                        )}`}
-                                    >
-                                        {formatAcceptanceRate(
-                                            user.acceptanceRate
-                                        )}
-                                    </span>
-                                </td>
-                            </tr>
+                            <LeaderboardRow key={user.id} user={user} />
                         ))}
                     </tbody>
                 </table>

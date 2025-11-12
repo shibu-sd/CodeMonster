@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CheckCircle } from "lucide-react";
+import { memo } from "react";
 import {
     Problem,
     getDifficultyBadgeColor,
@@ -12,6 +13,67 @@ interface ProblemsTableProps {
     solvedProblemIds: Set<string>;
     currentPage: number;
 }
+
+interface ProblemRowProps {
+    problem: Problem;
+    index: number;
+    currentPage: number;
+    isSolved: boolean;
+}
+
+const ProblemRow = memo(
+    ({ problem, index, currentPage, isSolved }: ProblemRowProps) => {
+        return (
+            <tr className="border-t border-border/50 hover:bg-muted/20 transition-all duration-200 group">
+                <td className="py-5 px-6">
+                    <Link
+                        href={`/problems/${problem?.slug || "unknown"}`}
+                        className="hover:text-primary transition-colors"
+                    >
+                        <div className="flex items-center space-x-3">
+                            <span className="text-sm font-medium text-muted-foreground min-w-[2rem]">
+                                {(currentPage - 1) * 10 + index + 1}.
+                            </span>
+                            <span className="font-semibold text-base group-hover:underline">
+                                {problem?.title || "Unknown Problem"}
+                            </span>
+                        </div>
+                    </Link>
+                </td>
+                <td className="py-5 px-6 text-center">
+                    <span
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide shadow-sm ${getDifficultyBadgeColor(
+                            problem?.difficulty || "EASY"
+                        )}`}
+                    >
+                        {problem?.difficulty || "EASY"}
+                    </span>
+                </td>
+                <td className="py-5 px-6 text-center">
+                    <span className="text-sm font-medium">
+                        {formatAcceptanceRate(problem?.acceptanceRate)}
+                    </span>
+                </td>
+                <td className="py-5 px-6 text-center">
+                    <span className="text-sm font-medium text-muted-foreground">
+                        {formatSubmissionCount(problem?.totalSubmissions)}
+                    </span>
+                </td>
+                <td className="py-5 px-6 text-center">
+                    {isSolved && (
+                        <div className="flex justify-center">
+                            <div className="p-1.5 bg-green-100 dark:bg-green-900/30 rounded-full">
+                                <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+                            </div>
+                        </div>
+                    )}
+                </td>
+            </tr>
+        );
+    }
+);
+
+ProblemRow.displayName = "ProblemRow";
 
 export function ProblemsTable({
     problems,
@@ -43,66 +105,15 @@ export function ProblemsTable({
                     </thead>
                     <tbody>
                         {problems?.map((problem, index) => (
-                            <tr
+                            <ProblemRow
                                 key={problem?.id || index}
-                                className="border-t border-border/50 hover:bg-muted/20 transition-all duration-200 group"
-                            >
-                                <td className="py-5 px-6">
-                                    <Link
-                                        href={`/problems/${
-                                            problem?.slug || "unknown"
-                                        }`}
-                                        className="hover:text-primary transition-colors"
-                                    >
-                                        <div className="flex items-center space-x-3">
-                                            <span className="text-sm font-medium text-muted-foreground min-w-[2rem]">
-                                                {(currentPage - 1) * 10 +
-                                                    index +
-                                                    1}
-                                                .
-                                            </span>
-                                            <span className="font-semibold text-base group-hover:underline">
-                                                {problem?.title ||
-                                                    "Unknown Problem"}
-                                            </span>
-                                        </div>
-                                    </Link>
-                                </td>
-                                <td className="py-5 px-6 text-center">
-                                    <span
-                                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide shadow-sm ${getDifficultyBadgeColor(
-                                            problem?.difficulty || "EASY"
-                                        )}`}
-                                    >
-                                        {problem?.difficulty || "EASY"}
-                                    </span>
-                                </td>
-                                <td className="py-5 px-6 text-center">
-                                    <span className="text-sm font-medium">
-                                        {formatAcceptanceRate(
-                                            problem?.acceptanceRate
-                                        )}
-                                    </span>
-                                </td>
-                                <td className="py-5 px-6 text-center">
-                                    <span className="text-sm font-medium text-muted-foreground">
-                                        {formatSubmissionCount(
-                                            problem?.totalSubmissions
-                                        )}
-                                    </span>
-                                </td>
-                                <td className="py-5 px-6 text-center">
-                                    {solvedProblemIds.has(
-                                        problem?.id || ""
-                                    ) && (
-                                        <div className="flex justify-center">
-                                            <div className="p-1.5 bg-green-100 dark:bg-green-900/30 rounded-full">
-                                                <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
-                                            </div>
-                                        </div>
-                                    )}
-                                </td>
-                            </tr>
+                                problem={problem}
+                                index={index}
+                                currentPage={currentPage}
+                                isSolved={solvedProblemIds.has(
+                                    problem?.id || ""
+                                )}
+                            />
                         ))}
                     </tbody>
                 </table>

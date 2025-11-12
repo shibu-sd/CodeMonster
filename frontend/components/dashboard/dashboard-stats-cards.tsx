@@ -1,4 +1,5 @@
 import { Target, Code, TrendingUp, Swords } from "lucide-react";
+import { memo } from "react";
 
 interface DashboardStatsCardsProps {
     problemsSolved: number;
@@ -7,7 +8,7 @@ interface DashboardStatsCardsProps {
     battlesWon: number;
 }
 
-export function DashboardStatsCards({
+export const DashboardStatsCards = memo(function DashboardStatsCards({
     problemsSolved,
     totalSubmissions,
     acceptanceRate,
@@ -72,4 +73,4 @@ export function DashboardStatsCards({
             </div>
         </div>
     );
-}
+});
