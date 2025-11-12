@@ -8,11 +8,15 @@ import "./globals.css";
 const geistSans = Geist({
     variable: "--font-geist-sans",
     subsets: ["latin"],
+    display: "swap",
+    preload: true,
 });
 
 const geistMono = Geist_Mono({
     variable: "--font-geist-mono",
     subsets: ["latin"],
+    display: "swap",
+    preload: true,
 });
 
 export const metadata: Metadata = {
@@ -48,6 +52,17 @@ export default function RootLayout({
                 <link rel="icon" type="image/png" href="/favicon.png" />
                 <link rel="shortcut icon" href="/favicon.png" />
                 <link rel="apple-touch-icon" href="/logo.png" />
+                <link
+                    rel="preconnect"
+                    href={
+                        process.env.NEXT_PUBLIC_API_URL ||
+                        "http://localhost:5000"
+                    }
+                />
+                <link rel="preconnect" href="https://clerk.com" />
+                <link rel="dns-prefetch" href="https://clerk.com" />
+                <link rel="preconnect" href="https://ik.imagekit.io" />
+                <link rel="dns-prefetch" href="https://ik.imagekit.io" />
             </head>
             <body
                 className={`${geistSans.variable} ${geistMono.variable} antialiased`}
