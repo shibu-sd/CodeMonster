@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, Filter } from "lucide-react";
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect, useRef, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { HeroHeader } from "@/components/header/header";
 import FooterSection from "@/components/footer/footer";
@@ -15,7 +15,7 @@ import { DotPattern } from "@/components/ui/dot-pattern";
 import { BlogsListSkeleton } from "@/components/skeletons/blogs/blogs-list-skeleton";
 import type { BlogPost } from "@/types";
 
-export default function BlogsPage() {
+function BlogsPageContent() {
     const searchParams = useSearchParams();
     const tagFromUrl = searchParams.get("tag");
 
@@ -233,5 +233,13 @@ export default function BlogsPage() {
             </main>
             <FooterSection />
         </div>
+    );
+}
+
+export default function BlogsPage() {
+    return (
+        <Suspense fallback={<BlogsListSkeleton />}>
+            <BlogsPageContent />
+        </Suspense>
     );
 }
