@@ -1,5 +1,6 @@
 import { Code, Clock, Calendar, ChevronRight } from "lucide-react";
 import Link from "next/link";
+import { memo } from "react";
 import { getDifficultyBadgeColor } from "@/lib/api";
 import type { DashboardData } from "@/types";
 
@@ -7,7 +8,7 @@ interface DashboardRecentSubmissionsProps {
     recentSubmissions: DashboardData["recentSubmissions"];
 }
 
-export function DashboardRecentSubmissions({
+export const DashboardRecentSubmissions = memo(function DashboardRecentSubmissions({
     recentSubmissions,
 }: DashboardRecentSubmissionsProps) {
     return (
@@ -87,4 +88,4 @@ export function DashboardRecentSubmissions({
             </div>
         </div>
     );
-}
+});

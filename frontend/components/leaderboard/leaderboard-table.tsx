@@ -123,7 +123,7 @@ const LeaderboardRow = memo(({ user }: { user: any }) => {
 
 LeaderboardRow.displayName = "LeaderboardRow";
 
-export function LeaderboardTable({
+export const LeaderboardTable = memo(function LeaderboardTable({
     users,
     isLoading,
     pagination,
@@ -279,4 +279,4 @@ export function LeaderboardTable({
             )}
         </div>
     );
-}
+});

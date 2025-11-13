@@ -75,7 +75,7 @@ const ProblemRow = memo(
 
 ProblemRow.displayName = "ProblemRow";
 
-export function ProblemsTable({
+export const ProblemsTable = memo(function ProblemsTable({
     problems,
     solvedProblemIds,
     currentPage,
@@ -120,4 +120,4 @@ export function ProblemsTable({
             </div>
         </div>
     );
-}
+});
