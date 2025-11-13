@@ -9,7 +9,6 @@ import { ResizablePanelGroup, ResizablePanel } from "@/components/ui/resizable";
 import { ProblemDetailSkeleton } from "@/components/skeletons/problems/problem-detail-skeleton";
 import { ProblemHeader } from "@/components/problems-detail/problem-header";
 import { ProblemContentTabs } from "@/components/problems-detail/problem-content-tabs";
-import { CodeEditorPanel } from "@/components/problems-detail/code-editor-panel";
 import { ResultsPanel } from "@/components/problems-detail/results-panel";
 import { ProblemErrorState } from "@/components/problems-detail/problem-error-state";
 import { useBattle } from "@/contexts/BattleContext";
@@ -18,6 +17,27 @@ import { useProblemData } from "@/hooks/useProblemData";
 import { useCodeExecution } from "@/hooks/useCodeExecution";
 import { useSubmissionPolling } from "@/hooks/useSubmissionPolling";
 import { useBattleNotifications } from "@/hooks/useBattleNotifications";
+
+// Lazy load Monaco Editor Panel
+const CodeEditorPanel = dynamic(
+    () =>
+        import("@/components/problems-detail/code-editor-panel").then(
+            (mod) => mod.CodeEditorPanel
+        ),
+    {
+        loading: () => (
+            <div className="flex items-center justify-center w-full h-full bg-card rounded-lg border">
+                <div className="text-center space-y-3">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+                    <p className="text-sm text-muted-foreground font-medium">
+                        Loading code editor...
+                    </p>
+                </div>
+            </div>
+        ),
+        ssr: false,
+    }
+);
 
 // Lazy load battle-specific components - only loads when battle is active
 const BattleNotifications = dynamic(
