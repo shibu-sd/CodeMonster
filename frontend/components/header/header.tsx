@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { LogOut, Menu, X, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import React, { useCallback, useState } from "react";
@@ -108,12 +109,16 @@ export const HeroHeader: React.FC = () => {
                                         <DropdownMenuTrigger asChild>
                                             <button className="relative h-8 w-8 rounded-full overflow-hidden border-2 border-primary/20 hover:border-primary transition-colors cursor-pointer">
                                                 {user?.imageUrl ? (
-                                                    <img
+                                                    <Image
                                                         src={user.imageUrl}
                                                         alt={
-                                                            user.firstName || "User"
+                                                            user.firstName ||
+                                                            "User"
                                                         }
-                                                        className="h-full w-full object-cover"
+                                                        fill
+                                                        sizes="32px"
+                                                        className="object-cover"
+                                                        priority
                                                     />
                                                 ) : (
                                                     <div className="h-full w-full bg-primary/10 flex items-center justify-center">
@@ -151,7 +156,9 @@ export const HeroHeader: React.FC = () => {
 
                             <button
                                 onClick={toggleMenu}
-                                aria-label={menuState ? "Close Menu" : "Open Menu"}
+                                aria-label={
+                                    menuState ? "Close Menu" : "Open Menu"
+                                }
                                 className="relative z-20 block cursor-pointer p-2.5 lg:hidden"
                             >
                                 <Menu className="in-data-[state=active]:rotate-180 in-data-[state=active]:scale-0 in-data-[state=active]:opacity-0 m-auto size-6 duration-200" />
@@ -212,13 +219,15 @@ export const HeroHeader: React.FC = () => {
                                                 className="w-full flex items-center gap-2 p-3 rounded-lg border hover:bg-accent transition-colors"
                                             >
                                                 {user?.imageUrl && (
-                                                    <img
+                                                    <Image
                                                         src={user.imageUrl}
                                                         alt={
                                                             user.firstName ||
                                                             "User"
                                                         }
-                                                        className="h-8 w-8 rounded-full object-cover"
+                                                        width={32}
+                                                        height={32}
+                                                        className="rounded-full object-cover"
                                                     />
                                                 )}
                                                 <User className="h-4 w-4" />

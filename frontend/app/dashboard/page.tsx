@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import { useApiWithAuth } from "@/lib/api";
 import { useAuth } from "@clerk/nextjs";
 import { HeroHeader } from "@/components/header/header";
@@ -147,10 +148,13 @@ function DashboardPageContent() {
                 <div className="mb-8">
                     <div className="flex items-center gap-4 mb-4">
                         {user.profileImageUrl && (
-                            <img
+                            <Image
                                 src={user.profileImageUrl}
                                 alt={user.username || "User"}
-                                className="w-20 h-20 rounded-full border-4 border-primary"
+                                width={80}
+                                height={80}
+                                className="rounded-full border-4 border-primary"
+                                priority
                             />
                         )}
                         <div>
