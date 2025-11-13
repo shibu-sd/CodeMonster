@@ -100,7 +100,7 @@ function ProblemDetailPageContent() {
         runResult,
         showRunPanel,
         activeTestCase: runActiveTestCase,
-        handleRunCode,
+        handleRunCode: originalHandleRunCode,
         setShowRunPanel,
         setActiveTestCase: setRunActiveTestCase,
     } = useCodeExecution({
@@ -116,7 +116,7 @@ function ProblemDetailPageContent() {
         submissionResult,
         showSubmitPanel,
         pollingAttempts,
-        handleSubmitCode,
+        handleSubmitCode: originalHandleSubmitCode,
         setShowSubmitPanel,
     } = useSubmissionPolling({
         problem,
@@ -127,6 +127,16 @@ function ProblemDetailPageContent() {
         onAccepted: loadAcceptedSolution,
         onActiveTabChange: setActiveTab,
     });
+
+    const handleRunCode = () => {
+        setShowSubmitPanel(false);
+        originalHandleRunCode();
+    };
+
+    const handleSubmitCode = () => {
+        setShowRunPanel(false);
+        originalHandleSubmitCode();
+    };
 
     const {
         battleNotifications,
