@@ -122,15 +122,7 @@ export function ResultsPanel({
                 <div className="bg-card border-t rounded-t-lg h-full flex flex-col">
                     <div className="flex items-center justify-between p-3 border-b bg-muted/50 rounded-t-lg flex-shrink-0">
                         <div className="flex items-center space-x-2">
-                            {showRunPanel && (
-                                <>
-                                    <TestTube className="h-4 w-4" />
-                                    <span className="font-medium">
-                                        Test Results
-                                    </span>
-                                </>
-                            )}
-                            {showSubmitPanel && (
+                            {showSubmitPanel ? (
                                 <>
                                     <Code className="h-4 w-4" />
                                     <span className="font-medium">
@@ -142,7 +134,14 @@ export function ResultsPanel({
                                         </span>
                                     )}
                                 </>
-                            )}
+                            ) : showRunPanel ? (
+                                <>
+                                    <TestTube className="h-4 w-4" />
+                                    <span className="font-medium">
+                                        Test Results
+                                    </span>
+                                </>
+                            ) : null}
                         </div>
                         <div className="flex items-center space-x-1">
                             <Button
@@ -157,7 +156,7 @@ export function ResultsPanel({
                     </div>
 
                     <div className="flex-1 overflow-y-auto p-4 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#424242] [&::-webkit-scrollbar-thumb]:rounded dark:[&::-webkit-scrollbar-thumb:hover]:bg-[#4f4f4f] [&::-webkit-scrollbar-thumb:hover]:bg-[#525252]">
-                        {showRunPanel && runResult && (
+                        {showRunPanel && !showSubmitPanel && runResult && (
                             <div className="space-y-4">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center space-x-3">
@@ -331,197 +330,204 @@ export function ResultsPanel({
                             </div>
                         )}
 
-                        {showSubmitPanel && submissionResult && (
-                            <div className="space-y-4">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center space-x-3">
-                                        {getStatusIcon(submissionResult.status)}
-                                        <div>
-                                            <span
-                                                className={`font-semibold text-lg ${getStatusColor(
-                                                    submissionResult.status
-                                                )}`}
-                                            >
-                                                {submissionResult.status.replace(
-                                                    "_",
-                                                    " "
-                                                )}
-                                            </span>
-                                            {(submissionResult.status ===
-                                                "PENDING" ||
-                                                submissionResult.status ===
-                                                    "RUNNING") && (
-                                                <div className="text-xs text-muted-foreground mt-1">
-                                                    {submissionResult.status ===
-                                                    "PENDING"
-                                                        ? `Queued... (${Math.floor(
-                                                              pollingAttempts /
-                                                                  5 +
-                                                                  1
-                                                          )}/10)`
-                                                        : submissionResult.currentTestCase
-                                                        ? `Running test case ${
-                                                              submissionResult.currentTestCase
-                                                          }/${
-                                                              submissionResult.totalTestCases ||
-                                                              5
-                                                          }...`
-                                                        : "Executing your code..."}
-                                                </div>
+                        {showSubmitPanel &&
+                            !showRunPanel &&
+                            submissionResult && (
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center space-x-3">
+                                            {getStatusIcon(
+                                                submissionResult.status
                                             )}
-                                        </div>
-                                    </div>
-                                    {submissionResult.testCasesPassed !==
-                                        undefined && (
-                                        <div className="text-right">
-                                            <div
-                                                className={`font-bold ${
-                                                    submissionResult.status ===
-                                                    "ACCEPTED"
-                                                        ? "text-green-600"
-                                                        : "text-red-600"
-                                                }`}
-                                            >
-                                                {
-                                                    submissionResult.testCasesPassed
-                                                }
-                                                /
-                                                {
-                                                    submissionResult.totalTestCases
-                                                }{" "}
-                                                passed
-                                            </div>
-                                            <div className="w-32 bg-muted rounded-full h-2 mt-1">
-                                                <div
-                                                    className={`h-2 rounded-full transition-all duration-1000 ${
-                                                        submissionResult.status ===
-                                                        "ACCEPTED"
-                                                            ? "bg-green-500"
-                                                            : "bg-red-500"
-                                                    }`}
-                                                    style={{
-                                                        width: `${
-                                                            ((submissionResult.testCasesPassed ||
-                                                                0) /
-                                                                (submissionResult.totalTestCases ||
-                                                                    1)) *
-                                                            100
-                                                        }%`,
-                                                    }}
-                                                />
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {(submissionResult.status === "ACCEPTED" ||
-                                    submissionResult.runtime) && (
-                                    <div className="grid grid-cols-2 gap-4">
-                                        {submissionResult.runtime &&
-                                            submissionResult.runtime > 0 && (
-                                                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 border border-blue-200 dark:border-blue-800">
-                                                    <div className="text-xs text-muted-foreground mb-1">
-                                                        Runtime
-                                                    </div>
-                                                    <div className="text-lg font-bold text-blue-600 dark:text-blue-400">
-                                                        {
-                                                            submissionResult.runtime
-                                                        }{" "}
-                                                        ms
-                                                    </div>
-                                                    <div className="text-xs text-muted-foreground">
-                                                        {submissionResult.runtime <
-                                                        100
-                                                            ? "⚡ Excellent"
-                                                            : submissionResult.runtime <
-                                                              500
-                                                            ? "✅ Good"
-                                                            : submissionResult.runtime <
-                                                              1000
-                                                            ? "⚠️ Average"
-                                                            : "🐌 Slow"}
-                                                    </div>
-                                                </div>
-                                            )}
-                                        {submissionResult.memoryUsage &&
-                                            submissionResult.memoryUsage >
-                                                0 && (
-                                                <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-3 border border-purple-200 dark:border-purple-800">
-                                                    <div className="text-xs text-muted-foreground mb-1">
-                                                        Memory
-                                                    </div>
-                                                    <div className="text-lg font-bold text-purple-600 dark:text-purple-400">
-                                                        {
-                                                            submissionResult.memoryUsage
-                                                        }{" "}
-                                                        MB
-                                                    </div>
-                                                    <div className="text-xs text-muted-foreground">
-                                                        {submissionResult.memoryUsage <
-                                                        50
-                                                            ? "🔥 Efficient"
-                                                            : submissionResult.memoryUsage <
-                                                              100
-                                                            ? "✅ Good"
-                                                            : "📈 High"}
-                                                    </div>
-                                                </div>
-                                            )}
-                                    </div>
-                                )}
-
-                                {submissionResult.status === "ACCEPTED" && (
-                                    <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
-                                        <div className="flex items-center space-x-2">
-                                            <CheckCircle className="h-5 w-5 text-green-500" />
-                                            <span className="font-semibold text-green-800 dark:text-green-200">
-                                                Accepted! 🎉
-                                            </span>
-                                        </div>
-                                        <p className="text-sm text-green-700 dark:text-green-300 mt-2">
-                                            Your solution passed all test cases!
-                                            Great job solving this problem.
-                                        </p>
-                                    </div>
-                                )}
-
-                                {submissionResult.error && (
-                                    <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-                                        <div className="flex items-center space-x-2 mb-2">
-                                            <XCircle className="h-4 w-4 text-red-500" />
-                                            <span className="font-medium text-red-800 dark:text-red-200">
-                                                Error Details
-                                            </span>
-                                        </div>
-                                        <pre className="text-sm text-red-700 dark:text-red-300 whitespace-pre-wrap font-mono">
-                                            {submissionResult.error}
-                                        </pre>
-                                    </div>
-                                )}
-
-                                {submissionResult.status !== "ACCEPTED" &&
-                                    submissionResult.status !== "PENDING" &&
-                                    submissionResult.status !== "RUNNING" &&
-                                    !submissionResult.error && (
-                                        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-                                            <div className="flex items-center space-x-2">
-                                                <XCircle className="h-4 w-4 text-red-500" />
-                                                <span className="font-semibold text-red-800 dark:text-red-200">
+                                            <div>
+                                                <span
+                                                    className={`font-semibold text-lg ${getStatusColor(
+                                                        submissionResult.status
+                                                    )}`}
+                                                >
                                                     {submissionResult.status.replace(
                                                         "_",
                                                         " "
                                                     )}
                                                 </span>
+                                                {(submissionResult.status ===
+                                                    "PENDING" ||
+                                                    submissionResult.status ===
+                                                        "RUNNING") && (
+                                                    <div className="text-xs text-muted-foreground mt-1">
+                                                        {submissionResult.status ===
+                                                        "PENDING"
+                                                            ? `Queued... (${Math.floor(
+                                                                  pollingAttempts /
+                                                                      5 +
+                                                                      1
+                                                              )}/10)`
+                                                            : submissionResult.currentTestCase
+                                                            ? `Running test case ${
+                                                                  submissionResult.currentTestCase
+                                                              }/${
+                                                                  submissionResult.totalTestCases ||
+                                                                  5
+                                                              }...`
+                                                            : "Executing your code..."}
+                                                    </div>
+                                                )}
                                             </div>
-                                            <p className="text-sm text-red-700 dark:text-red-300 mt-2">
-                                                Your solution didn't pass all
-                                                test cases. Try debugging your
-                                                code and submit again.
+                                        </div>
+                                        {submissionResult.testCasesPassed !==
+                                            undefined && (
+                                            <div className="text-right">
+                                                <div
+                                                    className={`font-bold ${
+                                                        submissionResult.status ===
+                                                        "ACCEPTED"
+                                                            ? "text-green-600"
+                                                            : "text-red-600"
+                                                    }`}
+                                                >
+                                                    {
+                                                        submissionResult.testCasesPassed
+                                                    }
+                                                    /
+                                                    {
+                                                        submissionResult.totalTestCases
+                                                    }{" "}
+                                                    passed
+                                                </div>
+                                                <div className="w-32 bg-muted rounded-full h-2 mt-1">
+                                                    <div
+                                                        className={`h-2 rounded-full transition-all duration-1000 ${
+                                                            submissionResult.status ===
+                                                            "ACCEPTED"
+                                                                ? "bg-green-500"
+                                                                : "bg-red-500"
+                                                        }`}
+                                                        style={{
+                                                            width: `${
+                                                                ((submissionResult.testCasesPassed ||
+                                                                    0) /
+                                                                    (submissionResult.totalTestCases ||
+                                                                        1)) *
+                                                                100
+                                                            }%`,
+                                                        }}
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {submissionResult.status === "ACCEPTED" && (
+                                        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+                                            <div className="flex items-center space-x-2">
+                                                <CheckCircle className="h-5 w-5 text-green-500" />
+                                                <span className="font-semibold text-green-800 dark:text-green-200">
+                                                    Accepted! 🎉
+                                                </span>
+                                            </div>
+                                            <p className="text-sm text-green-700 dark:text-green-300 mt-2">
+                                                Your solution passed all test
+                                                cases! Great job solving this
+                                                problem.
                                             </p>
                                         </div>
                                     )}
-                            </div>
-                        )}
+
+                                    {(submissionResult.status === "ACCEPTED" ||
+                                        submissionResult.runtime) && (
+                                        <div className="grid grid-cols-2 gap-4">
+                                            {submissionResult.runtime &&
+                                                submissionResult.runtime >
+                                                    0 && (
+                                                    <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 border border-blue-200 dark:border-blue-800">
+                                                        <div className="text-xs text-muted-foreground mb-1">
+                                                            Runtime
+                                                        </div>
+                                                        <div className="text-lg font-bold text-blue-600 dark:text-blue-400">
+                                                            {
+                                                                submissionResult.runtime
+                                                            }{" "}
+                                                            ms
+                                                        </div>
+                                                        <div className="text-xs text-muted-foreground">
+                                                            {submissionResult.runtime <
+                                                            100
+                                                                ? "⚡ Excellent"
+                                                                : submissionResult.runtime <
+                                                                  500
+                                                                ? "✅ Good"
+                                                                : submissionResult.runtime <
+                                                                  1000
+                                                                ? "⚠️ Average"
+                                                                : "🐌 Slow"}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            {submissionResult.memoryUsage &&
+                                                submissionResult.memoryUsage >
+                                                    0 && (
+                                                    <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-3 border border-purple-200 dark:border-purple-800">
+                                                        <div className="text-xs text-muted-foreground mb-1">
+                                                            Memory
+                                                        </div>
+                                                        <div className="text-lg font-bold text-purple-600 dark:text-purple-400">
+                                                            {
+                                                                submissionResult.memoryUsage
+                                                            }{" "}
+                                                            MB
+                                                        </div>
+                                                        <div className="text-xs text-muted-foreground">
+                                                            {submissionResult.memoryUsage <
+                                                            50
+                                                                ? "🔥 Efficient"
+                                                                : submissionResult.memoryUsage <
+                                                                  100
+                                                                ? "✅ Good"
+                                                                : "📈 High"}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                        </div>
+                                    )}
+
+                                    {submissionResult.error && (
+                                        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+                                            <div className="flex items-center space-x-2 mb-2">
+                                                <XCircle className="h-4 w-4 text-red-500" />
+                                                <span className="font-medium text-red-800 dark:text-red-200">
+                                                    Error Details
+                                                </span>
+                                            </div>
+                                            <pre className="text-sm text-red-700 dark:text-red-300 whitespace-pre-wrap font-mono">
+                                                {submissionResult.error}
+                                            </pre>
+                                        </div>
+                                    )}
+
+                                    {submissionResult.status !== "ACCEPTED" &&
+                                        submissionResult.status !== "PENDING" &&
+                                        submissionResult.status !== "RUNNING" &&
+                                        !submissionResult.error && (
+                                            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+                                                <div className="flex items-center space-x-2">
+                                                    <XCircle className="h-4 w-4 text-red-500" />
+                                                    <span className="font-semibold text-red-800 dark:text-red-200">
+                                                        {submissionResult.status.replace(
+                                                            "_",
+                                                            " "
+                                                        )}
+                                                    </span>
+                                                </div>
+                                                <p className="text-sm text-red-700 dark:text-red-300 mt-2">
+                                                    Your solution didn't pass
+                                                    all test cases. Try
+                                                    debugging your code and
+                                                    submit again.
+                                                </p>
+                                            </div>
+                                        )}
+                                </div>
+                            )}
                     </div>
                 </div>
             </ResizablePanel>
