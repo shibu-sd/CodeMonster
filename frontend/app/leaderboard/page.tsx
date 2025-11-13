@@ -69,13 +69,6 @@ function LeaderboardPageContent() {
                 setIsLoading(true);
                 setError(null);
 
-                if (isSignedIn) {
-                    const token = await getToken();
-                    if (token) {
-                        api.setAuthToken(token);
-                    }
-                }
-
                 const response = await api.getLeaderboard({
                     page,
                     limit: pagination.limit,
@@ -115,19 +108,12 @@ function LeaderboardPageContent() {
                 setIsLoading(false);
             }
         },
-        [isSignedIn, pagination.limit]
+        [isSignedIn, pagination.limit, api]
     );
 
     const loadStats = useCallback(async () => {
         try {
             setIsStatsLoading(true);
-
-            if (isSignedIn) {
-                const token = await getToken();
-                if (token) {
-                    api.setAuthToken(token);
-                }
-            }
 
             const response = await api.getLeaderboardStats();
 
@@ -141,7 +127,7 @@ function LeaderboardPageContent() {
         } finally {
             setIsStatsLoading(false);
         }
-    }, [isSignedIn]);
+    }, [api]);
 
     const handleNextPage = () => {
         if (pagination.hasNext) {
@@ -155,10 +141,10 @@ function LeaderboardPageContent() {
         }
     };
 
+    // Parallelize API calls for faster loading
     useEffect(() => {
         if (authReady) {
-            loadLeaderboard();
-            loadStats();
+            Promise.all([loadLeaderboard(), loadStats()]);
         }
     }, [authReady, loadLeaderboard, loadStats]);
 

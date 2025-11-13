@@ -55,27 +55,20 @@ function ProblemsPageContent() {
     }, [isLoaded, isSignedIn]);
 
     useEffect(() => {
-        if (authReady && isSignedIn) {
-            fetchSolvedProblems();
-        }
-    }, [authReady, isSignedIn]);
-
-    useEffect(() => {
         if (authReady) {
-            fetchProblems();
-            fetchStats();
+            // Parallelize all API calls
+            Promise.all([
+                fetchProblems(),
+                fetchStats(),
+                isSignedIn ? fetchSolvedProblems() : Promise.resolve(),
+            ]);
         }
-    }, [currentPage, selectedDifficulty, searchTerm, authReady]);
+    }, [currentPage, selectedDifficulty, searchTerm, authReady, isSignedIn]);
 
     const fetchSolvedProblems = useCallback(async () => {
         if (!isSignedIn) return;
 
         try {
-            const token = await getToken();
-            if (token) {
-                api.setAuthToken(token);
-            }
-
             const response = await api.getUserDashboard();
             if (response.success && response.data.solvedProblems) {
                 const solvedIds = new Set<string>(
@@ -88,7 +81,7 @@ function ProblemsPageContent() {
         } catch (err) {
             console.log("Could not fetch solved problems:", err);
         }
-    }, [isSignedIn, getToken, api]);
+    }, [isSignedIn, api]);
 
     const fetchProblems = useCallback(async () => {
         try {
