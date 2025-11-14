@@ -5,11 +5,6 @@ RUN adduser -D -s /bin/sh coderunner
 WORKDIR /workspace
 RUN chown coderunner:coderunner /workspace
 
-RUN apk add --no-cache \
-    gcc \
-    musl-dev \
-    linux-headers
-
 COPY runner.py /runner.py
 RUN chmod +x /runner.py
 
