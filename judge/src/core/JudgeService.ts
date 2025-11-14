@@ -18,6 +18,7 @@ export class JudgeService {
 
     async judgeSubmission(submission: CodeSubmission): Promise<JudgeResult> {
         const { code, language, testCases } = submission;
+        let compiledWorkspaceDir: string | undefined;
 
         try {
             const langConfig = getLanguageConfig(language);
@@ -32,13 +33,15 @@ export class JudgeService {
             };
 
             if (langConfig.compileCommand) {
-                console.log(`🔧 Testing compilation for ${language}...`);
-                const compileResult = await this.testCompilation(
+                console.log(`🔧 Compiling code once for ${language}...`);
+                const compileResult = await this.codeExecutor.compileCode(
                     code,
                     language
                 );
                 console.log(
-                    `🔧 Compilation result: Success=${compileResult.success}, Error="${compileResult.error}"`
+                    `🔧 Compilation result: Success=${
+                        compileResult.success
+                    }, Error="${compileResult.error || "none"}"`
                 );
                 if (!compileResult.success) {
                     result.status = "COMPILATION_ERROR";
@@ -46,8 +49,9 @@ export class JudgeService {
                         compileResult.error || "Compilation failed";
                     return result;
                 }
+                compiledWorkspaceDir = compileResult.workspaceDir;
                 console.log(
-                    `✅ Compilation successful, proceeding to test cases...`
+                    `✅ Compilation successful, will reuse for all ${testCases.length} test cases...`
                 );
             }
 
@@ -81,7 +85,8 @@ export class JudgeService {
                                 language,
                                 testCase.input,
                                 langConfig.timeLimit,
-                                langConfig.memoryLimit
+                                langConfig.memoryLimit,
+                                compiledWorkspaceDir
                             );
 
                         const testCaseResult: TestCaseResult = {
@@ -191,6 +196,13 @@ export class JudgeService {
                 totalRuntime: 0,
                 maxMemoryUsage: 0,
             };
+        } finally {
+            if (compiledWorkspaceDir) {
+                console.log(
+                    `🧹 Cleaning up compiled workspace: ${compiledWorkspaceDir}`
+                );
+                await this.codeExecutor.cleanupWorkspace(compiledWorkspaceDir);
+            }
         }
     }
 

@@ -36,10 +36,14 @@ export class CodeExecutor {
         language: string,
         input?: string,
         timeLimit?: number,
-        memoryLimit?: number
+        memoryLimit?: number,
+        workspaceDir?: string
     ): Promise<ExecutionResult> {
-        const executionId = uuidv4();
-        const workspaceDir = path.join(this.tempDir, executionId);
+        const executionId = workspaceDir
+            ? path.basename(workspaceDir)
+            : uuidv4();
+        const workspace = workspaceDir || path.join(this.tempDir, executionId);
+        const shouldCleanup = !workspaceDir;
 
         console.log(`🚀 Starting code execution: ${executionId} (${language})`);
 
@@ -47,11 +51,22 @@ export class CodeExecutor {
             const langConfig = getLanguageConfig(language);
             console.log(`📋 Language config loaded: ${langConfig.name}`);
 
-            await this.createWorkspace(workspaceDir, code, input, langConfig);
-            console.log(`📁 Workspace created: ${workspaceDir}`);
+            if (!workspaceDir) {
+                await this.createWorkspace(workspace, code, input, langConfig);
+                console.log(`📁 Workspace created: ${workspace}`);
+            } else {
+                if (input) {
+                    await fs.writeFile(
+                        path.join(workspace, "input.txt"),
+                        input,
+                        "utf8"
+                    );
+                }
+                console.log(`♻️  Reusing compiled workspace: ${workspace}`);
+            }
 
             const result = await this.runInDocker(
-                workspaceDir,
+                workspace,
                 langConfig,
                 timeLimit || langConfig.timeLimit,
                 memoryLimit || langConfig.memoryLimit
@@ -78,8 +93,71 @@ export class CodeExecutor {
                 exitCode: -1,
             };
         } finally {
-            console.log(`🧹 Cleaning up workspace: ${workspaceDir}`);
+            if (shouldCleanup) {
+                console.log(`🧹 Cleaning up workspace: ${workspace}`);
+                await this.cleanupWorkspace(workspace);
+            }
+        }
+    }
+
+    async compileCode(
+        code: string,
+        language: string
+    ): Promise<{ success: boolean; workspaceDir?: string; error?: string }> {
+        const executionId = uuidv4();
+        const workspaceDir = path.join(this.tempDir, executionId);
+
+        console.log(`🔧 Compiling code: ${executionId} (${language})`);
+
+        try {
+            const langConfig = getLanguageConfig(language);
+
+            if (!langConfig.compileCommand) {
+                return {
+                    success: true,
+                    error: "Language does not require compilation",
+                };
+            }
+
+            await this.createWorkspace(
+                workspaceDir,
+                code,
+                undefined,
+                langConfig
+            );
+            console.log(`📁 Compilation workspace created: ${workspaceDir}`);
+
+            const result = await this.executeCode(
+                code,
+                language,
+                undefined,
+                5,
+                128,
+                workspaceDir
+            );
+
+            if (!result.success) {
+                await this.cleanupWorkspace(workspaceDir);
+                return {
+                    success: false,
+                    error: result.error || "Compilation failed",
+                };
+            }
+
+            console.log(`✅ Compilation successful: ${executionId}`);
+            return {
+                success: true,
+                workspaceDir: workspaceDir,
+            };
+        } catch (error) {
             await this.cleanupWorkspace(workspaceDir);
+            return {
+                success: false,
+                error:
+                    error instanceof Error
+                        ? error.message
+                        : "Compilation failed",
+            };
         }
     }
 
@@ -301,9 +379,10 @@ export class CodeExecutor {
         return Math.floor(Math.random() * memoryLimit * 0.5) + 10;
     }
 
-    private async cleanupWorkspace(workspaceDir: string): Promise<void> {
+    async cleanupWorkspace(workspaceDir: string): Promise<void> {
         try {
             await fs.remove(workspaceDir);
+            console.log(`🗑️  Workspace cleaned: ${workspaceDir}`);
         } catch (error) {
             console.error("Failed to cleanup workspace:", workspaceDir, error);
         }
