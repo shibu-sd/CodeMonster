@@ -5,16 +5,20 @@ RUN adduser -D -s /bin/sh coderunner
 WORKDIR /workspace
 RUN chown coderunner:coderunner /workspace
 
-RUN apk add --no-cache \
-    g++ \
-    gcc \
-    musl-dev \
-    bash \
-    coreutils
+RUN apk add --no-cache g++ && \
+    rm -rf /usr/share/man \
+           /usr/share/doc \
+           /usr/share/info \
+           /usr/lib/gcc/*/*/install-tools \
+           /usr/lib/gcc/*/*/plugin \
+           /var/cache/apk/* \
+           /tmp/*
 
 COPY runner.cpp /runner.cpp
 COPY runner.sh /runner.sh
-RUN chmod +x /runner.sh
+
+RUN sed -i 's|#!/bin/bash|#!/bin/sh|' /runner.sh && \
+    chmod +x /runner.sh
 
 USER coderunner
 
