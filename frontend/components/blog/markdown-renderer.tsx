@@ -7,11 +7,7 @@ import rehypeSlug from "rehype-slug";
 import { Copy, Check } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-
-interface MarkdownRendererProps {
-    content: string;
-    className?: string;
-}
+import type { MarkdownRendererProps } from "@/types";
 
 export function MarkdownRenderer({
     content,
@@ -35,7 +31,6 @@ export function MarkdownRenderer({
                 remarkPlugins={[remarkGfm]}
                 rehypePlugins={[rehypeHighlight, rehypeSlug]}
                 components={{
-                    // Custom code block component with copy button
                     code: ({ className, children, ...props }) => {
                         const match = /language-(\w+)/.exec(className || "");
                         const language = match ? match[1] : "";
@@ -78,7 +73,6 @@ export function MarkdownRenderer({
                         );
                     },
 
-                    // Custom heading components for better styling
                     h1: ({ children, ...props }) => (
                         <h1
                             className="text-3xl font-bold mt-8 mb-4 text-foreground"
@@ -104,7 +98,6 @@ export function MarkdownRenderer({
                         </h3>
                     ),
 
-                    // Custom list components
                     ul: ({ children, ...props }) => (
                         <ul
                             className="list-disc list-inside my-4 space-y-1"
@@ -122,7 +115,6 @@ export function MarkdownRenderer({
                         </ol>
                     ),
 
-                    // Custom paragraph component
                     p: ({ children, ...props }) => (
                         <p
                             className="my-4 leading-7 text-foreground"
@@ -132,7 +124,6 @@ export function MarkdownRenderer({
                         </p>
                     ),
 
-                    // Custom blockquote component
                     blockquote: ({ children, ...props }) => (
                         <blockquote
                             className="border-l-4 border-primary pl-4 my-6 italic text-muted-foreground"
@@ -142,7 +133,6 @@ export function MarkdownRenderer({
                         </blockquote>
                     ),
 
-                    // Custom table components
                     table: ({ children, ...props }) => (
                         <div className="overflow-x-auto my-6">
                             <table
@@ -175,7 +165,6 @@ export function MarkdownRenderer({
                         </td>
                     ),
 
-                    // Custom link component
                     a: ({ children, href, ...props }) => (
                         <a
                             href={href}
@@ -188,7 +177,6 @@ export function MarkdownRenderer({
                         </a>
                     ),
 
-                    // Custom image component
                     img: ({ src, alt, ...props }) => (
                         <img
                             src={src}
@@ -198,7 +186,6 @@ export function MarkdownRenderer({
                         />
                     ),
 
-                    // Custom horizontal rule
                     hr: ({ ...props }) => (
                         <hr className="my-8 border-border" {...props} />
                     ),

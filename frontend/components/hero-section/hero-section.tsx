@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, memo, useCallback } from "react";
 import { HeroHeader } from "@/components/header/header";
 import { HeroAnnouncement } from "./hero-announcement";
 import { HeroContent } from "./hero-content";
@@ -21,7 +21,7 @@ function getRandomColor() {
     return COLORS[Math.floor(Math.random() * COLORS.length)];
 }
 
-function SubGrid() {
+const SubGrid = memo(function SubGrid() {
     const [cellColors, setCellColors] = useState<(string | null)[]>([
         null,
         null,
@@ -36,7 +36,7 @@ function SubGrid() {
         null,
     ]);
 
-    function handleHover(cellIdx: number) {
+    const handleHover = useCallback((cellIdx: number) => {
         // Clear any pending timeout for this cell
         const timeout = leaveTimeouts.current[cellIdx];
         if (timeout) {
@@ -46,8 +46,9 @@ function SubGrid() {
         setCellColors((prev) =>
             prev.map((c, i) => (i === cellIdx ? getRandomColor() : c))
         );
-    }
-    function handleLeave(cellIdx: number) {
+    }, []);
+
+    const handleLeave = useCallback((cellIdx: number) => {
         // Add a small delay before removing the color
         leaveTimeouts.current[cellIdx] = setTimeout(() => {
             setCellColors((prev) =>
@@ -55,7 +56,8 @@ function SubGrid() {
             );
             leaveTimeouts.current[cellIdx] = null;
         }, 120);
-    }
+    }, []);
+
     // Cleanup on unmount
     useEffect(() => {
         return () => {
@@ -80,27 +82,41 @@ function SubGrid() {
             ))}
         </div>
     );
-}
+});
 
 function InteractiveGrid() {
     const containerRef = useRef<HTMLDivElement>(null);
     const [grid, setGrid] = useState({ columns: 0, rows: 0 });
+    const resizeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    const updateGrid = useCallback(() => {
+        if (containerRef.current) {
+            const { width, height } =
+                containerRef.current.getBoundingClientRect();
+            setGrid({
+                columns: Math.ceil(width / CELL_SIZE),
+                rows: Math.ceil(height / CELL_SIZE),
+            });
+        }
+    }, []);
 
     useEffect(() => {
-        function updateGrid() {
-            if (containerRef.current) {
-                const { width, height } =
-                    containerRef.current.getBoundingClientRect();
-                setGrid({
-                    columns: Math.ceil(width / CELL_SIZE),
-                    rows: Math.ceil(height / CELL_SIZE),
-                });
+        const handleResize = () => {
+            if (resizeTimeoutRef.current) {
+                clearTimeout(resizeTimeoutRef.current);
             }
-        }
-        updateGrid();
-        window.addEventListener("resize", updateGrid);
-        return () => window.removeEventListener("resize", updateGrid);
-    }, []);
+            resizeTimeoutRef.current = setTimeout(updateGrid, 150);
+        };
+
+        updateGrid(); // Initial grid calculation
+        window.addEventListener("resize", handleResize);
+        return () => {
+            window.removeEventListener("resize", handleResize);
+            if (resizeTimeoutRef.current) {
+                clearTimeout(resizeTimeoutRef.current);
+            }
+        };
+    }, [updateGrid]);
 
     const total = grid.columns * grid.rows;
 

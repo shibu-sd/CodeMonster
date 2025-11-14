@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import PrivacyContent from "./privacy-content";
+import PrivacyContent from "@/components/privacy/privacy-content";
 
 export const metadata: Metadata = {
     title: "Privacy Policy - CodeMonster",

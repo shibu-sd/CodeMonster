@@ -8,8 +8,6 @@ import { FooterLinks } from "./footer-links";
 import { SocialLinks } from "./social-links";
 
 export default function FooterSection() {
-    const currentYear = new Date().getFullYear();
-
     return (
         <footer className="border-b bg-background pt-20">
             <div className="mx-auto max-w-5xl px-6">

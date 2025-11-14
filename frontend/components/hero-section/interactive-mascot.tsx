@@ -2,11 +2,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-
-interface MascotProps {
-    className?: string;
-    size?: "sm" | "md" | "lg";
-}
+import type { MascotProps } from "@/types";
 
 export const InteractiveMascot: React.FC<MascotProps> = ({
     className,
@@ -25,21 +21,16 @@ export const InteractiveMascot: React.FC<MascotProps> = ({
 
             const deltaX = event.clientX - mascotCenterX;
             const deltaY = event.clientY - mascotCenterY;
-
-            // Calculate distance from monster center
             const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 
-            // Normalize the direction vector and limit eye movement
-            const maxEyeMovement = 2.5; // Maximum distance pupils can move from center
+            const maxEyeMovement = 2.5;
             let eyeX = 0;
             let eyeY = 0;
 
             if (distance > 0) {
-                // Calculate normalized direction
                 const directionX = deltaX / distance;
                 const directionY = deltaY / distance;
 
-                // Apply movement with proper scaling
                 const movementScale = Math.min(distance / 100, 1); // Scale based on cursor distance
                 eyeX = directionX * maxEyeMovement * movementScale;
                 eyeY = directionY * maxEyeMovement * movementScale;
@@ -91,7 +82,6 @@ export const InteractiveMascot: React.FC<MascotProps> = ({
                 height: config.size,
             }}
         >
-            {/* Your actual logo */}
             <Image
                 src="/logo.png"
                 alt="CodeMonster"
@@ -100,7 +90,6 @@ export const InteractiveMascot: React.FC<MascotProps> = ({
                 className="w-full h-full object-contain"
             />
 
-            {/* Interactive eyes overlay - positioned over the logo's eyes */}
             <div
                 className={cn(
                     "absolute left-1/2 transform -translate-x-1/2 flex",
@@ -108,7 +97,6 @@ export const InteractiveMascot: React.FC<MascotProps> = ({
                     config.eyeSpacing
                 )}
             >
-                {/* Left Eye - Round shape */}
                 <div
                     className={cn(
                         "relative bg-white rounded-full border-2 border-gray-800",
@@ -124,12 +112,10 @@ export const InteractiveMascot: React.FC<MascotProps> = ({
                             transform: `translate(${eyePosition.x}px, ${eyePosition.y}px) translate(-50%, -50%)`,
                         }}
                     >
-                        {/* Pupil highlight */}
                         <div className="absolute top-0.5 left-0.5 w-1 h-1 bg-white rounded-full"></div>
                     </div>
                 </div>
 
-                {/* Right Eye - Round shape */}
                 <div
                     className={cn(
                         "relative bg-white rounded-full border-2 border-gray-800",
@@ -145,7 +131,6 @@ export const InteractiveMascot: React.FC<MascotProps> = ({
                             transform: `translate(${eyePosition.x}px, ${eyePosition.y}px) translate(-50%, -50%)`,
                         }}
                     >
-                        {/* Pupil highlight */}
                         <div className="absolute top-0.5 left-0.5 w-1 h-1 bg-white rounded-full"></div>
                     </div>
                 </div>
@@ -154,12 +139,10 @@ export const InteractiveMascot: React.FC<MascotProps> = ({
     );
 };
 
-// Dashboard positioned version
 export const DashboardMascot: React.FC = () => {
     return (
         <div className="fixed top-4 right-4 z-50 hidden lg:block">
             <div className="relative">
-                {/* Speech bubble (optional) */}
                 <div className="absolute -left-32 top-2 bg-white dark:bg-gray-800 rounded-lg px-3 py-2 shadow-lg border opacity-0 hover:opacity-100 transition-opacity duration-300">
                     <div className="text-xs text-gray-700 dark:text-gray-300 whitespace-nowrap">
                         Ready to solve some problems? 🚀

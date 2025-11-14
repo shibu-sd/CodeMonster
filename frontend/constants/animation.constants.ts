@@ -1,0 +1,10 @@
+export const ANIMATION = {
+    SCROLL_THRESHOLD: 0.05,
+    STAGGER_CHILDREN: 0.05,
+    DELAY_CHILDREN: 0.75,
+    BASE_DURATION: 0.3,
+    SPRING_BOUNCE: 0.3,
+    SPRING_DURATION: 1.5,
+    BLUR_AMOUNT: "12px",
+    Y_OFFSET: 12,
+} as const;

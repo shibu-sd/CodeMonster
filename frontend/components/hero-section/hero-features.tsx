@@ -37,7 +37,7 @@ export default function HeroFeatures() {
     };
 
     return (
-        <section className="bg-gray-50 py-16 md:py-32 dark:bg-transparent">
+        <section className="bg-gray-50 py-16 md:py-32 dark:bg-zinc-950">
             <div className="mx-auto max-w-5xl px-6">
                 <div className="text-center mb-12">
                     <h2 className="text-balance text-4xl font-semibold lg:text-5xl">

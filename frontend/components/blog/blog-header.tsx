@@ -1,15 +1,6 @@
 import { Calendar, User, Clock, Tag } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-
-interface BlogHeaderProps {
-    title: string;
-    excerpt: string;
-    author: string;
-    date: string;
-    tags: string[];
-    featured?: boolean;
-    readTime: string;
-}
+import type { BlogHeaderProps } from "@/types";
 
 export function BlogHeader({
     title,

@@ -1,10 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { FOOTER_LINKS } from "@/constants";
-
-interface FooterLinksProps {
-    className?: string;
-}
+import type { FooterLinksProps } from "@/types";
 
 export const FooterLinks: React.FC<FooterLinksProps> = ({ className }) => {
     return (

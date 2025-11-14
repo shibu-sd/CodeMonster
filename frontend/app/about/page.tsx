@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import AboutContent from "./about-content";
+import AboutContent from "@/components/about/about-content";
 
 export const metadata: Metadata = {
     title: "About Us - CodeMonster",

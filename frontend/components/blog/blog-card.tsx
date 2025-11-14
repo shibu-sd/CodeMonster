@@ -4,17 +4,7 @@ import Link from "next/link";
 import { Calendar, User, Clock, Tag } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-
-interface BlogCardProps {
-    slug: string;
-    title: string;
-    excerpt: string;
-    author: string;
-    date: string;
-    tags: string[];
-    featured?: boolean;
-    readTime: string;
-}
+import type { BlogCardProps } from "@/types";
 
 export function BlogCard({
     slug,
@@ -97,14 +87,10 @@ export function BlogCard({
                                 +{tags.length - 3}
                             </Badge>
 
-                            {/* Tooltip */}
                             <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 opacity-0 invisible group-hover/tags:opacity-100 group-hover/tags:visible transition-all duration-200 ease-out z-50 pointer-events-none">
-                                {/* Tooltip arrow */}
                                 <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-px">
                                     <div className="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-background"></div>
                                 </div>
-
-                                {/* Tooltip content */}
                                 <div className="relative bg-background border border-border/40 shadow-lg rounded-lg px-3 py-2 backdrop-blur-sm">
                                     <div className="flex flex-wrap gap-1.5 max-w-[200px]">
                                         {tags.slice(3).map((tag, index) => (

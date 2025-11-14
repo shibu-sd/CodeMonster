@@ -3,7 +3,7 @@
 import React, { createContext, useContext, ReactNode } from "react";
 import { useBattleSocket } from "@/hooks/useBattleSocket";
 import type { Socket } from "socket.io-client";
-import type { BattleEvents, BattleState } from "@/hooks/useBattleSocket";
+import type { BattleEvents, BattleState } from "@/types";
 
 interface BattleContextValue {
     socket: Socket<BattleEvents> | null;

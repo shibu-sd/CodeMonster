@@ -1,59 +1,54 @@
-// Common types used across the application
-
-export interface MenuItem {
-  name: string;
-  href: string;
-  requireAuth: boolean;
-}
-
-export interface FooterLink {
-  title: string;
-  href: string;
-}
-
-export interface FooterLinkGroup {
-  group: string;
-  items: FooterLink[];
-}
-
-export interface SocialLink {
-  name: string;
-  href: string;
-  ariaLabel: string;
-  svgPath: string;
-}
-
-export interface PartnerLogo {
-  name: string;
-  src: string;
-  height: string;
-}
-
-export interface AnimationVariants {
-  hidden?: Record<string, any>;
-  visible?: Record<string, any>;
-  exit?: Record<string, any>;
-}
-
-export interface ComponentWithClassName {
-  className?: string;
-}
-
-export interface ComponentWithChildren {
-  children: React.ReactNode;
-}
-
-// Theme types
-export type Theme = 'light' | 'dark' | 'system';
-
-// Animation preset types
-export type TextEffectPreset = 'blur' | 'fade-in-blur' | 'scale' | 'fade' | 'slide';
-export type TextEffectPer = 'word' | 'char' | 'line';
-
-// Breakpoint types for responsive design
-export type Breakpoint = 'sm' | 'md' | 'lg' | 'xl' | '2xl';
-
-// Common props for UI components
-export interface BaseComponentProps extends ComponentWithClassName {
-  children?: React.ReactNode;
-}
+export type { MenuItem, FooterLink, FooterLinkGroup } from "./navigation.types";
+export type { SocialLink } from "./social.types";
+export type { Theme, Breakpoint } from "./theme.types";
+export type {
+    Problem,
+    TestCase,
+    StarterCode,
+    ProblemStats,
+    LeaderboardEntry,
+    LeaderboardStats,
+    LeaderboardResponse,
+    UserRankResponse,
+    ApiResponse,
+    ProblemsResponse,
+} from "./api.types";
+export type { BlogPost } from "./blog.types";
+export type {
+    BattleUser,
+    BattleProblem,
+    BattleEvents,
+    BattleState,
+    BattleSocketState,
+} from "./battle.types";
+export type { Testimonial, TestimonialCardProps } from "./testimonial.types";
+export type {
+    PaginationInfo,
+    LeaderboardTableProps,
+    LeaderboardStatsProps,
+} from "./leaderboard.types";
+export type { MascotProps } from "./hero.types";
+export type { FooterLinksProps } from "./footer.types";
+export type { FaqItem, FaqsAccordionProps } from "./faqs.types";
+export type { MonacoEditorProps } from "./editor.types";
+export type {
+    BlogCardProps,
+    BlogHeaderProps,
+    BlogSidebarProps,
+    MarkdownRendererProps,
+} from "./blog-components.types";
+export type {
+    BattleChatBoxProps,
+    BattleEndDialogProps,
+    BattleQueueProps,
+    BattleStartingAnimationProps,
+    BattleTimerProps,
+} from "./battle-components.types";
+export type { DashboardData } from "./dashboard.types";
+export type {
+    TestCaseResult,
+    RunResult,
+    SubmissionResult,
+    BattleNotification,
+    AcceptedSolution,
+} from "./problem-detail.types";
