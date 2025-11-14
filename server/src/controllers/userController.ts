@@ -334,7 +334,7 @@ export class UserController {
                 orderBy: {
                     submittedAt: "desc",
                 },
-                take: 15,
+                take: 10,
             });
 
             const difficultyStats = {
