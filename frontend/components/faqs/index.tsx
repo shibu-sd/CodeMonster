@@ -17,7 +17,7 @@ export function FaqsAccordion({
     };
 
     return (
-        <section className="py-20">
+        <section className="py-20 bg-gray-50 dark:bg-zinc-950">
             <div className="mx-auto max-w-4xl px-6">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}

@@ -8,7 +8,7 @@ import { testimonials } from "./testimonial-data";
 
 export function Testimonials() {
     return (
-        <section className="relative w-full py-20 overflow-hidden">
+        <section className="relative w-full py-20 overflow-hidden bg-white dark:bg-zinc-900">
             <div className="container mx-auto px-4">
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
