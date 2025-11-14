@@ -42,8 +42,21 @@ export class CodeExecutor {
         const executionId = workspaceDir
             ? path.basename(workspaceDir)
             : uuidv4();
-        const workspace = workspaceDir || path.join(this.tempDir, executionId);
-        const shouldCleanup = !workspaceDir;
+
+        let workspace: string;
+        let shouldCleanup: boolean;
+
+        if (workspaceDir) {
+            const uniqueId = uuidv4();
+            workspace = path.join(this.tempDir, uniqueId);
+            shouldCleanup = true;
+
+            await fs.copy(workspaceDir, workspace);
+            console.log(`📋 Copied compiled workspace to: ${workspace}`);
+        } else {
+            workspace = path.join(this.tempDir, executionId);
+            shouldCleanup = true;
+        }
 
         console.log(`🚀 Starting code execution: ${executionId} (${language})`);
 
@@ -56,13 +69,16 @@ export class CodeExecutor {
                 console.log(`📁 Workspace created: ${workspace}`);
             } else {
                 if (input) {
+                    console.log(
+                        `📝 Writing input to workspace copy: "${input}"`
+                    );
                     await fs.writeFile(
                         path.join(workspace, "input.txt"),
                         input,
                         "utf8"
                     );
                 }
-                console.log(`♻️  Reusing compiled workspace: ${workspace}`);
+                console.log(`♻️  Using workspace copy for execution`);
             }
 
             const result = await this.runInDocker(
