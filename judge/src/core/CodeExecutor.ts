@@ -253,6 +253,10 @@ export class CodeExecutor {
 
             const endTime = Date.now();
             const runtime = endTime - startTime;
+            const memoryUsage = await this.getContainerMemoryUsage(
+                container,
+                memoryLimit
+            );
 
             const logs = await container.logs({
                 stdout: true,
@@ -280,7 +284,7 @@ export class CodeExecutor {
                     output: runnerResult.output || "",
                     error: runnerResult.error,
                     runtime: runnerResult.runtime || runtime,
-                    memoryUsage: this.estimateMemoryUsage(memoryLimit),
+                    memoryUsage: memoryUsage,
                     exitCode: result.exitCode,
                 };
             } catch (parseError) {
@@ -293,7 +297,7 @@ export class CodeExecutor {
                     error:
                         result.exitCode !== 0 ? "Execution failed" : undefined,
                     runtime,
-                    memoryUsage: this.estimateMemoryUsage(memoryLimit),
+                    memoryUsage: memoryUsage,
                     exitCode: result.exitCode,
                 };
             } finally {
@@ -374,9 +378,32 @@ export class CodeExecutor {
         }
     }
 
+    private async getContainerMemoryUsage(
+        container: Docker.Container,
+        memoryLimit: number
+    ): Promise<number> {
+        try {
+            const stats = await container.stats({ stream: false });
+            if (stats.memory_stats && stats.memory_stats.usage) {
+                const memoryUsageMB = stats.memory_stats.usage / (1024 * 1024);
+                console.log(
+                    `📊 Real memory usage: ${memoryUsageMB.toFixed(2)} MB`
+                );
+                return Math.round(memoryUsageMB);
+            }
+
+            console.warn("⚠️ Memory stats not available, using estimation");
+            return this.estimateMemoryUsage(memoryLimit);
+        } catch (error) {
+            console.error("❌ Failed to get container stats, using estimation");
+            return this.estimateMemoryUsage(memoryLimit);
+        }
+    }
+
     private estimateMemoryUsage(memoryLimit: number): number {
-        // Simple estimation - in reality, we'd get this from Docker stats
-        return Math.floor(Math.random() * memoryLimit * 0.5) + 10;
+        const estimated = Math.floor(Math.random() * memoryLimit * 0.5) + 10;
+        console.log(`🔮 Estimated memory usage: ${estimated} MB`);
+        return estimated;
     }
 
     async cleanupWorkspace(workspaceDir: string): Promise<void> {

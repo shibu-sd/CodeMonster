@@ -137,10 +137,17 @@ export class JudgeService {
 
             const testCaseResultsArray = await Promise.all(testCasePromises);
 
+            let totalRuntime = 0;
+            let totalMemory = 0;
+            let validTestCases = 0;
+
             for (const testCaseResult of testCaseResultsArray) {
                 if (!testCaseResult) continue;
 
-                result.totalRuntime += testCaseResult.runtime;
+                totalRuntime += testCaseResult.runtime;
+                totalMemory += testCaseResult.memoryUsage;
+                validTestCases++;
+
                 result.maxMemoryUsage = Math.max(
                     result.maxMemoryUsage,
                     testCaseResult.memoryUsage
@@ -169,6 +176,25 @@ export class JudgeService {
 
                 result.testCaseResults.push(testCaseResult);
             }
+
+            result.totalRuntime =
+                validTestCases > 0
+                    ? Math.round(totalRuntime / validTestCases)
+                    : 0;
+
+            if (
+                result.maxMemoryUsage === 0 &&
+                validTestCases > 0 &&
+                totalMemory > 0
+            ) {
+                result.maxMemoryUsage = Math.round(
+                    totalMemory / validTestCases
+                );
+            }
+
+            console.log(
+                `📊 Stats - Avg Runtime: ${result.totalRuntime}ms, Max Memory: ${result.maxMemoryUsage}MB`
+            );
 
             if (
                 result.status === "ACCEPTED" &&
