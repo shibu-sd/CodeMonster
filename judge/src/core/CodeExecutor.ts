@@ -36,10 +36,27 @@ export class CodeExecutor {
         language: string,
         input?: string,
         timeLimit?: number,
-        memoryLimit?: number
+        memoryLimit?: number,
+        workspaceDir?: string
     ): Promise<ExecutionResult> {
-        const executionId = uuidv4();
-        const workspaceDir = path.join(this.tempDir, executionId);
+        const executionId = workspaceDir
+            ? path.basename(workspaceDir)
+            : uuidv4();
+
+        let workspace: string;
+        let shouldCleanup: boolean;
+
+        if (workspaceDir) {
+            const uniqueId = uuidv4();
+            workspace = path.join(this.tempDir, uniqueId);
+            shouldCleanup = true;
+
+            await fs.copy(workspaceDir, workspace);
+            console.log(`📋 Copied compiled workspace to: ${workspace}`);
+        } else {
+            workspace = path.join(this.tempDir, executionId);
+            shouldCleanup = true;
+        }
 
         console.log(`🚀 Starting code execution: ${executionId} (${language})`);
 
@@ -47,11 +64,25 @@ export class CodeExecutor {
             const langConfig = getLanguageConfig(language);
             console.log(`📋 Language config loaded: ${langConfig.name}`);
 
-            await this.createWorkspace(workspaceDir, code, input, langConfig);
-            console.log(`📁 Workspace created: ${workspaceDir}`);
+            if (!workspaceDir) {
+                await this.createWorkspace(workspace, code, input, langConfig);
+                console.log(`📁 Workspace created: ${workspace}`);
+            } else {
+                if (input) {
+                    console.log(
+                        `📝 Writing input to workspace copy: "${input}"`
+                    );
+                    await fs.writeFile(
+                        path.join(workspace, "input.txt"),
+                        input,
+                        "utf8"
+                    );
+                }
+                console.log(`♻️  Using workspace copy for execution`);
+            }
 
             const result = await this.runInDocker(
-                workspaceDir,
+                workspace,
                 langConfig,
                 timeLimit || langConfig.timeLimit,
                 memoryLimit || langConfig.memoryLimit
@@ -78,8 +109,71 @@ export class CodeExecutor {
                 exitCode: -1,
             };
         } finally {
-            console.log(`🧹 Cleaning up workspace: ${workspaceDir}`);
+            if (shouldCleanup) {
+                console.log(`🧹 Cleaning up workspace: ${workspace}`);
+                await this.cleanupWorkspace(workspace);
+            }
+        }
+    }
+
+    async compileCode(
+        code: string,
+        language: string
+    ): Promise<{ success: boolean; workspaceDir?: string; error?: string }> {
+        const executionId = uuidv4();
+        const workspaceDir = path.join(this.tempDir, executionId);
+
+        console.log(`🔧 Compiling code: ${executionId} (${language})`);
+
+        try {
+            const langConfig = getLanguageConfig(language);
+
+            if (!langConfig.compileCommand) {
+                return {
+                    success: true,
+                    error: "Language does not require compilation",
+                };
+            }
+
+            await this.createWorkspace(
+                workspaceDir,
+                code,
+                undefined,
+                langConfig
+            );
+            console.log(`📁 Compilation workspace created: ${workspaceDir}`);
+
+            const result = await this.executeCode(
+                code,
+                language,
+                undefined,
+                5,
+                128,
+                workspaceDir
+            );
+
+            if (!result.success) {
+                await this.cleanupWorkspace(workspaceDir);
+                return {
+                    success: false,
+                    error: result.error || "Compilation failed",
+                };
+            }
+
+            console.log(`✅ Compilation successful: ${executionId}`);
+            return {
+                success: true,
+                workspaceDir: workspaceDir,
+            };
+        } catch (error) {
             await this.cleanupWorkspace(workspaceDir);
+            return {
+                success: false,
+                error:
+                    error instanceof Error
+                        ? error.message
+                        : "Compilation failed",
+            };
         }
     }
 
@@ -175,6 +269,10 @@ export class CodeExecutor {
 
             const endTime = Date.now();
             const runtime = endTime - startTime;
+            const memoryUsage = await this.getContainerMemoryUsage(
+                container,
+                memoryLimit
+            );
 
             const logs = await container.logs({
                 stdout: true,
@@ -202,7 +300,7 @@ export class CodeExecutor {
                     output: runnerResult.output || "",
                     error: runnerResult.error,
                     runtime: runnerResult.runtime || runtime,
-                    memoryUsage: this.estimateMemoryUsage(memoryLimit),
+                    memoryUsage: memoryUsage,
                     exitCode: result.exitCode,
                 };
             } catch (parseError) {
@@ -215,7 +313,7 @@ export class CodeExecutor {
                     error:
                         result.exitCode !== 0 ? "Execution failed" : undefined,
                     runtime,
-                    memoryUsage: this.estimateMemoryUsage(memoryLimit),
+                    memoryUsage: memoryUsage,
                     exitCode: result.exitCode,
                 };
             } finally {
@@ -296,14 +394,38 @@ export class CodeExecutor {
         }
     }
 
-    private estimateMemoryUsage(memoryLimit: number): number {
-        // Simple estimation - in reality, we'd get this from Docker stats
-        return Math.floor(Math.random() * memoryLimit * 0.5) + 10;
+    private async getContainerMemoryUsage(
+        container: Docker.Container,
+        memoryLimit: number
+    ): Promise<number> {
+        try {
+            const stats = await container.stats({ stream: false });
+            if (stats.memory_stats && stats.memory_stats.usage) {
+                const memoryUsageMB = stats.memory_stats.usage / (1024 * 1024);
+                console.log(
+                    `📊 Real memory usage: ${memoryUsageMB.toFixed(2)} MB`
+                );
+                return Math.round(memoryUsageMB);
+            }
+
+            console.warn("⚠️ Memory stats not available, using estimation");
+            return this.estimateMemoryUsage(memoryLimit);
+        } catch (error) {
+            console.error("❌ Failed to get container stats, using estimation");
+            return this.estimateMemoryUsage(memoryLimit);
+        }
     }
 
-    private async cleanupWorkspace(workspaceDir: string): Promise<void> {
+    private estimateMemoryUsage(memoryLimit: number): number {
+        const estimated = Math.floor(Math.random() * memoryLimit * 0.5) + 10;
+        console.log(`🔮 Estimated memory usage: ${estimated} MB`);
+        return estimated;
+    }
+
+    async cleanupWorkspace(workspaceDir: string): Promise<void> {
         try {
             await fs.remove(workspaceDir);
+            console.log(`🗑️  Workspace cleaned: ${workspaceDir}`);
         } catch (error) {
             console.error("Failed to cleanup workspace:", workspaceDir, error);
         }

@@ -1,4 +1,19 @@
-FROM eclipse-temurin:17-jdk-alpine
+FROM eclipse-temurin:17-jdk-alpine AS jdk-builder
+
+RUN jlink \
+    --add-modules java.base,java.compiler,jdk.compiler,jdk.zipfs,java.logging \
+    --strip-debug \
+    --no-man-pages \
+    --no-header-files \
+    --compress=2 \
+    --output /custom-jdk
+
+FROM alpine:latest
+
+COPY --from=jdk-builder /custom-jdk /opt/java/openjdk
+
+ENV JAVA_HOME=/opt/java/openjdk
+ENV PATH="${JAVA_HOME}/bin:${PATH}"
 
 RUN adduser -D -s /bin/sh coderunner
 WORKDIR /workspace
@@ -11,7 +26,5 @@ RUN chmod +x /runner.sh
 RUN javac /Runner.java
 
 USER coderunner
-
-ENV JAVA_TOOL_OPTIONS="-Xmx256m -Xms64m -XX:+UseSerialGC -XX:MaxMetaspaceSize=128m"
 
 CMD ["/runner.sh"]

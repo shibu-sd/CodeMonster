@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Set resource limits
 ulimit -t 10  # CPU time limit: 10 seconds

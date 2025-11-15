@@ -7,6 +7,7 @@ import {
     ExecutionResult,
 } from "./types";
 import { getLanguageConfig } from "../config/LanguageConfig";
+import pLimit from "p-limit";
 
 export class JudgeService {
     private codeExecutor: CodeExecutor;
@@ -17,6 +18,7 @@ export class JudgeService {
 
     async judgeSubmission(submission: CodeSubmission): Promise<JudgeResult> {
         const { code, language, testCases } = submission;
+        let compiledWorkspaceDir: string | undefined;
 
         try {
             const langConfig = getLanguageConfig(language);
@@ -31,13 +33,15 @@ export class JudgeService {
             };
 
             if (langConfig.compileCommand) {
-                console.log(`🔧 Testing compilation for ${language}...`);
-                const compileResult = await this.testCompilation(
+                console.log(`🔧 Compiling code once for ${language}...`);
+                const compileResult = await this.codeExecutor.compileCode(
                     code,
                     language
                 );
                 console.log(
-                    `🔧 Compilation result: Success=${compileResult.success}, Error="${compileResult.error}"`
+                    `🔧 Compilation result: Success=${
+                        compileResult.success
+                    }, Error="${compileResult.error || "none"}"`
                 );
                 if (!compileResult.success) {
                     result.status = "COMPILATION_ERROR";
@@ -45,126 +49,152 @@ export class JudgeService {
                         compileResult.error || "Compilation failed";
                     return result;
                 }
+                compiledWorkspaceDir = compileResult.workspaceDir;
                 console.log(
-                    `✅ Compilation successful, proceeding to test cases...`
+                    `✅ Compilation successful, will reuse for all ${testCases.length} test cases...`
                 );
             }
 
-            // Execute code against each test case
-            for (let i = 0; i < testCases.length; i++) {
-                const testCase = testCases[i];
-                if (!testCase) {
-                    console.error(`❌ Test case ${i + 1} is undefined`);
-                    continue;
-                }
+            const parallelLimit = parseInt(
+                process.env.PARALLEL_TEST_LIMIT || "5",
+                10
+            );
+            const limit = pLimit(parallelLimit);
 
-                console.log(
-                    `🧪 Running test case ${i + 1}/${testCases.length}`
-                );
-                console.log(`📥 Test case input: "${testCase.input}"`);
-                console.log(`📤 Expected output: "${testCase.output}"`);
+            console.log(
+                `🚀 Running ${testCases.length} test cases with concurrency limit: ${parallelLimit}`
+            );
 
-                try {
-                    const executionResult = await this.codeExecutor.executeCode(
-                        code,
-                        language,
-                        testCase.input,
-                        langConfig.timeLimit,
-                        langConfig.memoryLimit
-                    );
-
-                    const testCaseResult: TestCaseResult = {
-                        input: testCase.input,
-                        expectedOutput: testCase.output.trim(),
-                        actualOutput: executionResult.output.trim(),
-                        passed: false,
-                        runtime: executionResult.runtime,
-                        memoryUsage: executionResult.memoryUsage,
-                        error: executionResult.error || undefined,
-                    };
-
-                    result.totalRuntime += executionResult.runtime;
-                    result.maxMemoryUsage = Math.max(
-                        result.maxMemoryUsage,
-                        executionResult.memoryUsage
-                    );
-
-                    if (!executionResult.success) {
-                        testCaseResult.passed = false;
-
-                        if (
-                            executionResult.error?.includes(
-                                "Time Limit Exceeded"
-                            )
-                        ) {
-                            result.status = "TIME_LIMIT_EXCEEDED";
-                        } else if (
-                            executionResult.error?.includes(
-                                "Memory Limit Exceeded"
-                            )
-                        ) {
-                            result.status = "MEMORY_LIMIT_EXCEEDED";
-                        } else {
-                            result.status = "RUNTIME_ERROR";
-                        }
-
-                        result.testCaseResults.push(testCaseResult);
-                        result.errorMessage =
-                            executionResult.error || "Execution failed";
-                        break; // Stop on first error
+            const testCasePromises = testCases.map((testCase, i) =>
+                limit(async () => {
+                    if (!testCase) {
+                        console.error(`❌ Test case ${i + 1} is undefined`);
+                        return null;
                     }
 
-                    const outputMatches = this.compareOutputs(
-                        testCaseResult.expectedOutput,
-                        testCaseResult.actualOutput
-                    );
-
-                    console.log(`🔍 Test case ${i + 1} comparison:`);
                     console.log(
-                        `   Expected: "${testCaseResult.expectedOutput}"`
+                        `🧪 Running test case ${i + 1}/${testCases.length}`
                     );
-                    console.log(
-                        `   Actual:   "${testCaseResult.actualOutput}"`
-                    );
-                    console.log(`   Match:    ${outputMatches}`);
+                    console.log(`📥 Input: "${testCase.input}"`);
+                    console.log(`📤 Expected: "${testCase.output}"`);
 
-                    if (outputMatches) {
-                        testCaseResult.passed = true;
-                        result.testCasesPassed++;
+                    try {
+                        const executionResult =
+                            await this.codeExecutor.executeCode(
+                                code,
+                                language,
+                                testCase.input,
+                                langConfig.timeLimit,
+                                langConfig.memoryLimit,
+                                compiledWorkspaceDir
+                            );
+
+                        const testCaseResult: TestCaseResult = {
+                            input: testCase.input,
+                            expectedOutput: testCase.output.trim(),
+                            actualOutput: executionResult.output.trim(),
+                            passed: false,
+                            runtime: executionResult.runtime,
+                            memoryUsage: executionResult.memoryUsage,
+                            error: executionResult.error || undefined,
+                        };
+
+                        if (!executionResult.success) {
+                            testCaseResult.passed = false;
+                            return testCaseResult;
+                        }
+
+                        const outputMatches = this.compareOutputs(
+                            testCaseResult.expectedOutput,
+                            testCaseResult.actualOutput
+                        );
+
+                        console.log(
+                            `🔍 Test case ${i + 1}: ${
+                                outputMatches ? "✅ PASS" : "❌ FAIL"
+                            }`
+                        );
+
+                        testCaseResult.passed = outputMatches;
+                        return testCaseResult;
+                    } catch (error) {
+                        const errorMessage =
+                            error instanceof Error
+                                ? error.message
+                                : "Unknown error";
+                        return {
+                            input: testCase.input,
+                            expectedOutput: testCase.output.trim(),
+                            actualOutput: "",
+                            passed: false,
+                            runtime: 0,
+                            memoryUsage: 0,
+                            error: errorMessage,
+                        } as TestCaseResult;
+                    }
+                })
+            );
+
+            const testCaseResultsArray = await Promise.all(testCasePromises);
+
+            let totalRuntime = 0;
+            let totalMemory = 0;
+            let validTestCases = 0;
+
+            for (const testCaseResult of testCaseResultsArray) {
+                if (!testCaseResult) continue;
+
+                totalRuntime += testCaseResult.runtime;
+                totalMemory += testCaseResult.memoryUsage;
+                validTestCases++;
+
+                result.maxMemoryUsage = Math.max(
+                    result.maxMemoryUsage,
+                    testCaseResult.memoryUsage
+                );
+
+                if (testCaseResult.passed) {
+                    result.testCasesPassed++;
+                } else {
+                    if (testCaseResult.error?.includes("Time Limit Exceeded")) {
+                        result.status = "TIME_LIMIT_EXCEEDED";
+                    } else if (
+                        testCaseResult.error?.includes("Memory Limit Exceeded")
+                    ) {
+                        result.status = "MEMORY_LIMIT_EXCEEDED";
+                    } else if (testCaseResult.error) {
+                        result.status = "RUNTIME_ERROR";
                     } else {
-                        testCaseResult.passed = false;
                         result.status = "WRONG_ANSWER";
                     }
 
-                    result.testCaseResults.push(testCaseResult);
-
-                    if (
-                        !testCaseResult.passed &&
-                        process.env.STOP_ON_FIRST_FAILURE === "true"
-                    ) {
-                        break;
+                    if (!result.errorMessage) {
+                        result.errorMessage =
+                            testCaseResult.error || "Test case failed";
                     }
-                } catch (error) {
-                    const errorMessage =
-                        error instanceof Error
-                            ? error.message
-                            : "Unknown error";
-                    const testCaseResult: TestCaseResult = {
-                        input: testCase.input,
-                        expectedOutput: testCase.output.trim(),
-                        actualOutput: "",
-                        passed: false,
-                        runtime: 0,
-                        memoryUsage: 0,
-                        error: errorMessage,
-                    };
-
-                    result.testCaseResults.push(testCaseResult);
-                    result.status = "INTERNAL_ERROR";
-                    result.errorMessage = errorMessage;
-                    break;
                 }
+
+                result.testCaseResults.push(testCaseResult);
             }
+
+            result.totalRuntime =
+                validTestCases > 0
+                    ? Math.round(totalRuntime / validTestCases)
+                    : 0;
+
+            if (
+                result.maxMemoryUsage === 0 &&
+                validTestCases > 0 &&
+                totalMemory > 0
+            ) {
+                result.maxMemoryUsage = Math.round(
+                    totalMemory / validTestCases
+                );
+            }
+
+            console.log(
+                `📊 Stats - Avg Runtime: ${result.totalRuntime}ms, Max Memory: ${result.maxMemoryUsage}MB`
+            );
 
             if (
                 result.status === "ACCEPTED" &&
@@ -192,6 +222,13 @@ export class JudgeService {
                 totalRuntime: 0,
                 maxMemoryUsage: 0,
             };
+        } finally {
+            if (compiledWorkspaceDir) {
+                console.log(
+                    `🧹 Cleaning up compiled workspace: ${compiledWorkspaceDir}`
+                );
+                await this.codeExecutor.cleanupWorkspace(compiledWorkspaceDir);
+            }
         }
     }
 

@@ -184,60 +184,45 @@ export class UserRepository extends BaseRepository<User, string> {
                 return result as unknown as UserStats;
             }
 
-            const [totalSubmissions, acceptedSubmissions, , ,] =
-                await Promise.all([
-                    this.prisma.submission.count({
-                        where: { userId },
-                    }),
-                    this.prisma.submission.count({
-                        where: { userId, status: "ACCEPTED" },
-                    }),
-                    this.prisma.userProblem.aggregate({
-                        where: { userId },
-                        _count: true,
-                    }),
+            const [submissionStats, problemDifficultyStats] = await Promise.all(
+                [
                     this.prisma.submission.groupBy({
                         by: ["status"],
                         where: { userId },
                         _count: { status: true },
                     }),
-                ]);
+                    this.prisma.$queryRaw<
+                        Array<{ difficulty: string; count: bigint }>
+                    >`
+                    SELECT p.difficulty, COUNT(*) as count
+                    FROM "UserProblem" up
+                    INNER JOIN "Problem" p ON up."problemId" = p.id
+                    WHERE up."userId" = ${userId} AND up."isSolved" = true
+                    GROUP BY p.difficulty
+                `,
+                ]
+            );
 
-            const problemsSolved = await this.prisma.userProblem.count({
-                where: {
-                    userId,
-                    isSolved: true,
-                },
-            });
+            const totalSubmissions = submissionStats.reduce(
+                (sum, stat) => sum + stat._count.status,
+                0
+            );
+            const acceptedSubmissions =
+                submissionStats.find((stat) => stat.status === "ACCEPTED")
+                    ?._count.status || 0;
 
-            const easySolved = await this.prisma.userProblem.count({
-                where: {
-                    userId,
-                    isSolved: true,
-                    problem: {
-                        difficulty: "EASY",
-                    },
-                },
-            });
+            let problemsSolved = 0;
+            let easySolved = 0;
+            let mediumSolved = 0;
+            let hardSolved = 0;
 
-            const mediumSolved = await this.prisma.userProblem.count({
-                where: {
-                    userId,
-                    isSolved: true,
-                    problem: {
-                        difficulty: "MEDIUM",
-                    },
-                },
-            });
+            problemDifficultyStats.forEach((stat) => {
+                const count = Number(stat.count);
+                problemsSolved += count;
 
-            const hardSolved = await this.prisma.userProblem.count({
-                where: {
-                    userId,
-                    isSolved: true,
-                    problem: {
-                        difficulty: "HARD",
-                    },
-                },
+                if (stat.difficulty === "EASY") easySolved = count;
+                else if (stat.difficulty === "MEDIUM") mediumSolved = count;
+                else if (stat.difficulty === "HARD") hardSolved = count;
             });
 
             const stats: UserStats = {
@@ -519,6 +504,9 @@ export class UserRepository extends BaseRepository<User, string> {
             const users = await this.prisma.user.findMany({
                 skip,
                 take: limit,
+                where: {
+                    totalSubmissions: { gt: 0 }, // Only show users who have submitted
+                },
                 select: {
                     id: true,
                     clerkId: true,
@@ -535,44 +523,12 @@ export class UserRepository extends BaseRepository<User, string> {
                     totalSubmissions: true,
                     acceptedSubmissions: true,
                 },
-            });
-
-            users.sort((a, b) => {
-                const problemsSolvedA = Number(a.problemsSolved) || 0;
-                const problemsSolvedB = Number(b.problemsSolved) || 0;
-                const battlesWonA = Number(a.battlesWon) || 0;
-                const battlesWonB = Number(b.battlesWon) || 0;
-                const totalSubmissionsA = Number(a.totalSubmissions) || 0;
-                const totalSubmissionsB = Number(b.totalSubmissions) || 0;
-                const acceptedSubmissionsA = Number(a.acceptedSubmissions) || 0;
-                const acceptedSubmissionsB = Number(b.acceptedSubmissions) || 0;
-
-                const acceptanceRateA =
-                    totalSubmissionsA > 0
-                        ? (acceptedSubmissionsA / totalSubmissionsA) * 100
-                        : 0;
-                const acceptanceRateB =
-                    totalSubmissionsB > 0
-                        ? (acceptedSubmissionsB / totalSubmissionsB) * 100
-                        : 0;
-
-                // Primary sort: Problems solved
-                if (problemsSolvedB !== problemsSolvedA) {
-                    return problemsSolvedB - problemsSolvedA;
-                }
-
-                // Secondary sort: Battles won
-                if (battlesWonB !== battlesWonA) {
-                    return battlesWonB - battlesWonA;
-                }
-
-                // Tertiary sort: Acceptance rate
-                if (Math.abs(acceptanceRateB - acceptanceRateA) > 0.01) {
-                    return acceptanceRateB - acceptanceRateA;
-                }
-
-                // Quaternary sort: Fewer submissions (efficiency)
-                return totalSubmissionsA - totalSubmissionsB;
+                orderBy: [
+                    { problemsSolved: "desc" }, // Primary
+                    { battlesWon: "desc" }, // Secondary
+                    { acceptedSubmissions: "desc" }, // Tertiary
+                    { totalSubmissions: "asc" }, // Quaternary
+                ],
             });
 
             const usersWithStats = users.map((user, index) => {
@@ -598,7 +554,11 @@ export class UserRepository extends BaseRepository<User, string> {
                 };
             });
 
-            const totalCount = await this.prisma.user.count();
+            const totalCount = await this.prisma.user.count({
+                where: {
+                    totalSubmissions: { gt: 0 },
+                },
+            });
 
             return { users: usersWithStats, totalCount };
         } catch (error) {

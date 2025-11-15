@@ -13,6 +13,8 @@
         "db:migrate": "prisma migrate dev",
         "db:studio": "prisma studio",
         "db:seed": "ts-node src/scripts/seed.ts",
+        "db:seed:additional": "ts-node src/scripts/seedAdditionalProblemsSafe.ts",
+        "db:seed:leetcode": "ts-node src/scripts/seedLeetCodeProblemsSafe.ts",
         "fix:rates": "ts-node src/scripts/recalculateAcceptanceRates.ts"
     },
     "keywords": [
