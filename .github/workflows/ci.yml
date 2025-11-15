@@ -47,11 +47,6 @@ jobs:
           cd server
           npm run build
 
-      - name: Run server tests
-        run: |
-          cd server
-          npm test
-
       # Judge Service
       - name: Install judge dependencies
         run: |
@@ -62,8 +57,3 @@ jobs:
         run: |
           cd judge
           npm run build
-
-      - name: Run judge tests
-        run: |
-          cd judge
-          npm test

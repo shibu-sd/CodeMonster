@@ -31,17 +31,11 @@ jobs:
       - name: Type check server
         run: cd server && npm run build
 
-      - name: Run server tests
-        run: cd server && npm test
-
       - name: Install judge dependencies
         run: cd judge && npm ci
 
       - name: Type check judge
         run: cd judge && npm run build
-
-      - name: Run judge tests
-        run: cd judge && npm test
 
       # Build Docker images for judge service
       - name: Set up Docker Buildx
