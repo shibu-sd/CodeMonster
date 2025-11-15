@@ -1,0 +1,65 @@
+name: Production Build
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18.x"
+          cache: "npm"
+
+      # Run all CI checks first
+      - name: Install frontend dependencies
+        run: cd frontend && npm ci
+
+      - name: Lint frontend
+        run: cd frontend && npm run lint
+
+      - name: Build frontend
+        run: cd frontend && npm run build
+
+      - name: Install server dependencies
+        run: cd server && npm ci
+
+      - name: Type check server
+        run: cd server && npm run build
+
+      - name: Run server tests
+        run: cd server && npm test
+
+      - name: Install judge dependencies
+        run: cd judge && npm ci
+
+      - name: Type check judge
+        run: cd judge && npm run build
+
+      - name: Run judge tests
+        run: cd judge && npm test
+
+      # Build Docker images for judge service
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Python judge image
+        run: |
+          cd judge
+          npm run docker:build:python
+
+      - name: Build Java judge image
+        run: |
+          cd judge
+          npm run docker:build:java
+
+      - name: Build C++ judge image
+        run: |
+          cd judge
+          npm run docker:build:cpp
