@@ -95,7 +95,7 @@ Output:
             },
             {
                 input: "10\n1 2 3 4 5 6 7 8 9 10",
-                output: "37",
+                output: "55",
                 isHidden: true,
             },
             {
@@ -104,13 +104,13 @@ Output:
                 isHidden: true,
             },
             {
-                input: "7\n100 1 200 300 400 500",
-                output: "1500",
+                input: "6\n100 1 200 300 400 500",
+                output: "1501",
                 isHidden: true,
             },
             {
                 input: "4\n1 -1 1 -1",
-                output: "2",
+                output: "1",
                 isHidden: true,
             },
             {
@@ -131,6 +131,11 @@ Output:
             {
                 input: "1\n10000",
                 output: "10000",
+                isHidden: true,
+            },
+            {
+                input: "5\n-2 1 -3 4 -1",
+                output: "4",
                 isHidden: true,
             },
         ],
@@ -306,6 +311,16 @@ Output:
                 output: "1\n1 17",
                 isHidden: true,
             },
+            {
+                input: "3\n1 4\n0 4\n3 5",
+                output: "1\n0 5",
+                isHidden: true,
+            },
+            {
+                input: "2\n1 3\n2 4",
+                output: "1\n1 4",
+                isHidden: true,
+            },
         ],
         starterCode: [
             {
@@ -466,6 +481,21 @@ Output:
             {
                 input: "15\n15 14 13 12 11 10 9 8 7 6 5 4 3 2 1\n5",
                 output: "15 14 13 12 11 10 9 8 7 6 5",
+                isHidden: true,
+            },
+            {
+                input: "6\n1 -1 -3 5 3 6\n3",
+                output: "1 5 5 6",
+                isHidden: true,
+            },
+            {
+                input: "3\n1 1 1\n2",
+                output: "1 1",
+                isHidden: true,
+            },
+            {
+                input: "7\n10 9 8 7 6 5 4\n4",
+                output: "10 9 8 7",
                 isHidden: true,
             },
         ],
