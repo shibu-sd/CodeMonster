@@ -85,9 +85,10 @@ export class ProblemRepository extends BaseRepository<Problem, string> {
                     where,
                     skip: pagination.skip,
                     take: pagination.take,
-                    orderBy: {
-                        [pagination.sortBy]: pagination.sortOrder,
-                    },
+                    orderBy: [
+                        { createdAt: "asc" },
+                        { [pagination.sortBy]: pagination.sortOrder },
+                    ],
                     select: {
                         id: true,
                         title: true,
