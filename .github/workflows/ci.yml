@@ -42,6 +42,11 @@ jobs:
           cd server
           npm ci --no-audit || npm ci --no-audit || npm ci --no-audit
 
+      - name: Generate Prisma Client
+        run: |
+          cd server
+          npm run db:generate
+
       - name: Type check server
         run: |
           cd server
