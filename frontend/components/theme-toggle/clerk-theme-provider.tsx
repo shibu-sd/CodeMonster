@@ -22,9 +22,6 @@ export function ClerkThemeProvider({
 }: ClerkThemeProviderProps) {
     const { theme } = useTheme();
 
-    if (!theme) 
-        return null;
-
     const clerkTheme = theme === "dark" ? dark : shadcn;
 
     return (
