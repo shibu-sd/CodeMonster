@@ -9,18 +9,21 @@ interface ClerkThemeProviderProps {
     children: ReactNode;
     signInUrl?: string;
     signUpUrl?: string;
-    afterSignInUrl?: string;
-    afterSignUpUrl?: string;
+    signInFallbackRedirectUrl?: string;
+    signUpFallbackRedirectUrl?: string;
 }
 
 export function ClerkThemeProvider({
     children,
     signInUrl = "/auth/sign-in",
     signUpUrl = "/auth/sign-up",
-    afterSignInUrl = "/",
-    afterSignUpUrl = "/",
+    signInFallbackRedirectUrl = "/",
+    signUpFallbackRedirectUrl = "/",
 }: ClerkThemeProviderProps) {
     const { theme } = useTheme();
+
+    if (!theme) 
+        return null;
 
     const clerkTheme = theme === "dark" ? dark : shadcn;
 
@@ -28,8 +31,8 @@ export function ClerkThemeProvider({
         <ClerkProvider
             signInUrl={signInUrl}
             signUpUrl={signUpUrl}
-            afterSignInUrl={afterSignInUrl}
-            afterSignUpUrl={afterSignUpUrl}
+            signInFallbackRedirectUrl={signInFallbackRedirectUrl}
+            signUpFallbackRedirectUrl={signUpFallbackRedirectUrl}
             appearance={{
                 baseTheme: clerkTheme,
                 variables: {
