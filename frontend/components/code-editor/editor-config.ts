@@ -41,4 +41,13 @@ export const getEditorOptions = (
         verticalScrollbarSize: 8,
         horizontalScrollbarSize: 8,
     },
+    // Performance optimizations
+    quickSuggestions: false,
+    suggestOnTriggerCharacters: false,
+    acceptSuggestionOnCommitCharacter: false,
+    tabCompletion: "off" as const,
+    wordBasedSuggestions: "off" as const,
+    parameterHints: {
+        enabled: false,
+    },
 });

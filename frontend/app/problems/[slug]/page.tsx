@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { HeroHeader } from "@/components/header/header";
@@ -90,6 +90,10 @@ function ProblemDetailPageContent() {
         { id: "JAVA", name: "Java", extension: "java" },
         { id: "CPP", name: "C++", extension: "cpp" },
     ];
+
+    const handleCodeChange = useCallback((newCode: string) => {
+        setCode(newCode);
+    }, []);
 
     // Custom hooks
     const { problem, loading, error, acceptedSolution, loadAcceptedSolution } =
@@ -283,7 +287,7 @@ function ProblemDetailPageContent() {
                                     selectedLanguage={selectedLanguage}
                                     code={code}
                                     onLanguageChange={handleLanguageChange}
-                                    onCodeChange={setCode}
+                                    onCodeChange={handleCodeChange}
                                     onCodeReset={handleCodeReset}
                                     onRunCode={handleRunCode}
                                     onSubmitCode={handleSubmitCode}

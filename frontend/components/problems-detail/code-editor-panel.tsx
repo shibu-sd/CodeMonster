@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { RotateCcw, Play, Send } from "lucide-react";
 import dynamic from "next/dynamic";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 
 // Lazy load Monaco Editor
 const MonacoEditor = dynamic(
