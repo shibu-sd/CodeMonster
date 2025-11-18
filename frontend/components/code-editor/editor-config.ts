@@ -23,7 +23,7 @@ export const getEditorOptions = (
     fontFamily: "JetBrains Mono, Fira Code, Monaco, Menlo, monospace",
     minimap: { enabled: false },
     scrollBeyondLastLine: false,
-    automaticLayout: true,
+    automaticLayout: false,
     insertSpaces: true,
     wordWrap: "on" as const,
     lineNumbers: "on" as const,
@@ -40,5 +40,14 @@ export const getEditorOptions = (
         horizontal: "auto" as const,
         verticalScrollbarSize: 8,
         horizontalScrollbarSize: 8,
+    },
+    // Performance optimizations
+    quickSuggestions: false,
+    suggestOnTriggerCharacters: false,
+    acceptSuggestionOnCommitCharacter: false,
+    tabCompletion: "off" as const,
+    wordBasedSuggestions: "off" as const,
+    parameterHints: {
+        enabled: false,
     },
 });

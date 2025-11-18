@@ -2,11 +2,17 @@
 
 import { Editor } from "@monaco-editor/react";
 import { useTheme } from "next-themes";
-import React, { useState, useRef } from "react";
+import React, {
+    useState,
+    useRef,
+    useCallback,
+    useMemo,
+    useEffect,
+} from "react";
 import type { MonacoEditorProps } from "@/types";
 import { getMonacoLanguage, getEditorOptions } from "./editor-config";
 
-export function MonacoEditor({
+export const MonacoEditor = React.memo(function MonacoEditor({
     value,
     onChange,
     language,
@@ -19,7 +25,10 @@ export function MonacoEditor({
     const { theme, resolvedTheme } = useTheme();
     const [isLoading, setIsLoading] = useState(true);
     const [editorTheme, setEditorTheme] = useState("light");
-    const editorRef = useRef(null);
+    const editorRef = useRef<any>(null);
+    const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const lastEmittedValueRef = useRef<string>(value);
+    const isTypingRef = useRef<boolean>(false);
 
     React.useEffect(() => {
         const currentTheme = theme === "system" ? resolvedTheme : theme;
@@ -28,33 +37,81 @@ export function MonacoEditor({
 
     React.useEffect(() => {
         if (editorRef.current) {
-            (editorRef.current as any).updateOptions({
+            editorRef.current.updateOptions({
                 fontSize: fontSize,
             });
         }
     }, [fontSize]);
 
-    const handleEditorDidMount = (editor: any) => {
+    useEffect(() => {
+        if (editorRef.current && !isTypingRef.current) {
+            const currentEditorValue = editorRef.current.getValue();
+            if (
+                value !== currentEditorValue &&
+                value !== lastEmittedValueRef.current
+            ) {
+                editorRef.current.setValue(value);
+                lastEmittedValueRef.current = value;
+            }
+        }
+    }, [value]);
+
+    const handleEditorDidMount = useCallback((editor: any) => {
         editorRef.current = editor;
         setIsLoading(false);
-    };
+        lastEmittedValueRef.current = editor.getValue();
+        editor.layout();
+    }, []);
 
-    const handleEditorChange = (newValue: string | undefined) => {
-        if (newValue !== undefined) {
-            onChange(newValue);
-        }
-    };
+    const handleEditorChange = useCallback(
+        (newValue: string | undefined) => {
+            if (newValue === undefined) return;
+            isTypingRef.current = true;
+            if (debounceTimerRef.current) {
+                clearTimeout(debounceTimerRef.current);
+            }
+
+            debounceTimerRef.current = setTimeout(() => {
+                if (newValue !== lastEmittedValueRef.current) {
+                    lastEmittedValueRef.current = newValue;
+                    onChange(newValue);
+                }
+
+                isTypingRef.current = false;
+            }, 150);
+        },
+        [onChange]
+    );
+
+    useEffect(() => {
+        return () => {
+            if (debounceTimerRef.current) {
+                clearTimeout(debounceTimerRef.current);
+                if (editorRef.current) {
+                    const finalValue = editorRef.current.getValue();
+                    if (finalValue !== lastEmittedValueRef.current) {
+                        onChange(finalValue);
+                    }
+                }
+            }
+        };
+    }, [onChange]);
+
+    const editorOptions = useMemo(
+        () => getEditorOptions(readOnly, fontSize, tabSize),
+        [readOnly, fontSize, tabSize]
+    );
 
     return (
         <div className={`relative w-full ${className}`} style={{ height }}>
             <Editor
                 height={height}
                 language={getMonacoLanguage(language)}
-                value={value}
+                defaultValue={value}
                 onChange={handleEditorChange}
                 onMount={handleEditorDidMount}
                 theme={editorTheme}
-                options={getEditorOptions(readOnly, fontSize, tabSize)}
+                options={editorOptions}
                 loading={
                     <div className="flex items-center justify-center w-full h-full bg-muted rounded">
                         <div className="text-center">
@@ -68,4 +125,4 @@ export function MonacoEditor({
             />
         </div>
     );
-}
+});
