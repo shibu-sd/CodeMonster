@@ -23,7 +23,7 @@ export const getEditorOptions = (
     fontFamily: "JetBrains Mono, Fira Code, Monaco, Menlo, monospace",
     minimap: { enabled: false },
     scrollBeyondLastLine: false,
-    automaticLayout: false,
+    automaticLayout: true,
     insertSpaces: true,
     wordWrap: "on" as const,
     lineNumbers: "on" as const,
