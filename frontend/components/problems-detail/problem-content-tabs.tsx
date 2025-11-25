@@ -30,7 +30,6 @@ interface ProblemContentTabsProps {
         memory: number;
         solvedAt: string;
     } | null;
-    onCodeLoad: (code: string, language: string) => void;
     isBattleMode?: boolean;
 }
 
@@ -553,7 +552,6 @@ export function ProblemContentTabs({
     activeTab,
     onTabChange,
     acceptedSolution,
-    onCodeLoad,
     isBattleMode = false,
 }: ProblemContentTabsProps) {
     return (
@@ -660,19 +658,6 @@ export function ProblemContentTabs({
                                             <code>{acceptedSolution.code}</code>
                                         </pre>
                                     </div>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        className="mt-4"
-                                        onClick={() => {
-                                            onCodeLoad(
-                                                acceptedSolution.code,
-                                                acceptedSolution.language
-                                            );
-                                        }}
-                                    >
-                                        Load in Editor
-                                    </Button>
                                 </div>
                             ) : (
                                 <div className="bg-card rounded-lg p-6 border">
