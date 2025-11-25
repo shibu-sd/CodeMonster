@@ -233,7 +233,7 @@ export function ResultsPanel({
                                                             <span className="font-medium text-muted-foreground">
                                                                 Input:
                                                             </span>
-                                                            <div className="mt-1 p-2 bg-background rounded border font-mono text-xs">
+                                                            <div className="mt-1 p-2 bg-background rounded border font-mono text-sm">
                                                                 {
                                                                     runResult
                                                                         .testCaseResults[
@@ -246,7 +246,7 @@ export function ResultsPanel({
                                                             <span className="font-medium text-muted-foreground">
                                                                 Expected Output:
                                                             </span>
-                                                            <div className="mt-1 p-2 bg-background rounded border font-mono text-xs">
+                                                            <div className="mt-1 p-2 bg-background rounded border font-mono text-sm">
                                                                 {
                                                                     runResult
                                                                         .testCaseResults[
@@ -261,7 +261,7 @@ export function ResultsPanel({
                                                                 Your Output:
                                                             </span>
                                                             <div
-                                                                className={`mt-1 p-2 rounded border font-mono text-xs ${
+                                                                className={`mt-1 p-2 rounded border font-mono text-sm ${
                                                                     runResult
                                                                         .testCaseResults[
                                                                         activeTestCase
