@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { RotateCcw, Play, Send } from "lucide-react";
+import { RotateCcw, Play, Send, Code2 } from "lucide-react";
 import dynamic from "next/dynamic";
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import {
     Select,
     SelectContent,
@@ -9,6 +9,11 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { LANGUAGE_ICONS } from "@/constants";
+
+const LanguageIcon = ({ language }: { language: string }) => {
+    return LANGUAGE_ICONS[language] || <Code2 className="w-4 h-4" />;
+};
 
 // Lazy load Monaco Editor
 const MonacoEditor = dynamic(
@@ -91,13 +96,27 @@ export function CodeEditorPanel({
                             onValueChange={onLanguageChange}
                             disabled={isSubmitting}
                         >
-                            <SelectTrigger size="sm" className="w-[120px]">
-                                <SelectValue />
+                            <SelectTrigger size="sm" className="w-[140px]">
+                                <SelectValue>
+                                    <div className="flex items-center gap-2">
+                                        <LanguageIcon
+                                            language={selectedLanguage}
+                                        />
+                                        <span>
+                                            {availableLanguages.find(
+                                                (l) => l.id === selectedLanguage
+                                            )?.name || selectedLanguage}
+                                        </span>
+                                    </div>
+                                </SelectValue>
                             </SelectTrigger>
                             <SelectContent>
                                 {availableLanguages.map((lang) => (
                                     <SelectItem key={lang.id} value={lang.id}>
-                                        {lang.name}
+                                        <div className="flex items-center gap-2">
+                                            <LanguageIcon language={lang.id} />
+                                            <span>{lang.name}</span>
+                                        </div>
                                     </SelectItem>
                                 ))}
                             </SelectContent>
