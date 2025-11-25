@@ -2,6 +2,13 @@ import { Button } from "@/components/ui/button";
 import { RotateCcw, Play, Send } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useState, useCallback } from "react";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 
 // Lazy load Monaco Editor
 const MonacoEditor = dynamic(
@@ -79,38 +86,49 @@ export function CodeEditorPanel({
                 <div className="flex items-center gap-10">
                     <div className="flex items-center space-x-2">
                         <label className="text-sm font-medium">Language:</label>
-                        <select
+                        <Select
                             value={selectedLanguage}
-                            onChange={(e) => onLanguageChange(e.target.value)}
-                            className="px-3 py-1 border border-border rounded-md bg-background text-sm"
+                            onValueChange={onLanguageChange}
                             disabled={isSubmitting}
                         >
-                            {availableLanguages.map((lang) => (
-                                <option key={lang.id} value={lang.id}>
-                                    {lang.name}
-                                </option>
-                            ))}
-                        </select>
+                            <SelectTrigger size="sm" className="w-[120px]">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {availableLanguages.map((lang) => (
+                                    <SelectItem key={lang.id} value={lang.id}>
+                                        {lang.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
 
                     <div className="flex items-center space-x-2">
                         <label className="text-sm font-medium">
                             Font Size:
                         </label>
-                        <select
-                            value={fontSize}
-                            onChange={(e) =>
-                                setFontSize(Number(e.target.value))
+                        <Select
+                            value={fontSize.toString()}
+                            onValueChange={(value) =>
+                                setFontSize(Number(value))
                             }
-                            className="px-3 py-1 border border-border rounded-md bg-background text-sm"
                             disabled={isSubmitting}
                         >
-                            {fontSizes.map((size) => (
-                                <option key={size} value={size}>
-                                    {size}px
-                                </option>
-                            ))}
-                        </select>
+                            <SelectTrigger size="sm" className="w-[90px]">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {fontSizes.map((size) => (
+                                    <SelectItem
+                                        key={size}
+                                        value={size.toString()}
+                                    >
+                                        {size}px
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
                 </div>
 
