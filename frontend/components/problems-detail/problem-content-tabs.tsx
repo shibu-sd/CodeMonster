@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { Problem } from "@/lib/api";
 import { marked } from "marked";
+import { CodeBlock } from "@/components/ui/code-block";
 
 marked.setOptions({
     breaks: true,
@@ -643,7 +644,7 @@ export function ProblemContentTabs({
                                             </span>
                                         </div>
                                     </div>
-                                    <div className="mb-3 text-sm text-muted-foreground">
+                                    <div className="mb-4 text-sm text-muted-foreground">
                                         Solved on{" "}
                                         {new Date(
                                             acceptedSolution.solvedAt
@@ -653,11 +654,22 @@ export function ProblemContentTabs({
                                             day: "numeric",
                                         })}
                                     </div>
-                                    <div className="bg-muted/50 rounded-lg p-4 overflow-x-auto">
-                                        <pre className="text-sm">
-                                            <code>{acceptedSolution.code}</code>
-                                        </pre>
-                                    </div>
+                                    <CodeBlock
+                                        language={acceptedSolution.language.toLowerCase()}
+                                        filename={`solution.${
+                                            acceptedSolution.language ===
+                                            "PYTHON"
+                                                ? "py"
+                                                : acceptedSolution.language ===
+                                                  "JAVA"
+                                                ? "java"
+                                                : acceptedSolution.language ===
+                                                  "CPP"
+                                                ? "cpp"
+                                                : "txt"
+                                        }`}
+                                        code={acceptedSolution.code}
+                                    />
                                 </div>
                             ) : (
                                 <div className="bg-card rounded-lg p-6 border">
