@@ -260,11 +260,6 @@ function ProblemDetailPageContent() {
                             activeTab={activeTab}
                             onTabChange={setActiveTab}
                             acceptedSolution={acceptedSolution}
-                            onCodeLoad={(code, language) => {
-                                setCode(code);
-                                setSelectedLanguage(language);
-                                setActiveTab("description");
-                            }}
                             isBattleMode={
                                 !!battleState.currentBattle &&
                                 battleState.currentBattle.status === "active"
