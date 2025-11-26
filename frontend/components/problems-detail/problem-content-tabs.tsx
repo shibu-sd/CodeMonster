@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { Problem } from "@/lib/api";
 import { marked } from "marked";
+import { CodeBlock } from "@/components/ui/code-block";
 
 marked.setOptions({
     breaks: true,
@@ -30,7 +31,6 @@ interface ProblemContentTabsProps {
         memory: number;
         solvedAt: string;
     } | null;
-    onCodeLoad: (code: string, language: string) => void;
     isBattleMode?: boolean;
 }
 
@@ -553,7 +553,6 @@ export function ProblemContentTabs({
     activeTab,
     onTabChange,
     acceptedSolution,
-    onCodeLoad,
     isBattleMode = false,
 }: ProblemContentTabsProps) {
     return (
@@ -645,7 +644,7 @@ export function ProblemContentTabs({
                                             </span>
                                         </div>
                                     </div>
-                                    <div className="mb-3 text-sm text-muted-foreground">
+                                    <div className="mb-4 text-sm text-muted-foreground">
                                         Solved on{" "}
                                         {new Date(
                                             acceptedSolution.solvedAt
@@ -655,24 +654,22 @@ export function ProblemContentTabs({
                                             day: "numeric",
                                         })}
                                     </div>
-                                    <div className="bg-muted/50 rounded-lg p-4 overflow-x-auto">
-                                        <pre className="text-sm">
-                                            <code>{acceptedSolution.code}</code>
-                                        </pre>
-                                    </div>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        className="mt-4"
-                                        onClick={() => {
-                                            onCodeLoad(
-                                                acceptedSolution.code,
-                                                acceptedSolution.language
-                                            );
-                                        }}
-                                    >
-                                        Load in Editor
-                                    </Button>
+                                    <CodeBlock
+                                        language={acceptedSolution.language.toLowerCase()}
+                                        filename={`solution.${
+                                            acceptedSolution.language ===
+                                            "PYTHON"
+                                                ? "py"
+                                                : acceptedSolution.language ===
+                                                  "JAVA"
+                                                ? "java"
+                                                : acceptedSolution.language ===
+                                                  "CPP"
+                                                ? "cpp"
+                                                : "txt"
+                                        }`}
+                                        code={acceptedSolution.code}
+                                    />
                                 </div>
                             ) : (
                                 <div className="bg-card rounded-lg p-6 border">
